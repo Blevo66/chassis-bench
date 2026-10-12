@@ -136,6 +136,21 @@ details summary { cursor: pointer; font-family: var(--display); font-weight: 600
 td small.cmpv { display: block; color: var(--muted); font-size: 11px; }
 .link-grid { display: grid; gap: 8px; margin-top: 8px; }
 details > summary.note { cursor: pointer; font-family: var(--body); font-size: 13px; text-transform: none; letter-spacing: 0; }
+
+
+/* Side view stays pinned while scrolling */
+.view-card { position: sticky; top: 0; z-index: 5; box-shadow: 0 6px 14px -10px rgba(0,0,0,.35); }
+.view-card .drawing { max-height: 46vh; }
+@media (max-width: 900px) {
+  .main { display: flex; flex-direction: column; }
+  .board { display: contents; }
+  .main > *, .board > * { min-width: 0; max-width: 100%; }
+  .view-card { order: -1; padding: 8px 10px; }
+  .view-card .drawing { max-height: 30vh; }
+  .view-card .card-head h2 { display: none; }
+  .view-card .states button { padding: 4px 8px; font-size: 12px; }
+  .view-card .slider-tools { font-size: 12px; gap: 2px 12px; }
+}
 body { padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
 </style>
 
@@ -223,7 +238,7 @@ body { padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-are
     <div class="board">
       <div class="warnings" id="warnings" aria-live="polite"></div>
 
-      <div class="card">
+      <div class="card view-card">
         <div class="card-head">
           <h2>Side view</h2>
           <div class="states" role="group" aria-label="Load state">
