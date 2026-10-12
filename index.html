@@ -492,6 +492,159 @@ fieldset.collapsed > :not(legend) { display: none !important; }
 .card.collapsed .card-head > :not(h2) { display: none !important; }
 .sliders input[type=range] { touch-action: none; height: 28px; }
 @media (max-width: 560px) { .sliders { grid-template-columns: auto minmax(0, 1fr) auto; } }
+
+/* Side view options tucked into a fold */
+.view-opts { margin-top: 6px; }
+.view-opts > summary { cursor: pointer; font-size: 12px; color: var(--muted); padding: 4px 0; }
+.view-opts .slider-tools { margin-top: 4px; }
+/* Measuring mode */
+.measure { position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,.35); display: flex; justify-content: center; align-items: stretch; }
+.measure[hidden], .msketch[hidden] { display: none !important; }
+body.measuring { overflow: hidden; }
+.mpanel { background: var(--bg); width: 100%; max-width: 640px; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: calc(14px + env(safe-area-inset-top)) 16px calc(16px + env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 12px; }
+.mpanel > * { flex-shrink: 0; }
+.mtop { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.mtop h2 { margin: 2px 0 0; font-family: var(--display); font-size: 26px; text-transform: uppercase; letter-spacing: .03em; }
+.mprog { height: 4px; background: var(--grid); border-radius: 2px; overflow: hidden; }
+.mprog i { display: block; height: 100%; background: var(--accent); transition: width .2s; }
+.msketch { width: 100%; height: auto; aspect-ratio: 1720 / 870; flex-shrink: 0; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; }
+.mtext { margin: 0; line-height: 1.5; }
+.mfield { display: flex; flex-direction: column; gap: 6px; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 10px 12px; margin-bottom: 8px; }
+.mlabel { font-weight: 600; }
+.mfield input[type=number] { font-size: 20px; padding: 8px 10px; width: 100%; font-family: var(--mono); }
+.mpair { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; gap: 8px; align-items: center; }
+.maxis { font-family: var(--mono); color: var(--muted); }
+.mseg { display: inline-flex; border: 1px solid var(--line); border-radius: 5px; overflow: hidden; flex-wrap: wrap; }
+.mseg button { border: 0; border-radius: 0; padding: 9px 11px; font-size: 13px; }
+.mseg button + button { border-left: 1px solid var(--line); }
+.mseg button[aria-pressed=true] { background: var(--ink); color: var(--bg); }
+.mreview { width: 100%; border-collapse: collapse; font-size: 14px; font-family: var(--body); }
+.mreview td { padding: 7px 4px; border-bottom: 1px solid var(--line); }
+.mreview td:last-child { text-align: right; font-family: var(--mono); white-space: nowrap; }
+.mnav { display: flex; gap: 8px; align-items: center; margin-top: auto; padding-top: 8px; position: sticky; bottom: 0; background: var(--bg); }
+.mnav .primary { margin-left: auto; padding: 10px 18px; font-size: 16px; }
+.mnav #mBack { padding: 10px 14px; font-size: 16px; }
+.mhead { margin: 10px 0 2px; font-family: var(--display); font-size: 15px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+.mgroup { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; width: 100%; text-align: left; padding: 14px 16px; margin-bottom: 10px; border-radius: 8px; background: var(--panel); }
+.mgroup b { font-family: var(--display); font-size: 21px; text-transform: uppercase; letter-spacing: .03em; }
+.mgroup span { color: var(--muted); font-size: 14px; }
+.mgroup i { font-style: normal; font-family: var(--mono); font-size: 12px; color: var(--accent); }
+.mgroup.review { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.mgroup.review span { color: var(--bg); opacity: .75; }
+.mnav [hidden] { display: none !important; }
+button.link { border: 0; background: none; color: var(--muted); text-decoration: underline; padding: 6px; font-size: 13px; }
+/* Folding sections */
+.fold-h { cursor: pointer; user-select: none; -webkit-user-select: none; }
+.fold-h::after { content: ""; display: inline-block; width: 7px; height: 7px; margin-left: 9px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: translateY(-3px) rotate(45deg); transition: transform .15s; opacity: .6; }
+.collapsed > .fold-h::after, .collapsed .card-head > .fold-h::after { transform: translateY(0) rotate(-45deg); }
+.fold-h:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+fieldset.collapsed > :not(legend) { display: none !important; }
+.card.collapsed > :not(h2):not(.card-head) { display: none !important; }
+.card.collapsed .card-head > :not(h2) { display: none !important; }
+.sliders input[type=range] { touch-action: none; height: 28px; }
+@media (max-width: 560px) { .sliders { grid-template-columns: auto minmax(0, 1fr) auto; } }
+
+/* Side view options tucked into a fold */
+.view-opts { margin-top: 6px; }
+.view-opts > summary { cursor: pointer; font-size: 12px; color: var(--muted); padding: 4px 0; }
+.view-opts .slider-tools { margin-top: 4px; }
+/* Measuring mode */
+.measure { position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,.35); display: flex; justify-content: center; align-items: stretch; }
+.measure[hidden], .msketch[hidden] { display: none !important; }
+body.measuring { overflow: hidden; }
+.mpanel { background: var(--bg); width: 100%; max-width: 640px; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: calc(14px + env(safe-area-inset-top)) 16px calc(16px + env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 12px; }
+.mpanel > * { flex-shrink: 0; }
+.mtop { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.mtop h2 { margin: 2px 0 0; font-family: var(--display); font-size: 26px; text-transform: uppercase; letter-spacing: .03em; }
+.mprog { height: 4px; background: var(--grid); border-radius: 2px; overflow: hidden; }
+.mprog i { display: block; height: 100%; background: var(--accent); transition: width .2s; }
+.msketch { width: 100%; height: auto; aspect-ratio: 1720 / 870; flex-shrink: 0; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; }
+.mtext { margin: 0; line-height: 1.5; }
+.mfield { display: flex; flex-direction: column; gap: 6px; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 10px 12px; margin-bottom: 8px; }
+.mlabel { font-weight: 600; }
+.mfield input[type=number] { font-size: 20px; padding: 8px 10px; width: 100%; font-family: var(--mono); }
+.mpair { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; gap: 8px; align-items: center; }
+.maxis { font-family: var(--mono); color: var(--muted); }
+.mseg { display: inline-flex; border: 1px solid var(--line); border-radius: 5px; overflow: hidden; flex-wrap: wrap; }
+.mseg button { border: 0; border-radius: 0; padding: 9px 11px; font-size: 13px; }
+.mseg button + button { border-left: 1px solid var(--line); }
+.mseg button[aria-pressed=true] { background: var(--ink); color: var(--bg); }
+.mreview { width: 100%; border-collapse: collapse; font-size: 14px; font-family: var(--body); }
+.mreview td { padding: 7px 4px; border-bottom: 1px solid var(--line); }
+.mreview td:last-child { text-align: right; font-family: var(--mono); white-space: nowrap; }
+.mnav { display: flex; gap: 8px; align-items: center; margin-top: auto; padding-top: 8px; position: sticky; bottom: 0; background: var(--bg); }
+.mnav .primary { margin-left: auto; padding: 10px 18px; font-size: 16px; }
+.mnav #mBack { padding: 10px 14px; font-size: 16px; }
+.mhead { margin: 10px 0 2px; font-family: var(--display); font-size: 15px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+.mgroup { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; width: 100%; text-align: left; padding: 14px 16px; margin-bottom: 10px; border-radius: 8px; background: var(--panel); }
+.mgroup b { font-family: var(--display); font-size: 21px; text-transform: uppercase; letter-spacing: .03em; }
+.mgroup span { color: var(--muted); font-size: 14px; }
+.mgroup i { font-style: normal; font-family: var(--mono); font-size: 12px; color: var(--accent); }
+.mgroup.review { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.mgroup.review span { color: var(--bg); opacity: .75; }
+.mnav [hidden] { display: none !important; }
+button.link { border: 0; background: none; color: var(--muted); text-decoration: underline; padding: 6px; font-size: 13px; }
+/* Folding sections */
+.fold-h { cursor: pointer; user-select: none; -webkit-user-select: none; }
+.fold-h::after { content: ""; display: inline-block; width: 7px; height: 7px; margin-left: 9px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: translateY(-3px) rotate(45deg); transition: transform .15s; opacity: .6; }
+.collapsed > .fold-h::after, .collapsed .card-head > .fold-h::after { transform: translateY(0) rotate(-45deg); }
+.fold-h:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+fieldset.collapsed > :not(legend) { display: none !important; }
+.card.collapsed > :not(h2):not(.card-head) { display: none !important; }
+.card.collapsed .card-head > :not(h2) { display: none !important; }
+.sliders input[type=range] { touch-action: none; height: 28px; }
+@media (max-width: 560px) { .sliders { grid-template-columns: auto minmax(0, 1fr) auto; } }
+
+/* Side view options tucked into a fold */
+.view-opts { margin-top: 6px; }
+.view-opts > summary { cursor: pointer; font-size: 12px; color: var(--muted); padding: 4px 0; }
+.view-opts .slider-tools { margin-top: 4px; }
+/* Measuring mode */
+.measure { position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,.35); display: flex; justify-content: center; align-items: stretch; }
+.measure[hidden], .msketch[hidden] { display: none !important; }
+body.measuring { overflow: hidden; }
+.mpanel { background: var(--bg); width: 100%; max-width: 640px; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: calc(14px + env(safe-area-inset-top)) 16px calc(16px + env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 12px; }
+.mpanel > * { flex-shrink: 0; }
+.mtop { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.mtop h2 { margin: 2px 0 0; font-family: var(--display); font-size: 26px; text-transform: uppercase; letter-spacing: .03em; }
+.mprog { height: 4px; background: var(--grid); border-radius: 2px; overflow: hidden; }
+.mprog i { display: block; height: 100%; background: var(--accent); transition: width .2s; }
+.msketch { width: 100%; height: auto; aspect-ratio: 1720 / 870; flex-shrink: 0; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; }
+.mtext { margin: 0; line-height: 1.5; }
+.mfield { display: flex; flex-direction: column; gap: 6px; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 10px 12px; margin-bottom: 8px; }
+.mlabel { font-weight: 600; }
+.mfield input[type=number] { font-size: 20px; padding: 8px 10px; width: 100%; font-family: var(--mono); }
+.mpair { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; gap: 8px; align-items: center; }
+.maxis { font-family: var(--mono); color: var(--muted); }
+.mseg { display: inline-flex; border: 1px solid var(--line); border-radius: 5px; overflow: hidden; flex-wrap: wrap; }
+.mseg button { border: 0; border-radius: 0; padding: 9px 11px; font-size: 13px; }
+.mseg button + button { border-left: 1px solid var(--line); }
+.mseg button[aria-pressed=true] { background: var(--ink); color: var(--bg); }
+.mreview { width: 100%; border-collapse: collapse; font-size: 14px; font-family: var(--body); }
+.mreview td { padding: 7px 4px; border-bottom: 1px solid var(--line); }
+.mreview td:last-child { text-align: right; font-family: var(--mono); white-space: nowrap; }
+.mnav { display: flex; gap: 8px; align-items: center; margin-top: auto; padding-top: 8px; position: sticky; bottom: 0; background: var(--bg); }
+.mnav .primary { margin-left: auto; padding: 10px 18px; font-size: 16px; }
+.mnav #mBack { padding: 10px 14px; font-size: 16px; }
+.mhead { margin: 10px 0 2px; font-family: var(--display); font-size: 15px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+.mgroup { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; width: 100%; text-align: left; padding: 14px 16px; margin-bottom: 10px; border-radius: 8px; background: var(--panel); }
+.mgroup b { font-family: var(--display); font-size: 21px; text-transform: uppercase; letter-spacing: .03em; }
+.mgroup span { color: var(--muted); font-size: 14px; }
+.mgroup i { font-style: normal; font-family: var(--mono); font-size: 12px; color: var(--accent); }
+.mgroup.review { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.mgroup.review span { color: var(--bg); opacity: .75; }
+.mnav [hidden] { display: none !important; }
+button.link { border: 0; background: none; color: var(--muted); text-decoration: underline; padding: 6px; font-size: 13px; }
+/* Folding sections */
+.fold-h { cursor: pointer; user-select: none; -webkit-user-select: none; }
+.fold-h::after { content: ""; display: inline-block; width: 7px; height: 7px; margin-left: 9px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: translateY(-3px) rotate(45deg); transition: transform .15s; opacity: .6; }
+.collapsed > .fold-h::after, .collapsed .card-head > .fold-h::after { transform: translateY(0) rotate(-45deg); }
+.fold-h:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+fieldset.collapsed > :not(legend) { display: none !important; }
+.card.collapsed > :not(h2):not(.card-head) { display: none !important; }
+.card.collapsed .card-head > :not(h2) { display: none !important; }
+.sliders input[type=range] { touch-action: none; height: 28px; }
+@media (max-width: 560px) { .sliders { grid-template-columns: auto minmax(0, 1fr) auto; } }
 /* Side view stays pinned while scrolling */
 .pinned .view-card { position: sticky; top: 0; z-index: 5; box-shadow: 0 6px 14px -10px rgba(0,0,0,.35); }
 .pinned .view-card .drawing { max-height: 46vh; }
@@ -518,7 +671,7 @@ body { padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-are
     </div>
     <div class="hdr-tools">
       <button type="button" class="primary" id="measureBtn">Measuring mode</button>
-      <span class="note">Version 12 Oct 15:12</span>
+      <span class="note">Version 12 Oct 15:23</span>
       <span class="note" id="saveNote" aria-live="polite"></span>
       <button type="button" id="exportBtn">Back up</button>
       <button type="button" id="importBtn">Restore</button>
@@ -1107,19 +1260,19 @@ const SK = {
 const XDIR = ['Behind', 'In front'], YDIR = ['Above', 'Below'];
 const MSTEPS = [
   { id: 'setup', title: 'Set up the laser', hl: 'laser',
-    text: 'Put the bike on a stand with the frame roughly level and both wheels off the ground, so the suspension hangs at full extension. Aim the laser cross at the centre of the swingarm pivot bolt. Its horizontal line is your X (towards the back) and its vertical line is your Y (up). Every point from here on is measured from those two lines.' },
+    text: 'Sit the frame on a bench or stand, roughly level. Aim the laser cross at the centre of the swingarm pivot hole (a bolt or bar through it makes this easier). The laser\'s horizontal line is your X (towards the back) and its vertical line is your Y (up). Every frame point from here on is measured from those two lines.' },
   { id: 'pivotHead', title: 'Pivot to head tube', hl: 'pivotHead', fields: [{ k: 'pivotHead', label: 'Pivot bolt centre to bottom of head tube', unit: 'mm' }],
     text: 'Tape straight from the centre of the pivot bolt to the bottom of the head tube, where it meets the bottom yoke. This one sets the scale of the whole frame, so take it twice.' },
   { id: 'rho', title: 'Steering angle', hl: 'rho', fields: [{ k: 'rho', label: 'Head tube angle from the laser\'s vertical line', unit: '°', step: 0.25 }],
-    text: 'Measure the head tube\'s lean from the laser\'s vertical line. A phone angle app held flat against the front of a fork leg works well. Stock is roughly 26 to 28°.' },
-  { id: 'arm', title: 'Swingarm', hl: 'arm', fields: [{ k: 'armAngle', label: 'Arm angle below the laser\'s horizontal line', unit: '°', step: 0.5 }, { k: 'armLen', label: 'Pivot bolt centre to rear axle centre', unit: 'mm' }],
-    text: 'With the arm hanging as it is now, measure its angle below the laser\'s horizontal line, from the pivot bolt to the axle. Then tape pivot centre to axle centre. Leave the arm where it is for the next few steps.' },
+    text: 'Measure the head tube\'s lean from the laser\'s vertical line. A phone angle app held flat against the front of the head tube works well, or against a fork leg once the forks are in. Stock is roughly 26 to 28°.' },
+  { id: 'arm', title: 'Swingarm length', hl: 'arm', fields: [{ k: 'armLen', label: 'Pivot bolt centre to rear axle centre', unit: 'mm' }],
+    text: 'With the swingarm off the bike, tape from the centre of its pivot hole to the centre of the axle (mid-adjuster if it has chain adjusters).' },
   { id: 'shockTop', title: 'Shock top mount', hl: 'shockTop', fields: [{ k: 'shockTop', label: 'Shock top bolt centre', pair: true }],
     text: 'Find the centre of the shock\'s top bolt. Measure along the laser\'s horizontal line how far it is in front of or behind the pivot (X), then how far above or below the line it is (Y). On an XL it is usually a little in front of the pivot and well above it. Use the buttons to say which side.' },
   { id: 'frameLink', title: 'Dogbone frame mount', hl: 'frameLink', fields: [{ k: 'frameLink', label: 'Dogbone mount bolt centre, under the frame', pair: true }],
     text: 'Same again for the bolt where the dogbone meets the bottom of the frame. It is usually just behind the pivot and below the line, so pick Behind and Below.' },
-  { id: 'rockerPivot', title: 'Rocker pivot', hl: 'rockerPivot', fields: [{ k: 'rockerXY', label: 'Rocker pivot bolt centre, on top of the arm', pair: true }],
-    text: 'Same again for the bolt the rocker pivots on, on top of the swingarm. Measure it off the laser lines like the others. The bench turns it into a position along the arm using the arm angle you took earlier.' },
+  { id: 'rockerPivot', title: 'Rocker pivot on the arm', hl: 'rockerPivot', fields: [{ k: 'rockerAlong', label: 'Along the arm, from the pivot', unit: 'mm' }, { k: 'rockerAbove', label: 'Above the pivot-to-axle line', unit: 'mm' }],
+    text: 'Measure this on the swingarm itself, not the frame. Stretch a string from the centre of the arm\'s pivot hole to the axle centre. Measure along the string from the pivot to where a square from the rocker bolt meets it, then up from the string to the rocker bolt centre.' },
   { id: 'rocker', title: 'The rocker itself', hl: 'rocker', fields: [{ k: 'rD', label: 'Rocker pivot to dogbone eye', unit: 'mm', step: 0.5 }, { k: 'rS', label: 'Rocker pivot to shock eye', unit: 'mm', step: 0.5 }, { k: 'eyes', label: 'Dogbone eye to shock eye', unit: 'mm', step: 0.5 }],
     text: 'Measure the rocker\'s three bolt centres against each other: pivot to dogbone eye, pivot to shock eye, and the two eyes to each other. Easiest with it off the bike and a vernier.' },
   { id: 'dog', title: 'Dogbone', hl: 'dog', fields: [{ k: 'dog', label: 'Dogbone eye centre to eye centre', unit: 'mm', step: 0.5 }],
@@ -1127,7 +1280,7 @@ const MSTEPS = [
   { id: 'shock', title: 'Shock', hl: 'shock', fields: [{ k: 'eye', label: 'Shock eye to eye, fully extended', unit: 'mm' }, { k: 'stroke', label: 'Shock stroke', unit: 'mm' }],
     text: 'Eye centre to eye centre with the shock fully extended. Stroke is the shaft showing between the body and the bottom eye, minus the bump stop. Skip either if the shock is not to hand yet.' },
   { id: 'low', title: 'Low points', hl: 'low', fields: [{ k: 'engLow', label: 'Lowest point under the engine', pair: true }, { k: 'peg', label: 'Footpeg, middle of the top face', pair: true }],
-    text: 'These set the ground clearance. Find the lowest point under the engine or sump guard, and the middle of the footpeg\'s top. Both are usually in front of and below the pivot.' },
+    text: 'These set the ground clearance. If the engine isn\'t in yet, skip it and just do the footpeg (the middle of the peg bracket\'s pivot is fine). Both are usually in front of and below the pivot.' },
   { id: 'forks', title: 'Forks', hl: 'forks', fields: [{ k: 'forkLen', label: 'Axle centre to top of fork tube, fully extended', unit: 'mm' }, { k: 'stack', label: 'Top of tube to underside of bottom yoke, tubes flush', unit: 'mm' }, { k: 'slide', label: 'How far the tubes stick up above the top yoke', unit: 'mm' }],
     choice: { k: 'forkTab', label: 'These forks are', opts: [['build', 'The CR forks (Build tab)'], ['stock', 'The stock XL forks (Stock tab)']] },
     text: 'Fork leg off the floor, fully extended. Measure axle centre to the very top of the tube. Then, with the tops flush in the yokes, from the top of the tube to the underside of the bottom yoke.' },
@@ -1136,11 +1289,11 @@ const MSTEPS = [
 ];
 // Groups Joel can run on their own; the laser setup heads each group that measures off the laser lines
 const MGROUPS = [
-  { id: 'frame', title: 'Frame', sub: 'Head tube, steering angle, shock and dogbone mounts, low points', ids: ['setup', 'pivotHead', 'rho', 'shockTop', 'frameLink', 'low'] },
-  { id: 'arm', title: 'Swingarm', sub: 'Arm angle and length, rocker pivot on the arm', ids: ['setup', 'arm', 'rockerPivot'] },
+  { id: 'frame', now: true, title: 'Frame', sub: 'Head tube, steering angle, shock and dogbone mounts, footpeg', ids: ['setup', 'pivotHead', 'rho', 'shockTop', 'frameLink', 'low'] },
+  { id: 'forks', now: true, title: 'Forks and yokes', sub: 'Length, stack and how far they sit up in the yokes', ids: ['forks'] },
+  { id: 'arm', title: 'Swingarm', sub: 'Pivot to axle, and the rocker pivot measured on the arm', ids: ['arm', 'rockerPivot'] },
   { id: 'shock', title: 'Shock', sub: 'Eye to eye and stroke', ids: ['shock'] },
-  { id: 'dog', title: 'Dogbone and rocker', sub: 'Dogbone length and the rocker\'s three bolt centres', ids: ['dog', 'rocker'] },
-  { id: 'forks', title: 'Forks', sub: 'Length, stack and how far they sit up in the yokes', ids: ['forks'] }
+  { id: 'dog', title: 'Dogbone and rocker', sub: 'Dogbone length and the rocker\'s three bolt centres', ids: ['dog', 'rocker'] }
 ];
 const mStepById = id => MSTEPS.find(s => s.id === id);
 const groupSteps = g => g.ids.map(mStepById).concat(mStepById('review'));
@@ -1188,12 +1341,12 @@ function measSketch(svg, hl) {
     ln(SK.H, [-516 + 120, 365 + 230], hot); ln(SK.H, [SK.H[0], SK.H[1] + 260], dash);
     el('path', { d: `M${SK.H[0]} ${-(SK.H[1] + 180)} A180 180 0 0 1 ${SK.H[0] + 180 * Math.sin(27.5 * D2)} ${-(SK.H[1] + 180 * Math.cos(27.5 * D2))}`, fill: 'none', stroke: C('--accent'), 'stroke-width': 5 }, svg);
     label([SK.H[0] + 40, SK.H[1] + 200], 'angle', 20, -10); }
-  if (hl === 'arm') { ln(SK.P, SK.A, hot); dot(SK.A, 14, { fill: C('--accent') });
-    el('path', { d: `M220 0 A220 220 0 0 1 ${220 * Math.cos(11 * D2)} ${220 * Math.sin(11 * D2)}`, fill: 'none', stroke: C('--accent'), 'stroke-width': 5 }, svg);
-    label([240, -10], 'angle', 10, 40); label([400, -80], 'length', 0, 56, 'middle'); }
+  if (hl === 'arm') { ln(SK.P, SK.A, hot); dot(SK.A, 14, { fill: C('--accent') }); label([280, -55], 'pivot to axle', 0, 56, 'middle'); }
   if (hl === 'shockTop') legs(SK.S0, 'shock top');
   if (hl === 'frameLink') legs(SK.DM, 'dogbone mount');
-  if (hl === 'rockerPivot') legs(SK.R, 'rocker pivot');
+  if (hl === 'rockerPivot') { const L = Math.hypot(SK.A[0], SK.A[1]), u = [SK.A[0] / L, SK.A[1] / L], al = SK.R[0] * u[0] + SK.R[1] * u[1], F = [u[0] * al, u[1] * al];
+    ln(SK.P, SK.A, dash); ln(SK.P, F, hot); ln(F, SK.R, hot); dot(SK.R, 14, { fill: C('--accent') });
+    label([F[0] / 2, F[1] / 2], 'along', 0, 44, 'middle'); label(SK.R, 'above', 18, 30); label(SK.A, 'string to axle', -10, -20, 'end'); }
   if (hl === 'rocker') { ln(SK.R, SK.D, hot); ln(SK.R, SK.S, hot); ln(SK.D, SK.S, dash); [SK.R, SK.D, SK.S].forEach(q => dot(q, 13, { fill: C('--accent') }));
     label(SK.R, 'pivot', 16, 8); label(SK.D, 'dogbone eye', -18, 10, 'end'); label(SK.S, 'shock eye', 16, -10); }
   if (hl === 'dog') { ln(SK.D, SK.DM, hot); [SK.D, SK.DM].forEach(q => dot(q, 13, { fill: C('--accent') })); label([87, -76], 'eye to eye', 0, -26, 'middle'); }
@@ -1222,9 +1375,9 @@ function measResults() {
     return [(x ?? 0) * (meas.v[k + 'Xd'] == 1 ? -1 : 1), (y ?? 0) * (meas.v[k + 'Yd'] == 1 ? -1 : 1)]; };
   const r = { pivotHead: mv('pivotHead'), rho: mv('rho'), armAngle: mv('armAngle'), armLen: mv('armLen'), shockTop: pair('shockTop'), frameLink: pair('frameLink'),
     engLow: pair('engLow'), peg: pair('peg'), rD: mv('rD'), rS: mv('rS'), dog: mv('dog'), eye: mv('eye'), stroke: mv('stroke'), forkLen: mv('forkLen'), stack: mv('stack'), slideUp: mv('slide') };
-  // Rocker pivot: laser X/Y turned into along-the-arm and square-above-the-arm at the measured arm angle
-  const rp = pair('rockerXY');
-  if (rp) { const a = (r.armAngle ?? tabs.stock.armAngle) * D2; r.rockerArm = [Math.round(rp[0] * Math.cos(a) - rp[1] * Math.sin(a)), Math.round(rp[0] * Math.sin(a) + rp[1] * Math.cos(a))]; }
+  // Rocker pivot is measured on the swingarm itself: along the pivot-to-axle line, then square above it (the bench's own arm coordinates)
+  const ra = mv('rockerAlong'), rb = mv('rockerAbove');
+  if (ra !== null || rb !== null) r.rockerArm = [ra ?? tabs.stock.rockerArm[0], rb ?? tabs.stock.rockerArm[1]];
   // Rocker included angle from its three sides, keeping the bench's sign convention
   const eyes = mv('eyes');
   if (r.rD && r.rS && eyes) { const c = (r.rD ** 2 + r.rS ** 2 - eyes ** 2) / (2 * r.rD * r.rS); if (Math.abs(c) <= 1) r.incl = Math.round(Math.acos(c) / D2) * Math.sign(tabs.stock.incl || -1); }
@@ -1234,8 +1387,10 @@ function measMenu() {
   $('mStep').textContent = 'Measuring mode'; $('mTitle').textContent = 'What are you measuring?';
   $('mBar').style.width = '0%'; $('mSketch').toggleAttribute('hidden', true);
   $('mText').textContent = 'Pick a part and it walks you through just that bit. Do them in any order, at different times if you like. Everything you enter is kept until you apply it.';
-  $('mBody').innerHTML = MGROUPS.map(g => { const keys = g.ids.flatMap(id => stepKeys(mStepById(id))), done = keys.filter(k => mv(k) !== null).length;
-    return `<button type="button" class="mgroup" data-group="${g.id}"><b>${g.title}</b><span>${g.sub}</span><i>${done ? `${done} of ${keys.length} filled in` : 'Not started'}</i></button>`; }).join('')
+  const card = g => { const keys = g.ids.flatMap(id => stepKeys(mStepById(id))), done = keys.filter(k => mv(k) !== null).length;
+    return `<button type="button" class="mgroup" data-group="${g.id}"><b>${g.title}</b><span>${g.sub}</span><i>${done ? `${done} of ${keys.length} filled in` : 'Not started'}</i></button>`; };
+  $('mBody').innerHTML = '<h3 class="mhead">What you have now</h3>' + MGROUPS.filter(g => g.now).map(card).join('')
+    + '<h3 class="mhead">When you have the parts</h3><p class="note">Until then the bench uses its estimates for these.</p>' + MGROUPS.filter(g => !g.now).map(card).join('')
     + `<button type="button" class="mgroup review" data-group="review"><b>Check and apply</b><span>See everything you've entered and put it into the bench</span></button>`;
   $('mBody').querySelectorAll('[data-group]').forEach(b => b.addEventListener('click', () => { meas.group = b.dataset.group; meas.step = 0; measSave(); measRender(); }));
   $('mBack').hidden = true; $('mNext').hidden = true; $('mPanel').scrollTop = 0;
