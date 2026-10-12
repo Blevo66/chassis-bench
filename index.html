@@ -142,6 +142,9 @@ details > summary.note { cursor: pointer; font-family: var(--body); font-size: 1
 
 
 
+
+.sliders input[type=range] { touch-action: none; height: 28px; }
+@media (max-width: 560px) { .sliders { grid-template-columns: auto minmax(0, 1fr) auto; } }
 /* Side view stays pinned while scrolling */
 .pinned .view-card { position: sticky; top: 0; z-index: 5; box-shadow: 0 6px 14px -10px rgba(0,0,0,.35); }
 .pinned .view-card .drawing { max-height: 46vh; }
@@ -167,7 +170,7 @@ body { padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-are
       <p class="sub">The whole bike on its wheels. Set the forks, yokes, swingarm and Pro-Link, then move both ends through their travel to see head angle, trail, wheelbase, ground clearance and the rear leverage ratio.</p>
     </div>
     <div class="hdr-tools">
-      <span class="note">Version 12 Oct 14:38</span>
+      <span class="note">Version 12 Oct 14:41</span>
       <span class="note" id="saveNote" aria-live="polite"></span>
       <button type="button" id="exportBtn">Back up</button>
       <button type="button" id="importBtn">Restore</button>
@@ -695,6 +698,13 @@ function slide(which) {
 }
 $('fPos').addEventListener('input', () => slide('f'));
 $('rPos').addEventListener('input', () => slide('r'));
+// Drive the sliders from the finger directly: iOS hands a drag on a range inside a pinned panel to page scrolling,
+// so the range ignores touches (touch-action: none) and we set its value from where the finger is.
+['fPos', 'rPos'].forEach(id => { const s = $(id);
+  const setFrom = e => { const r = s.getBoundingClientRect(), t = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width));
+    s.value = Math.round(t * +s.max); s.dispatchEvent(new Event('input', { bubbles: true })); };
+  s.addEventListener('pointerdown', e => { if (e.pointerType === 'mouse') return; e.preventDefault(); s.setPointerCapture(e.pointerId); setFrom(e); });
+  s.addEventListener('pointermove', e => { if (e.pointerType !== 'mouse' && s.hasPointerCapture(e.pointerId)) setFrom(e); }); });
 $('ghost').addEventListener('change', render);
 $('zoom').addEventListener('change', render);
 // Pinned side view: a per-device preference
