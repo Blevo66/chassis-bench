@@ -851,6 +851,112 @@ fieldset.collapsed > :not(legend) { display: none !important; }
 .card.collapsed .card-head > :not(h2) { display: none !important; }
 .sliders input[type=range] { touch-action: none; height: 28px; }
 @media (max-width: 560px) { .sliders { grid-template-columns: auto minmax(0, 1fr) auto; } }
+
+/* iPhone zooms the page into any text box under 16px; keep them at 16px on touch screens */
+@media (pointer: coarse), (max-width: 900px) { input[type=number], input[type=text], select, textarea { font-size: 16px; } }
+/* Side view options tucked into a fold */
+.view-opts { margin-top: 6px; }
+.view-opts > summary { cursor: pointer; font-size: 12px; color: var(--muted); padding: 4px 0; }
+.view-opts .slider-tools { margin-top: 4px; }
+/* Measuring mode */
+.measure { position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,.35); display: flex; justify-content: center; align-items: stretch; }
+.measure[hidden], .msketch[hidden] { display: none !important; }
+body.measuring { overflow: hidden; }
+.mpanel { background: var(--bg); width: 100%; max-width: 640px; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: calc(14px + env(safe-area-inset-top)) 16px calc(16px + env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 12px; }
+.mpanel > * { flex-shrink: 0; }
+.mtop { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.mtop h2 { margin: 2px 0 0; font-family: var(--display); font-size: 26px; text-transform: uppercase; letter-spacing: .03em; }
+.mprog { height: 4px; background: var(--grid); border-radius: 2px; overflow: hidden; }
+.mprog i { display: block; height: 100%; background: var(--accent); transition: width .2s; }
+.msketch { width: 100%; height: auto; aspect-ratio: 1720 / 870; flex-shrink: 0; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; }
+.mtext { margin: 0; line-height: 1.5; }
+.mfield { display: flex; flex-direction: column; gap: 6px; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 10px 12px; margin-bottom: 8px; }
+.mlabel { font-weight: 600; }
+.mfield input[type=number] { font-size: 20px; padding: 8px 10px; width: 100%; font-family: var(--mono); }
+.mpair { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; gap: 8px; align-items: center; }
+.maxis { font-family: var(--mono); color: var(--muted); }
+.mseg { display: inline-flex; border: 1px solid var(--line); border-radius: 5px; overflow: hidden; flex-wrap: wrap; }
+.mseg button { border: 0; border-radius: 0; padding: 9px 11px; font-size: 13px; }
+.mseg button + button { border-left: 1px solid var(--line); }
+.mseg button[aria-pressed=true] { background: var(--ink); color: var(--bg); }
+.mreview { width: 100%; border-collapse: collapse; font-size: 14px; font-family: var(--body); }
+.mreview td { padding: 7px 4px; border-bottom: 1px solid var(--line); }
+.mreview td:last-child { text-align: right; font-family: var(--mono); white-space: nowrap; }
+.mnav { display: flex; gap: 8px; align-items: center; margin-top: auto; padding-top: 8px; position: sticky; bottom: 0; background: var(--bg); }
+.mnav .primary { margin-left: auto; padding: 10px 18px; font-size: 16px; }
+.mnav #mBack { padding: 10px 14px; font-size: 16px; }
+.mhead { margin: 10px 0 2px; font-family: var(--display); font-size: 15px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+.mgroup { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; width: 100%; text-align: left; padding: 14px 16px; margin-bottom: 10px; border-radius: 8px; background: var(--panel); }
+.mgroup b { font-family: var(--display); font-size: 21px; text-transform: uppercase; letter-spacing: .03em; }
+.mgroup span { color: var(--muted); font-size: 14px; }
+.mgroup i { font-style: normal; font-family: var(--mono); font-size: 12px; color: var(--accent); }
+.mgroup.review { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.mgroup.review span { color: var(--bg); opacity: .75; }
+.mnav [hidden] { display: none !important; }
+button.link { border: 0; background: none; color: var(--muted); text-decoration: underline; padding: 6px; font-size: 13px; }
+/* Folding sections */
+.fold-h { cursor: pointer; user-select: none; -webkit-user-select: none; }
+.fold-h::after { content: ""; display: inline-block; width: 7px; height: 7px; margin-left: 9px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: translateY(-3px) rotate(45deg); transition: transform .15s; opacity: .6; }
+.collapsed > .fold-h::after, .collapsed .card-head > .fold-h::after { transform: translateY(0) rotate(-45deg); }
+.fold-h:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+fieldset.collapsed > :not(legend) { display: none !important; }
+.card.collapsed > :not(h2):not(.card-head) { display: none !important; }
+.card.collapsed .card-head > :not(h2) { display: none !important; }
+.sliders input[type=range] { touch-action: none; height: 28px; }
+@media (max-width: 560px) { .sliders { grid-template-columns: auto minmax(0, 1fr) auto; } }
+
+/* iPhone zooms the page into any text box under 16px; keep them at 16px on touch screens */
+@media (pointer: coarse), (max-width: 900px) { input[type=number], input[type=text], select, textarea { font-size: 16px; } }
+/* Side view options tucked into a fold */
+.view-opts { margin-top: 6px; }
+.view-opts > summary { cursor: pointer; font-size: 12px; color: var(--muted); padding: 4px 0; }
+.view-opts .slider-tools { margin-top: 4px; }
+/* Measuring mode */
+.measure { position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,.35); display: flex; justify-content: center; align-items: stretch; }
+.measure[hidden], .msketch[hidden] { display: none !important; }
+body.measuring { overflow: hidden; }
+.mpanel { background: var(--bg); width: 100%; max-width: 640px; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: calc(14px + env(safe-area-inset-top)) 16px calc(16px + env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 12px; }
+.mpanel > * { flex-shrink: 0; }
+.mtop { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.mtop h2 { margin: 2px 0 0; font-family: var(--display); font-size: 26px; text-transform: uppercase; letter-spacing: .03em; }
+.mprog { height: 4px; background: var(--grid); border-radius: 2px; overflow: hidden; }
+.mprog i { display: block; height: 100%; background: var(--accent); transition: width .2s; }
+.msketch { width: 100%; height: auto; aspect-ratio: 1720 / 870; flex-shrink: 0; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; }
+.mtext { margin: 0; line-height: 1.5; }
+.mfield { display: flex; flex-direction: column; gap: 6px; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 10px 12px; margin-bottom: 8px; }
+.mlabel { font-weight: 600; }
+.mfield input[type=number] { font-size: 20px; padding: 8px 10px; width: 100%; font-family: var(--mono); }
+.mpair { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; gap: 8px; align-items: center; }
+.maxis { font-family: var(--mono); color: var(--muted); }
+.mseg { display: inline-flex; border: 1px solid var(--line); border-radius: 5px; overflow: hidden; flex-wrap: wrap; }
+.mseg button { border: 0; border-radius: 0; padding: 9px 11px; font-size: 13px; }
+.mseg button + button { border-left: 1px solid var(--line); }
+.mseg button[aria-pressed=true] { background: var(--ink); color: var(--bg); }
+.mreview { width: 100%; border-collapse: collapse; font-size: 14px; font-family: var(--body); }
+.mreview td { padding: 7px 4px; border-bottom: 1px solid var(--line); }
+.mreview td:last-child { text-align: right; font-family: var(--mono); white-space: nowrap; }
+.mnav { display: flex; gap: 8px; align-items: center; margin-top: auto; padding-top: 8px; position: sticky; bottom: 0; background: var(--bg); }
+.mnav .primary { margin-left: auto; padding: 10px 18px; font-size: 16px; }
+.mnav #mBack { padding: 10px 14px; font-size: 16px; }
+.mhead { margin: 10px 0 2px; font-family: var(--display); font-size: 15px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+.mgroup { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; width: 100%; text-align: left; padding: 14px 16px; margin-bottom: 10px; border-radius: 8px; background: var(--panel); }
+.mgroup b { font-family: var(--display); font-size: 21px; text-transform: uppercase; letter-spacing: .03em; }
+.mgroup span { color: var(--muted); font-size: 14px; }
+.mgroup i { font-style: normal; font-family: var(--mono); font-size: 12px; color: var(--accent); }
+.mgroup.review { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.mgroup.review span { color: var(--bg); opacity: .75; }
+.mnav [hidden] { display: none !important; }
+button.link { border: 0; background: none; color: var(--muted); text-decoration: underline; padding: 6px; font-size: 13px; }
+/* Folding sections */
+.fold-h { cursor: pointer; user-select: none; -webkit-user-select: none; }
+.fold-h::after { content: ""; display: inline-block; width: 7px; height: 7px; margin-left: 9px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: translateY(-3px) rotate(45deg); transition: transform .15s; opacity: .6; }
+.collapsed > .fold-h::after, .collapsed .card-head > .fold-h::after { transform: translateY(0) rotate(-45deg); }
+.fold-h:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+fieldset.collapsed > :not(legend) { display: none !important; }
+.card.collapsed > :not(h2):not(.card-head) { display: none !important; }
+.card.collapsed .card-head > :not(h2) { display: none !important; }
+.sliders input[type=range] { touch-action: none; height: 28px; }
+@media (max-width: 560px) { .sliders { grid-template-columns: auto minmax(0, 1fr) auto; } }
 /* Side view stays pinned while scrolling */
 .pinned .view-card { position: sticky; top: 0; z-index: 5; box-shadow: 0 6px 14px -10px rgba(0,0,0,.35); }
 .pinned .view-card .drawing { max-height: 46vh; }
@@ -877,7 +983,7 @@ body { padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-are
     </div>
     <div class="hdr-tools">
       <button type="button" class="primary" id="measureBtn">Measuring mode</button>
-      <span class="note">Version 12 Oct 15:46</span>
+      <span class="note">Version 12 Oct 17:11</span>
       <span class="note" id="saveNote" aria-live="polite"></span>
       <button type="button" id="exportBtn">Back up</button>
       <button type="button" id="importBtn">Restore</button>
@@ -889,6 +995,7 @@ body { padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-are
   <div class="tabs" role="tablist" aria-label="Set-ups">
     <button type="button" role="tab" data-tab="build" aria-selected="true"><b>Build: CR forks</b><span>'86-87 CR250R forks, long arm</span></button>
     <button type="button" role="tab" data-tab="stock" aria-selected="false"><b>Stock XL125R</b><span>Reference, for comparison</span></button>
+    <button type="button" role="tab" data-tab="crf" aria-selected="false"><b>CRF style</b><span>CRF450 rocker under the arm</span></button>
   </div>
 
   <div class="banner"><b>Educated guesses.</b> The frame shape comes from your LiDAR scan, scaled and set at an angle so a stock XL comes out at 28° and 1355 mm. The scan's head tube is too lumpy to read its angle. The fork stack, offsets, springs and linkage are estimates. Put in the real numbers as you measure them.</div>
@@ -1132,15 +1239,18 @@ const DEF_TABS = {
   stock: Object.assign({ forkLen: 680, stack: 100, slide: 0, spacer: 0, travel: 215, offset: 65, rf: 346, fk: 5, fpre: 18, fUn: 35, fLad: 75,
     armLen: 530, rr: 323, eye: 337, stroke: 75, k: 95, preload: 5, wUnladen: 40, wLaden: 100 }, LINK)
 };
-const TAB_NAMES = { build: 'Build', stock: 'Stock XL' };
 const clone = o => JSON.parse(JSON.stringify(o));
+// CRF style: Joel's '02-03 CRF450R rocker (eyes 48.5 / 77 / 70 mm) hung under the arm, CR forks as Build.
+// Rocker spot on the arm, the dogbone lug and the dogbone are fitted guesses (266 mm travel, ratio 4.2 to 2.6) until measured.
+DEF_TABS.crf = Object.assign(clone(DEF_TABS.build), { rockerArm: [120, -30], frameLink: [10, -88], dog: 96, rD: 48.5, rS: 77, incl: -63, eye: 406 });
+const TAB_NAMES = { build: 'Build', stock: 'Stock XL', crf: 'CRF style' };
 const $ = id => document.getElementById(id);
 const store = { get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} } };
 
 let frame = clone(DEF_FRAME), tabs = clone(DEF_TABS), active = 'build';
 let pos = { state: 'rider', f: 0, r: 0 };
-try { const s = JSON.parse(store.get('xl-chassis-v2') || 'null'); if (s) { frame = Object.assign(frame, s.frame); ['build','stock'].forEach(k => { if (s.tabs && s.tabs[k]) tabs[k] = Object.assign(tabs[k], s.tabs[k]); }); if (s.active in tabs) active = s.active; } } catch (e) {}
-const other = () => active === 'build' ? 'stock' : 'build';
+try { const s = JSON.parse(store.get('xl-chassis-v2') || 'null'); if (s) { frame = Object.assign(frame, s.frame); Object.keys(DEF_TABS).forEach(k => { if (s.tabs && s.tabs[k]) tabs[k] = Object.assign(tabs[k], s.tabs[k]); }); if (s.active in tabs) active = s.active; } } catch (e) {}
+const other = () => active === 'stock' ? 'build' : 'stock'; // Build and CRF style compare with Stock; Stock compares with Build
 
 // ---------- Whole-bike solver ----------
 function frameGeom(fr) {
@@ -1489,7 +1599,7 @@ const MSTEPS = [
   { id: 'low', title: 'Low points', hl: 'low', fields: [{ k: 'engLow', label: 'Lowest point under the engine', pair: true }, { k: 'peg', label: 'Footpeg, middle of the top face', pair: true }],
     text: 'These set the ground clearance. If the engine isn\'t in yet, skip it and just do the footpeg (the middle of the peg bracket\'s pivot is fine). Both are usually in front of and below the pivot.' },
   { id: 'forks', title: 'Forks', hl: 'forks', fields: [{ k: 'forkLen', label: 'Axle centre to top of fork tube, fully extended', unit: 'mm' }, { k: 'stack', label: 'Top of tube to underside of bottom yoke, tubes flush', unit: 'mm' }, { k: 'slide', label: 'How far the tubes stick up above the top yoke', unit: 'mm' }],
-    choice: { k: 'forkTab', label: 'These forks are', opts: [['build', 'The CR forks (Build tab)'], ['stock', 'The stock XL forks (Stock tab)']] },
+    choice: { k: 'forkTab', label: 'These forks are', opts: [['build', 'The CR forks (Build and CRF style tabs)'], ['stock', 'The stock XL forks (Stock tab)']] },
     text: 'Fork leg off the floor, fully extended. Measure axle centre to the very top of the tube. Then, with the tops flush in the yokes, from the top of the tube to the underside of the bottom yoke.' },
   { id: 'review', title: 'Check and apply', hl: 'none',
     text: 'Here is everything you have entered so far, from every part. Anything left blank keeps its current value. Tap Apply to put them into the bench.' }
@@ -1642,11 +1752,12 @@ function measApply() {
   ['pivotHead', 'rho', 'engLow', 'peg'].forEach(k => put(frame, k, r[k]));
   (both ? ['build', 'stock'] : ['stock']).forEach(t => ['armAngle', 'shockTop', 'frameLink', 'rockerArm', 'rD', 'rS', 'incl', 'dog', 'eye', 'stroke'].forEach(k => put(tabs[t], k, r[k])));
   ['shockTop', 'frameLink'].forEach(k => ['build', 'stock'].forEach(t => put(tabs[t], k, r[k])));
+  // CRF style keeps its own rocker and dogbone lug; it shares the frame's shock top, the arm angle and (with the CR forks) the fork numbers
+  put(tabs.crf, 'shockTop', r.shockTop); put(tabs.crf, 'armAngle', r.armAngle);
   put(tabs.stock, 'armLen', r.armLen);
-  const ft = tabs[meas.v.forkTab || 'build'];
-  put(ft, 'forkLen', r.forkLen); put(ft, 'stack', r.stack);
   // Tubes showing above the top yoke is what the bench calls slide-up, once the top yoke's own height is counted in the stack
-  put(ft, 'slide', r.slideUp);
+  const ftabs = (meas.v.forkTab || 'build') === 'build' ? [tabs.build, tabs.crf] : [tabs.stock];
+  ftabs.forEach(ft => { put(ft, 'forkLen', r.forkLen); put(ft, 'stack', r.stack); put(ft, 'slide', r.slideUp); });
   toForm(); render(); measClose();
   const n = $('warnings'), note = document.createElement('div'); note.className = 'banner'; note.textContent = 'Your measurements are in. Blank ones kept their old values.';
   n.prepend(note); setTimeout(() => note.remove(), 6000);
@@ -1667,7 +1778,7 @@ const saveNote = t => { $('saveNote').textContent = t; };
 function applySaved(s) {
   if (!s) return;
   frame = Object.assign(clone(DEF_FRAME), s.frame || {});
-  ['build', 'stock'].forEach(k => { tabs[k] = Object.assign(clone(DEF_TABS[k]), (s.tabs || {})[k] || {}); });
+  Object.keys(DEF_TABS).forEach(k => { tabs[k] = Object.assign(clone(DEF_TABS[k]), (s.tabs || {})[k] || {}); });
   if (s.active in tabs) active = s.active;
 }
 function cloudSave() { saveNote('Saved on this phone · ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })); }
