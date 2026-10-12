@@ -139,15 +139,16 @@ details > summary.note { cursor: pointer; font-family: var(--body); font-size: 1
 
 
 
+
 /* Side view stays pinned while scrolling */
-.view-card { position: sticky; top: 0; z-index: 5; box-shadow: 0 6px 14px -10px rgba(0,0,0,.35); }
-.view-card .drawing { max-height: 46vh; }
+.pinned .view-card { position: sticky; top: 0; z-index: 5; box-shadow: 0 6px 14px -10px rgba(0,0,0,.35); }
+.pinned .view-card .drawing { max-height: 46vh; }
 @media (max-width: 900px) {
   .main { display: flex; flex-direction: column; }
   .board { display: contents; }
   .main > *, .board > * { min-width: 0; max-width: 100%; }
   .view-card { order: -1; padding: 8px 10px; }
-  .view-card .drawing { max-height: 30vh; }
+  .pinned .view-card .drawing { max-height: 30vh; }
   .view-card .card-head h2 { display: none; }
   .view-card .states button { padding: 4px 8px; font-size: 12px; }
   .view-card .slider-tools { font-size: 12px; gap: 2px 12px; }
@@ -259,6 +260,7 @@ body { padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-are
           <label class="check"><input type="checkbox" id="linkEnds" checked> Move both ends together</label>
           <label class="check"><input type="checkbox" id="ghost" checked> Show the other tab as an outline</label>
           <label class="check"><input type="checkbox" id="zoom"> Zoom in to the rear linkage</label>
+          <label class="check"><input type="checkbox" id="pin" checked> Keep the side view pinned while scrolling</label>
         </div>
       </div>
 
@@ -693,6 +695,10 @@ $('fPos').addEventListener('input', () => slide('f'));
 $('rPos').addEventListener('input', () => slide('r'));
 $('ghost').addEventListener('change', render);
 $('zoom').addEventListener('change', render);
+// Pinned side view: a per-device preference
+{ const setPin = on => { document.body.classList.toggle('pinned', on); $('pin').checked = on; };
+  setPin(store.get('xl-chassis-pin') !== '0');
+  $('pin').addEventListener('change', e => { setPin(e.target.checked); store.set('xl-chassis-pin', e.target.checked ? '1' : '0'); }); }
 $('resetTab').addEventListener('click', () => { tabs[active] = clone(DEF_TABS[active]); frame = clone(DEF_FRAME); toForm(); render(); });
 window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', render);
 new MutationObserver(render).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
