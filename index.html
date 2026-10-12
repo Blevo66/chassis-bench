@@ -171,6 +171,177 @@ fieldset.collapsed > :not(legend) { display: none !important; }
 .card.collapsed .card-head > :not(h2) { display: none !important; }
 .sliders input[type=range] { touch-action: none; height: 28px; }
 @media (max-width: 560px) { .sliders { grid-template-columns: auto minmax(0, 1fr) auto; } }
+
+/* Side view options tucked into a fold */
+.view-opts { margin-top: 6px; }
+.view-opts > summary { cursor: pointer; font-size: 12px; color: var(--muted); padding: 4px 0; }
+.view-opts .slider-tools { margin-top: 4px; }
+/* Measuring mode */
+.measure { position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,.35); display: flex; justify-content: center; align-items: stretch; }
+.measure[hidden] { display: none; }
+body.measuring { overflow: hidden; }
+.mpanel { background: var(--bg); width: 100%; max-width: 640px; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: calc(14px + env(safe-area-inset-top)) 16px calc(16px + env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 12px; }
+.mtop { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.mtop h2 { margin: 2px 0 0; font-family: var(--display); font-size: 26px; text-transform: uppercase; letter-spacing: .03em; }
+.mprog { height: 4px; background: var(--grid); border-radius: 2px; overflow: hidden; }
+.mprog i { display: block; height: 100%; background: var(--accent); transition: width .2s; }
+.msketch { width: 100%; height: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; }
+.mtext { margin: 0; line-height: 1.5; }
+.mfield { display: flex; flex-direction: column; gap: 6px; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 10px 12px; margin-bottom: 8px; }
+.mlabel { font-weight: 600; }
+.mfield input[type=number] { font-size: 20px; padding: 8px 10px; width: 100%; font-family: var(--mono); }
+.mpair { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; gap: 8px; align-items: center; }
+.maxis { font-family: var(--mono); color: var(--muted); }
+.mseg { display: inline-flex; border: 1px solid var(--line); border-radius: 5px; overflow: hidden; flex-wrap: wrap; }
+.mseg button { border: 0; border-radius: 0; padding: 9px 11px; font-size: 13px; }
+.mseg button + button { border-left: 1px solid var(--line); }
+.mseg button[aria-pressed=true] { background: var(--ink); color: var(--bg); }
+.mreview { width: 100%; border-collapse: collapse; font-size: 14px; }
+.mreview td { padding: 7px 4px; border-bottom: 1px solid var(--line); }
+.mreview td:last-child { text-align: right; font-family: var(--mono); white-space: nowrap; }
+.mnav { display: flex; gap: 8px; align-items: center; margin-top: auto; padding-top: 8px; position: sticky; bottom: 0; background: var(--bg); }
+.mnav .primary { margin-left: auto; padding: 10px 18px; font-size: 16px; }
+.mnav #mBack { padding: 10px 14px; font-size: 16px; }
+button.link { border: 0; background: none; color: var(--muted); text-decoration: underline; padding: 6px; font-size: 13px; }
+/* Folding sections */
+.fold-h { cursor: pointer; user-select: none; -webkit-user-select: none; }
+.fold-h::after { content: ""; display: inline-block; width: 7px; height: 7px; margin-left: 9px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: translateY(-3px) rotate(45deg); transition: transform .15s; opacity: .6; }
+.collapsed > .fold-h::after, .collapsed .card-head > .fold-h::after { transform: translateY(0) rotate(-45deg); }
+.fold-h:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+fieldset.collapsed > :not(legend) { display: none !important; }
+.card.collapsed > :not(h2):not(.card-head) { display: none !important; }
+.card.collapsed .card-head > :not(h2) { display: none !important; }
+.sliders input[type=range] { touch-action: none; height: 28px; }
+@media (max-width: 560px) { .sliders { grid-template-columns: auto minmax(0, 1fr) auto; } }
+
+/* Side view options tucked into a fold */
+.view-opts { margin-top: 6px; }
+.view-opts > summary { cursor: pointer; font-size: 12px; color: var(--muted); padding: 4px 0; }
+.view-opts .slider-tools { margin-top: 4px; }
+/* Measuring mode */
+.measure { position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,.35); display: flex; justify-content: center; align-items: stretch; }
+.measure[hidden] { display: none; }
+body.measuring { overflow: hidden; }
+.mpanel { background: var(--bg); width: 100%; max-width: 640px; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: calc(14px + env(safe-area-inset-top)) 16px calc(16px + env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 12px; }
+.mpanel > * { flex-shrink: 0; }
+.mtop { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.mtop h2 { margin: 2px 0 0; font-family: var(--display); font-size: 26px; text-transform: uppercase; letter-spacing: .03em; }
+.mprog { height: 4px; background: var(--grid); border-radius: 2px; overflow: hidden; }
+.mprog i { display: block; height: 100%; background: var(--accent); transition: width .2s; }
+.msketch { width: 100%; height: auto; aspect-ratio: 1720 / 870; flex-shrink: 0; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; }
+.mtext { margin: 0; line-height: 1.5; }
+.mfield { display: flex; flex-direction: column; gap: 6px; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 10px 12px; margin-bottom: 8px; }
+.mlabel { font-weight: 600; }
+.mfield input[type=number] { font-size: 20px; padding: 8px 10px; width: 100%; font-family: var(--mono); }
+.mpair { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; gap: 8px; align-items: center; }
+.maxis { font-family: var(--mono); color: var(--muted); }
+.mseg { display: inline-flex; border: 1px solid var(--line); border-radius: 5px; overflow: hidden; flex-wrap: wrap; }
+.mseg button { border: 0; border-radius: 0; padding: 9px 11px; font-size: 13px; }
+.mseg button + button { border-left: 1px solid var(--line); }
+.mseg button[aria-pressed=true] { background: var(--ink); color: var(--bg); }
+.mreview { width: 100%; border-collapse: collapse; font-size: 14px; }
+.mreview td { padding: 7px 4px; border-bottom: 1px solid var(--line); }
+.mreview td:last-child { text-align: right; font-family: var(--mono); white-space: nowrap; }
+.mnav { display: flex; gap: 8px; align-items: center; margin-top: auto; padding-top: 8px; position: sticky; bottom: 0; background: var(--bg); }
+.mnav .primary { margin-left: auto; padding: 10px 18px; font-size: 16px; }
+.mnav #mBack { padding: 10px 14px; font-size: 16px; }
+button.link { border: 0; background: none; color: var(--muted); text-decoration: underline; padding: 6px; font-size: 13px; }
+/* Folding sections */
+.fold-h { cursor: pointer; user-select: none; -webkit-user-select: none; }
+.fold-h::after { content: ""; display: inline-block; width: 7px; height: 7px; margin-left: 9px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: translateY(-3px) rotate(45deg); transition: transform .15s; opacity: .6; }
+.collapsed > .fold-h::after, .collapsed .card-head > .fold-h::after { transform: translateY(0) rotate(-45deg); }
+.fold-h:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+fieldset.collapsed > :not(legend) { display: none !important; }
+.card.collapsed > :not(h2):not(.card-head) { display: none !important; }
+.card.collapsed .card-head > :not(h2) { display: none !important; }
+.sliders input[type=range] { touch-action: none; height: 28px; }
+@media (max-width: 560px) { .sliders { grid-template-columns: auto minmax(0, 1fr) auto; } }
+
+/* Side view options tucked into a fold */
+.view-opts { margin-top: 6px; }
+.view-opts > summary { cursor: pointer; font-size: 12px; color: var(--muted); padding: 4px 0; }
+.view-opts .slider-tools { margin-top: 4px; }
+/* Measuring mode */
+.measure { position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,.35); display: flex; justify-content: center; align-items: stretch; }
+.measure[hidden], .msketch[hidden] { display: none !important; }
+body.measuring { overflow: hidden; }
+.mpanel { background: var(--bg); width: 100%; max-width: 640px; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: calc(14px + env(safe-area-inset-top)) 16px calc(16px + env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 12px; }
+.mpanel > * { flex-shrink: 0; }
+.mtop { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.mtop h2 { margin: 2px 0 0; font-family: var(--display); font-size: 26px; text-transform: uppercase; letter-spacing: .03em; }
+.mprog { height: 4px; background: var(--grid); border-radius: 2px; overflow: hidden; }
+.mprog i { display: block; height: 100%; background: var(--accent); transition: width .2s; }
+.msketch { width: 100%; height: auto; aspect-ratio: 1720 / 870; flex-shrink: 0; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; }
+.mtext { margin: 0; line-height: 1.5; }
+.mfield { display: flex; flex-direction: column; gap: 6px; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 10px 12px; margin-bottom: 8px; }
+.mlabel { font-weight: 600; }
+.mfield input[type=number] { font-size: 20px; padding: 8px 10px; width: 100%; font-family: var(--mono); }
+.mpair { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; gap: 8px; align-items: center; }
+.maxis { font-family: var(--mono); color: var(--muted); }
+.mseg { display: inline-flex; border: 1px solid var(--line); border-radius: 5px; overflow: hidden; flex-wrap: wrap; }
+.mseg button { border: 0; border-radius: 0; padding: 9px 11px; font-size: 13px; }
+.mseg button + button { border-left: 1px solid var(--line); }
+.mseg button[aria-pressed=true] { background: var(--ink); color: var(--bg); }
+.mreview { width: 100%; border-collapse: collapse; font-size: 14px; }
+.mreview td { padding: 7px 4px; border-bottom: 1px solid var(--line); }
+.mreview td:last-child { text-align: right; font-family: var(--mono); white-space: nowrap; }
+.mnav { display: flex; gap: 8px; align-items: center; margin-top: auto; padding-top: 8px; position: sticky; bottom: 0; background: var(--bg); }
+.mnav .primary { margin-left: auto; padding: 10px 18px; font-size: 16px; }
+.mnav #mBack { padding: 10px 14px; font-size: 16px; }
+button.link { border: 0; background: none; color: var(--muted); text-decoration: underline; padding: 6px; font-size: 13px; }
+/* Folding sections */
+.fold-h { cursor: pointer; user-select: none; -webkit-user-select: none; }
+.fold-h::after { content: ""; display: inline-block; width: 7px; height: 7px; margin-left: 9px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: translateY(-3px) rotate(45deg); transition: transform .15s; opacity: .6; }
+.collapsed > .fold-h::after, .collapsed .card-head > .fold-h::after { transform: translateY(0) rotate(-45deg); }
+.fold-h:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+fieldset.collapsed > :not(legend) { display: none !important; }
+.card.collapsed > :not(h2):not(.card-head) { display: none !important; }
+.card.collapsed .card-head > :not(h2) { display: none !important; }
+.sliders input[type=range] { touch-action: none; height: 28px; }
+@media (max-width: 560px) { .sliders { grid-template-columns: auto minmax(0, 1fr) auto; } }
+
+/* Side view options tucked into a fold */
+.view-opts { margin-top: 6px; }
+.view-opts > summary { cursor: pointer; font-size: 12px; color: var(--muted); padding: 4px 0; }
+.view-opts .slider-tools { margin-top: 4px; }
+/* Measuring mode */
+.measure { position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,.35); display: flex; justify-content: center; align-items: stretch; }
+.measure[hidden], .msketch[hidden] { display: none !important; }
+body.measuring { overflow: hidden; }
+.mpanel { background: var(--bg); width: 100%; max-width: 640px; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: calc(14px + env(safe-area-inset-top)) 16px calc(16px + env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 12px; }
+.mpanel > * { flex-shrink: 0; }
+.mtop { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.mtop h2 { margin: 2px 0 0; font-family: var(--display); font-size: 26px; text-transform: uppercase; letter-spacing: .03em; }
+.mprog { height: 4px; background: var(--grid); border-radius: 2px; overflow: hidden; }
+.mprog i { display: block; height: 100%; background: var(--accent); transition: width .2s; }
+.msketch { width: 100%; height: auto; aspect-ratio: 1720 / 870; flex-shrink: 0; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; }
+.mtext { margin: 0; line-height: 1.5; }
+.mfield { display: flex; flex-direction: column; gap: 6px; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 10px 12px; margin-bottom: 8px; }
+.mlabel { font-weight: 600; }
+.mfield input[type=number] { font-size: 20px; padding: 8px 10px; width: 100%; font-family: var(--mono); }
+.mpair { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; gap: 8px; align-items: center; }
+.maxis { font-family: var(--mono); color: var(--muted); }
+.mseg { display: inline-flex; border: 1px solid var(--line); border-radius: 5px; overflow: hidden; flex-wrap: wrap; }
+.mseg button { border: 0; border-radius: 0; padding: 9px 11px; font-size: 13px; }
+.mseg button + button { border-left: 1px solid var(--line); }
+.mseg button[aria-pressed=true] { background: var(--ink); color: var(--bg); }
+.mreview { width: 100%; border-collapse: collapse; font-size: 14px; font-family: var(--body); }
+.mreview td { padding: 7px 4px; border-bottom: 1px solid var(--line); }
+.mreview td:last-child { text-align: right; font-family: var(--mono); white-space: nowrap; }
+.mnav { display: flex; gap: 8px; align-items: center; margin-top: auto; padding-top: 8px; position: sticky; bottom: 0; background: var(--bg); }
+.mnav .primary { margin-left: auto; padding: 10px 18px; font-size: 16px; }
+.mnav #mBack { padding: 10px 14px; font-size: 16px; }
+button.link { border: 0; background: none; color: var(--muted); text-decoration: underline; padding: 6px; font-size: 13px; }
+/* Folding sections */
+.fold-h { cursor: pointer; user-select: none; -webkit-user-select: none; }
+.fold-h::after { content: ""; display: inline-block; width: 7px; height: 7px; margin-left: 9px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: translateY(-3px) rotate(45deg); transition: transform .15s; opacity: .6; }
+.collapsed > .fold-h::after, .collapsed .card-head > .fold-h::after { transform: translateY(0) rotate(-45deg); }
+.fold-h:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+fieldset.collapsed > :not(legend) { display: none !important; }
+.card.collapsed > :not(h2):not(.card-head) { display: none !important; }
+.card.collapsed .card-head > :not(h2) { display: none !important; }
+.sliders input[type=range] { touch-action: none; height: 28px; }
+@media (max-width: 560px) { .sliders { grid-template-columns: auto minmax(0, 1fr) auto; } }
 /* Side view stays pinned while scrolling */
 .pinned .view-card { position: sticky; top: 0; z-index: 5; box-shadow: 0 6px 14px -10px rgba(0,0,0,.35); }
 .pinned .view-card .drawing { max-height: 46vh; }
@@ -196,7 +367,8 @@ body { padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-are
       <p class="sub">The whole bike on its wheels. Set the forks, yokes, swingarm and Pro-Link, then move both ends through their travel to see head angle, trail, wheelbase, ground clearance and the rear leverage ratio.</p>
     </div>
     <div class="hdr-tools">
-      <span class="note">Version 12 Oct 14:58</span>
+      <button type="button" class="primary" id="measureBtn">Measuring mode</button>
+      <span class="note">Version 12 Oct 15:04</span>
       <span class="note" id="saveNote" aria-live="polite"></span>
       <button type="button" id="exportBtn">Back up</button>
       <button type="button" id="importBtn">Restore</button>
@@ -327,6 +499,24 @@ body { padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-are
           <p>Trail is measured on the ground, from where the steering axis meets it back to the front contact patch. Arm angle is the swingarm against the ground, the way you quote it.</p>
         </div>
       </details>
+    </div>
+  </div>
+</div>
+
+<div class="measure" id="measure" hidden role="dialog" aria-modal="true" aria-labelledby="mTitle">
+  <div class="mpanel" id="mPanel">
+    <div class="mtop">
+      <div><div class="note" id="mStep"></div><h2 id="mTitle"></h2></div>
+      <button type="button" id="mClose" aria-label="Close measuring mode">Done</button>
+    </div>
+    <div class="mprog"><i id="mBar"></i></div>
+    <svg class="msketch" id="mSketch" role="img" aria-label="Where to measure"></svg>
+    <p class="mtext" id="mText"></p>
+    <div id="mBody"></div>
+    <div class="mnav">
+      <button type="button" id="mBack">Back</button>
+      <button type="button" class="link" id="mClear">Clear all</button>
+      <button type="button" class="primary" id="mNext">Next</button>
     </div>
   </div>
 </div>
@@ -753,6 +943,184 @@ document.querySelectorAll('#sheet fieldset > legend, .board .card:not(.view-card
 $('resetTab').addEventListener('click', () => { tabs[active] = clone(DEF_TABS[active]); frame = clone(DEF_FRAME); toForm(); render(); });
 window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', render);
 new MutationObserver(render).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+// ---------- Measuring mode ----------
+// A guided walk round the bike with a laser cross on the swingarm pivot bolt. Each step shows where to measure on a sketch,
+// takes the number(s), and the last step drops everything into the bench. Progress is kept on this device as you go.
+const MEAS_KEY = 'xl-measure-v1';
+const D2 = Math.PI / 180;
+// Sketch of the bike in the bench's own frame coordinates (mm from the pivot, x back, y up)
+const SK = {
+  P: [0, 0], H: [-516, 365], HT: [-488, 444], J: [-94, 345], RE: [258, 469], CC: [-373, -32], CF: [-17, -26], SA: [9, 60], SB: [169, 422],
+  A: [560, -110], FA: [-700, -105], S0: [-80, 300], DM: [38, -66], R: [214, 13], D: [136, -87], S: [132, 46], E: [-380, -70], PEG: [-60, -85]
+};
+// Signed inputs: iPhone number pads have no minus key, so each X and Y gets a direction toggle instead
+const XDIR = ['Behind', 'In front'], YDIR = ['Above', 'Below'];
+const MSTEPS = [
+  { id: 'setup', title: 'Set up the laser', hl: 'laser',
+    text: 'Put the bike on a stand with the frame roughly level and both wheels off the ground, so the suspension hangs at full extension. Aim the laser cross at the centre of the swingarm pivot bolt. Its horizontal line is your X (towards the back) and its vertical line is your Y (up). Every point from here on is measured from those two lines.' },
+  { id: 'pivotHead', title: 'Pivot to head tube', hl: 'pivotHead', fields: [{ k: 'pivotHead', label: 'Pivot bolt centre to bottom of head tube', unit: 'mm' }],
+    text: 'Tape straight from the centre of the pivot bolt to the bottom of the head tube, where it meets the bottom yoke. This one sets the scale of the whole frame, so take it twice.' },
+  { id: 'rho', title: 'Steering angle', hl: 'rho', fields: [{ k: 'rho', label: 'Head tube angle from the laser\'s vertical line', unit: '°', step: 0.25 }],
+    text: 'Measure the head tube\'s lean from the laser\'s vertical line. A phone angle app held flat against the front of a fork leg works well. Stock is roughly 26 to 28°.' },
+  { id: 'arm', title: 'Swingarm', hl: 'arm', fields: [{ k: 'armAngle', label: 'Arm angle below the laser\'s horizontal line', unit: '°', step: 0.5 }, { k: 'armLen', label: 'Pivot bolt centre to rear axle centre', unit: 'mm' }],
+    text: 'With the arm hanging as it is now, measure its angle below the laser\'s horizontal line, from the pivot bolt to the axle. Then tape pivot centre to axle centre. Leave the arm where it is for the next few steps.' },
+  { id: 'shockTop', title: 'Shock top mount', hl: 'shockTop', fields: [{ k: 'shockTop', label: 'Shock top bolt centre', pair: true }],
+    text: 'Find the centre of the shock\'s top bolt. Measure along the laser\'s horizontal line how far it is in front of or behind the pivot (X), then how far above or below the line it is (Y). On an XL it is usually a little in front of the pivot and well above it. Use the buttons to say which side.' },
+  { id: 'frameLink', title: 'Dogbone frame mount', hl: 'frameLink', fields: [{ k: 'frameLink', label: 'Dogbone mount bolt centre, under the frame', pair: true }],
+    text: 'Same again for the bolt where the dogbone meets the bottom of the frame. It is usually just behind the pivot and below the line, so pick Behind and Below.' },
+  { id: 'rockerPivot', title: 'Rocker pivot', hl: 'rockerPivot', fields: [{ k: 'rockerXY', label: 'Rocker pivot bolt centre, on top of the arm', pair: true }],
+    text: 'Same again for the bolt the rocker pivots on, on top of the swingarm. Measure it off the laser lines like the others. The bench turns it into a position along the arm using the arm angle you took earlier.' },
+  { id: 'rocker', title: 'The rocker itself', hl: 'rocker', fields: [{ k: 'rD', label: 'Rocker pivot to dogbone eye', unit: 'mm', step: 0.5 }, { k: 'rS', label: 'Rocker pivot to shock eye', unit: 'mm', step: 0.5 }, { k: 'eyes', label: 'Dogbone eye to shock eye', unit: 'mm', step: 0.5 }],
+    text: 'Measure the rocker\'s three bolt centres against each other: pivot to dogbone eye, pivot to shock eye, and the two eyes to each other. Easiest with it off the bike and a vernier.' },
+  { id: 'dog', title: 'Dogbone', hl: 'dog', fields: [{ k: 'dog', label: 'Dogbone eye centre to eye centre', unit: 'mm', step: 0.5 }],
+    text: 'Bolt centre to bolt centre along the dogbone.' },
+  { id: 'shock', title: 'Shock', hl: 'shock', fields: [{ k: 'eye', label: 'Shock eye to eye, fully extended', unit: 'mm' }, { k: 'stroke', label: 'Shock stroke', unit: 'mm' }],
+    text: 'Eye centre to eye centre with the shock fully extended. Stroke is the shaft showing between the body and the bottom eye, minus the bump stop. Skip either if the shock is not to hand yet.' },
+  { id: 'low', title: 'Low points', hl: 'low', fields: [{ k: 'engLow', label: 'Lowest point under the engine', pair: true }, { k: 'peg', label: 'Footpeg, middle of the top face', pair: true }],
+    text: 'These set the ground clearance. Find the lowest point under the engine or sump guard, and the middle of the footpeg\'s top. Both are usually in front of and below the pivot.' },
+  { id: 'forks', title: 'Forks', hl: 'forks', fields: [{ k: 'forkLen', label: 'Axle centre to top of fork tube, fully extended', unit: 'mm' }, { k: 'stack', label: 'Top of tube to underside of bottom yoke, tubes flush', unit: 'mm' }, { k: 'slide', label: 'How far the tubes stick up above the top yoke', unit: 'mm' }],
+    choice: { k: 'forkTab', label: 'These forks are', opts: [['build', 'The CR forks (Build tab)'], ['stock', 'The stock XL forks (Stock tab)']] },
+    text: 'Fork leg off the floor, fully extended. Measure axle centre to the very top of the tube. Then, with the tops flush in the yokes, from the top of the tube to the underside of the bottom yoke.' },
+  { id: 'review', title: 'Check and apply', hl: 'none',
+    text: 'Here is everything you entered. Anything left blank keeps its current value. Tap Apply to put them into the bench.' }
+];
+let meas = { step: 0, v: {} };
+try { const s = JSON.parse(store.get(MEAS_KEY) || 'null'); if (s && s.v) meas = s; } catch (e) {}
+const measSave = () => store.set(MEAS_KEY, JSON.stringify(meas));
+const mv = k => { const v = meas.v[k]; return v === '' || v === undefined || v === null || !isFinite(+v) ? null : +v; };
+
+function measSketch(svg, hl) {
+  svg.innerHTML = '';
+  const css = getComputedStyle(document.documentElement), C = n => css.getPropertyValue(n).trim();
+  // Rear-end steps zoom in on the linkage; k keeps strokes and text the same size on screen either way
+  const zoomed = ['shockTop', 'frameLink', 'rockerPivot', 'rocker', 'dog', 'shock'].includes(hl), k = zoomed ? 960 / 1720 : 1;
+  svg.setAttribute('viewBox', zoomed ? '-330 -380 960 486' : '-1000 -560 1720 870');
+  const P = q => [q[0], -q[1]];
+  const ln = (a, b, at) => el('line', Object.assign({ x1: P(a)[0], y1: P(a)[1], x2: P(b)[0], y2: P(b)[1], 'stroke-linecap': 'round' }, at, { 'stroke-width': (at['stroke-width'] || 1) * k }, at['stroke-dasharray'] ? { 'stroke-dasharray': `${18 * k} ${12 * k}` } : {}), svg);
+  const dot = (q, r, at) => el('circle', Object.assign({ cx: P(q)[0], cy: P(q)[1], r: r * k }, at, at['stroke-width'] ? { 'stroke-width': at['stroke-width'] * k } : {}), svg);
+  const label = (q, t, dx = 14, dy = -14, anchor = 'start') => { const e = el('text', { x: P(q)[0] + dx * k, y: P(q)[1] + dy * k, 'font-size': 34 * k, fill: C('--accent'), 'font-family': 'IBM Plex Mono, monospace', 'font-weight': 600, 'text-anchor': anchor, stroke: C('--panel'), 'stroke-width': 8 * k, 'paint-order': 'stroke' }, svg); e.textContent = t; };
+  const faint = { stroke: C('--line'), 'stroke-width': 10 };
+  const ink = { stroke: C('--ink'), 'stroke-width': 13 };
+  const hot = { stroke: C('--accent'), 'stroke-width': 9 };
+  const dash = { stroke: C('--accent'), 'stroke-width': 5, 'stroke-dasharray': '18 12' };
+  // wheels, engine, frame, arm, fork
+  [[SK.FA, 300], [SK.A, 290]].forEach(([c, r]) => dot(c, r, { fill: 'none', stroke: C('--line'), 'stroke-width': 26 }));
+  el('polygon', { points: [[-420, 120], [-150, 150], [-120, -40], [-380, -70], [-440, 10]].map(q => P(q).join(',')).join(' '), fill: C('--grid') }, svg);
+  [[SK.HT, SK.J], [SK.J, SK.P], [SK.J, SK.RE], [SK.H, SK.CC], [SK.CC, SK.CF], [SK.CF, SK.P], [SK.SA, SK.SB], [SK.H, SK.HT]].forEach(([a, b]) => ln(a, b, ink));
+  ln(SK.P, SK.A, { stroke: C('--steel'), 'stroke-width': 18 });
+  ln([-470, 520], SK.FA, { stroke: C('--steel'), 'stroke-width': 20 });
+  ln(SK.S0, SK.S, { stroke: C('--muted'), 'stroke-width': 14 });
+  el('polygon', { points: [SK.R, SK.D, SK.S].map(q => P(q).join(',')).join(' '), fill: C('--muted') }, svg);
+  ln(SK.D, SK.DM, { stroke: C('--muted'), 'stroke-width': 10 });
+  el('rect', { x: SK.PEG[0] - 40, y: -SK.PEG[1] - 8 * k, width: 80, height: 16 * k, fill: C('--ink') }, svg);
+  // laser cross through the pivot
+  const lz = { stroke: C('--accent'), 'stroke-width': hl === 'laser' ? 6 : 3, opacity: hl === 'laser' ? 1 : .45 };
+  ln([-1000, 0], [720, 0], lz); ln([0, -310], [0, 560], lz);
+  dot(SK.P, 16, { fill: C('--panel'), stroke: C('--ink'), 'stroke-width': 6 });
+  if (hl === 'laser') label(SK.P, 'laser cross on the pivot bolt', 24, 60);
+  // X and Y legs from the laser lines to a point
+  const legs = (q, name) => { ln([0, 0], [q[0], 0], dash); ln([q[0], 0], q, dash); dot(q, 16, { fill: C('--accent') });
+    label([q[0] / 2, 0], 'X', 0, q[1] > 0 ? 40 : -16, 'middle'); label([q[0], q[1] / 2], 'Y', q[0] < 0 ? -18 : 18, 12, q[0] < 0 ? 'end' : 'start'); if (name) label(q, name, 22, q[1] > 0 ? -18 : 46); };
+  if (hl === 'pivotHead') { ln(SK.P, SK.H, hot); dot(SK.H, 14, { fill: C('--accent') }); label([-258, 182], 'tape this', -10, -16, 'end'); }
+  if (hl === 'rho') { const top = [SK.H[0] + Math.sin(-27.5 * D2) * -260, SK.H[1] + 260];
+    ln(SK.H, [-516 + 120, 365 + 230], hot); ln(SK.H, [SK.H[0], SK.H[1] + 260], dash);
+    el('path', { d: `M${SK.H[0]} ${-(SK.H[1] + 180)} A180 180 0 0 1 ${SK.H[0] + 180 * Math.sin(27.5 * D2)} ${-(SK.H[1] + 180 * Math.cos(27.5 * D2))}`, fill: 'none', stroke: C('--accent'), 'stroke-width': 5 }, svg);
+    label([SK.H[0] + 40, SK.H[1] + 200], 'angle', 20, -10); }
+  if (hl === 'arm') { ln(SK.P, SK.A, hot); dot(SK.A, 14, { fill: C('--accent') });
+    el('path', { d: `M220 0 A220 220 0 0 1 ${220 * Math.cos(11 * D2)} ${220 * Math.sin(11 * D2)}`, fill: 'none', stroke: C('--accent'), 'stroke-width': 5 }, svg);
+    label([240, -10], 'angle', 10, 40); label([400, -80], 'length', 0, 56, 'middle'); }
+  if (hl === 'shockTop') legs(SK.S0, 'shock top');
+  if (hl === 'frameLink') legs(SK.DM, 'dogbone mount');
+  if (hl === 'rockerPivot') legs(SK.R, 'rocker pivot');
+  if (hl === 'rocker') { ln(SK.R, SK.D, hot); ln(SK.R, SK.S, hot); ln(SK.D, SK.S, dash); [SK.R, SK.D, SK.S].forEach(q => dot(q, 13, { fill: C('--accent') }));
+    label(SK.R, 'pivot', 16, 8); label(SK.D, 'dogbone eye', -18, 10, 'end'); label(SK.S, 'shock eye', 16, -10); }
+  if (hl === 'dog') { ln(SK.D, SK.DM, hot); [SK.D, SK.DM].forEach(q => dot(q, 13, { fill: C('--accent') })); label([87, -76], 'eye to eye', 0, -26, 'middle'); }
+  if (hl === 'shock') { ln(SK.S0, SK.S, hot); [SK.S0, SK.S].forEach(q => dot(q, 13, { fill: C('--accent') })); label([30, 180], 'eye to eye', 30, 0); }
+  if (hl === 'low') { legs(SK.E, 'engine'); legs(SK.PEG, 'peg'); }
+  if (hl === 'forks') { ln([-470, 520], SK.FA, hot); dot(SK.FA, 14, { fill: C('--accent') }); label([-560, 220], 'axle to top of tube', -20, 0, 'end'); }
+}
+
+function measOpen() {
+  const ov = $('measure'); ov.hidden = false; document.body.classList.add('measuring'); measRender();
+}
+function measClose() { $('measure').hidden = true; document.body.classList.remove('measuring'); }
+function measFieldHTML(f) {
+  if (f.pair) {
+    const x = meas.v[f.k + 'X'] ?? '', y = meas.v[f.k + 'Y'] ?? '', xd = meas.v[f.k + 'Xd'] ?? 0, yd = meas.v[f.k + 'Yd'] ?? 0;
+    const seg = (key, opts, cur) => `<span class="mseg">${opts.map((o, i) => `<button type="button" data-seg="${key}" data-i="${i}" aria-pressed="${cur == i}">${o}</button>`).join('')}</span>`;
+    return `<div class="mfield"><div class="mlabel">${f.label}</div>
+      <div class="mpair"><span class="maxis">X</span><input type="number" inputmode="decimal" data-k="${f.k}X" value="${x}" placeholder="mm">${seg(f.k + 'Xd', XDIR, xd)}</div>
+      <div class="mpair"><span class="maxis">Y</span><input type="number" inputmode="decimal" data-k="${f.k}Y" value="${y}" placeholder="mm">${seg(f.k + 'Yd', YDIR, yd)}</div></div>`;
+  }
+  return `<label class="mfield"><span class="mlabel">${f.label} <span class="u">${f.unit || ''}</span></span><input type="number" inputmode="decimal" step="${f.step || 1}" data-k="${f.k}" value="${meas.v[f.k] ?? ''}" placeholder="${f.unit || ''}"></label>`;
+}
+// Gather what was entered into bench values; null where blank
+function measResults() {
+  const pair = k => { const x = mv(k + 'X'), y = mv(k + 'Y'); if (x === null && y === null) return null;
+    return [(x ?? 0) * (meas.v[k + 'Xd'] == 1 ? -1 : 1), (y ?? 0) * (meas.v[k + 'Yd'] == 1 ? -1 : 1)]; };
+  const r = { pivotHead: mv('pivotHead'), rho: mv('rho'), armAngle: mv('armAngle'), armLen: mv('armLen'), shockTop: pair('shockTop'), frameLink: pair('frameLink'),
+    engLow: pair('engLow'), peg: pair('peg'), rD: mv('rD'), rS: mv('rS'), dog: mv('dog'), eye: mv('eye'), stroke: mv('stroke'), forkLen: mv('forkLen'), stack: mv('stack'), slideUp: mv('slide') };
+  // Rocker pivot: laser X/Y turned into along-the-arm and square-above-the-arm at the measured arm angle
+  const rp = pair('rockerXY');
+  if (rp) { const a = (r.armAngle ?? tabs.stock.armAngle) * D2; r.rockerArm = [Math.round(rp[0] * Math.cos(a) - rp[1] * Math.sin(a)), Math.round(rp[0] * Math.sin(a) + rp[1] * Math.cos(a))]; }
+  // Rocker included angle from its three sides, keeping the bench's sign convention
+  const eyes = mv('eyes');
+  if (r.rD && r.rS && eyes) { const c = (r.rD ** 2 + r.rS ** 2 - eyes ** 2) / (2 * r.rD * r.rS); if (Math.abs(c) <= 1) r.incl = Math.round(Math.acos(c) / D2) * Math.sign(tabs.stock.incl || -1); }
+  return r;
+}
+function measRender() {
+  const i = Math.max(0, Math.min(MSTEPS.length - 1, meas.step)), st = MSTEPS[i];
+  $('mStep').textContent = `Step ${i + 1} of ${MSTEPS.length}`; $('mTitle').textContent = st.title;
+  $('mBar').style.width = ((i + 1) / MSTEPS.length * 100) + '%';
+  const sk = $('mSketch'); sk.toggleAttribute('hidden', st.hl === 'none'); if (st.hl !== 'none') measSketch(sk, st.hl);
+  $('mText').textContent = st.text;
+  let html = (st.fields || []).map(measFieldHTML).join('');
+  if (st.choice) { const cur = meas.v[st.choice.k] || 'build';
+    html += `<div class="mfield"><div class="mlabel">${st.choice.label}</div><span class="mseg">${st.choice.opts.map(([v, t]) => `<button type="button" data-choice="${st.choice.k}" data-v="${v}" aria-pressed="${cur === v}">${t}</button>`).join('')}</span></div>`; }
+  if (st.id === 'review') {
+    const r = measResults(), rows = [];
+    const f1 = v => v === null || v === undefined ? '' : (Array.isArray(v) ? `${v[0]}, ${v[1]}` : String(v));
+    [['Pivot to head tube', 'pivotHead', 'mm'], ['Steering angle', 'rho', '°'], ['Arm angle', 'armAngle', '°'], ['Pivot to axle', 'armLen', 'mm'], ['Shock top (X, Y)', 'shockTop', 'mm'],
+     ['Dogbone mount (X, Y)', 'frameLink', 'mm'], ['Rocker pivot (along, above arm)', 'rockerArm', 'mm'], ['Rocker pivot to dogbone eye', 'rD', 'mm'], ['Rocker pivot to shock eye', 'rS', 'mm'],
+     ['Rocker angle between eyes', 'incl', '°'], ['Dogbone', 'dog', 'mm'], ['Shock eye to eye', 'eye', 'mm'], ['Shock stroke', 'stroke', 'mm'], ['Engine low point (X, Y)', 'engLow', 'mm'],
+     ['Footpeg (X, Y)', 'peg', 'mm'], ['Fork, axle to top of tube', 'forkLen', 'mm'], ['Fork stack', 'stack', 'mm'], ['Tubes above top yoke', 'slideUp', 'mm']]
+      .forEach(([t, k, u]) => { const v = r[k]; if (v !== null && v !== undefined) rows.push(`<tr><td>${t}</td><td>${f1(v)} ${u}</td></tr>`); });
+    html = rows.length ? `<table class="mreview">${rows.join('')}</table>
+      <label class="check"><input type="checkbox" id="mBoth" ${meas.v.both === false ? '' : 'checked'}> Use the measured frame mounts, rocker, dogbone and shock on both tabs</label>
+      <p class="note">Frame points always go on both tabs. The swingarm length goes on the Stock tab only, because the build gets a longer arm. The forks go on the tab you picked.</p>`
+      : '<p class="note">Nothing entered yet. Go back and fill in what you have.</p>';
+  }
+  $('mBody').innerHTML = html;
+  $('mBack').disabled = i === 0;
+  $('mNext').textContent = st.id === 'review' ? 'Apply to the bench' : (i === MSTEPS.length - 2 ? 'Review' : 'Next');
+  $('mBody').querySelectorAll('input[data-k]').forEach(inp => inp.addEventListener('input', () => { meas.v[inp.dataset.k] = inp.value; measSave(); }));
+  $('mBody').querySelectorAll('[data-seg]').forEach(b => b.addEventListener('click', () => { meas.v[b.dataset.seg] = +b.dataset.i; measSave(); b.parentElement.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b)); }));
+  $('mBody').querySelectorAll('[data-choice]').forEach(b => b.addEventListener('click', () => { meas.v[b.dataset.choice] = b.dataset.v; measSave(); b.parentElement.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b)); }));
+  const both = $('mBoth'); if (both) both.addEventListener('change', () => { meas.v.both = both.checked; measSave(); });
+  $('mPanel').scrollTop = 0;
+}
+function measApply() {
+  fromForm();
+  const r = measResults(), both = meas.v.both !== false, put = (o, k, v) => { if (v !== null && v !== undefined) o[k] = v; };
+  ['pivotHead', 'rho', 'engLow', 'peg'].forEach(k => put(frame, k, r[k]));
+  (both ? ['build', 'stock'] : ['stock']).forEach(t => ['armAngle', 'shockTop', 'frameLink', 'rockerArm', 'rD', 'rS', 'incl', 'dog', 'eye', 'stroke'].forEach(k => put(tabs[t], k, r[k])));
+  ['shockTop', 'frameLink'].forEach(k => ['build', 'stock'].forEach(t => put(tabs[t], k, r[k])));
+  put(tabs.stock, 'armLen', r.armLen);
+  const ft = tabs[meas.v.forkTab || 'build'];
+  put(ft, 'forkLen', r.forkLen); put(ft, 'stack', r.stack);
+  // Tubes showing above the top yoke is what the bench calls slide-up, once the top yoke's own height is counted in the stack
+  put(ft, 'slide', r.slideUp);
+  toForm(); render(); measClose();
+  const n = $('warnings'), note = document.createElement('div'); note.className = 'banner'; note.textContent = 'Your measurements are in. Blank ones kept their old values.';
+  n.prepend(note); setTimeout(() => note.remove(), 6000);
+}
+$('measureBtn').addEventListener('click', measOpen);
+$('mClose').addEventListener('click', measClose);
+$('mBack').addEventListener('click', () => { meas.step = Math.max(0, meas.step - 1); measSave(); measRender(); });
+$('mNext').addEventListener('click', () => { if (MSTEPS[meas.step].id === 'review') return measApply(); meas.step = Math.min(MSTEPS.length - 1, meas.step + 1); measSave(); measRender(); });
+$('mClear').addEventListener('click', () => { if (!confirm('Clear all the measurements you have entered?')) return; meas = { step: 0, v: {} }; measSave(); measRender(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('measure').hidden) measClose(); });
+
 // ---------- Saving (installed app) ----------
 // The app keeps everything in this phone's storage. Back up writes a JSON file you can keep in Files; Restore reads one back.
 const saveNote = t => { $('saveNote').textContent = t; };
