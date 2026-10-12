@@ -145,6 +145,32 @@ details > summary.note { cursor: pointer; font-family: var(--body); font-size: 1
 
 .sliders input[type=range] { touch-action: none; height: 28px; }
 @media (max-width: 560px) { .sliders { grid-template-columns: auto minmax(0, 1fr) auto; } }
+
+/* Folding sections */
+.fold-h { cursor: pointer; user-select: none; -webkit-user-select: none; }
+.fold-h::after { content: ""; display: inline-block; width: 7px; height: 7px; margin-left: 9px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: translateY(-3px) rotate(45deg); transition: transform .15s; opacity: .6; }
+.collapsed > .fold-h::after, .collapsed .card-head > .fold-h::after { transform: translateY(0) rotate(-45deg); }
+.fold-h:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+fieldset.collapsed > :not(legend) { display: none !important; }
+.card.collapsed > :not(h2):not(.card-head) { display: none !important; }
+.card.collapsed .card-head > :not(h2) { display: none !important; }
+.sliders input[type=range] { touch-action: none; height: 28px; }
+@media (max-width: 560px) { .sliders { grid-template-columns: auto minmax(0, 1fr) auto; } }
+
+/* Side view options tucked into a fold */
+.view-opts { margin-top: 6px; }
+.view-opts > summary { cursor: pointer; font-size: 12px; color: var(--muted); padding: 4px 0; }
+.view-opts .slider-tools { margin-top: 4px; }
+/* Folding sections */
+.fold-h { cursor: pointer; user-select: none; -webkit-user-select: none; }
+.fold-h::after { content: ""; display: inline-block; width: 7px; height: 7px; margin-left: 9px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: translateY(-3px) rotate(45deg); transition: transform .15s; opacity: .6; }
+.collapsed > .fold-h::after, .collapsed .card-head > .fold-h::after { transform: translateY(0) rotate(-45deg); }
+.fold-h:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+fieldset.collapsed > :not(legend) { display: none !important; }
+.card.collapsed > :not(h2):not(.card-head) { display: none !important; }
+.card.collapsed .card-head > :not(h2) { display: none !important; }
+.sliders input[type=range] { touch-action: none; height: 28px; }
+@media (max-width: 560px) { .sliders { grid-template-columns: auto minmax(0, 1fr) auto; } }
 /* Side view stays pinned while scrolling */
 .pinned .view-card { position: sticky; top: 0; z-index: 5; box-shadow: 0 6px 14px -10px rgba(0,0,0,.35); }
 .pinned .view-card .drawing { max-height: 46vh; }
@@ -170,7 +196,7 @@ body { padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-are
       <p class="sub">The whole bike on its wheels. Set the forks, yokes, swingarm and Pro-Link, then move both ends through their travel to see head angle, trail, wheelbase, ground clearance and the rear leverage ratio.</p>
     </div>
     <div class="hdr-tools">
-      <span class="note">Version 12 Oct 14:41</span>
+      <span class="note">Version 12 Oct 14:58</span>
       <span class="note" id="saveNote" aria-live="polite"></span>
       <button type="button" id="exportBtn">Back up</button>
       <button type="button" id="importBtn">Restore</button>
@@ -261,12 +287,15 @@ body { padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-are
           <label for="fPos">Front</label><input type="range" id="fPos" min="0" max="1000" value="0"><output id="fOut"></output>
           <label for="rPos">Rear</label><input type="range" id="rPos" min="0" max="1000" value="0"><output id="rOut"></output>
         </div>
+        <details class="view-opts">
+          <summary>View options</summary>
         <div class="slider-tools">
           <label class="check"><input type="checkbox" id="linkEnds" checked> Move both ends together</label>
           <label class="check"><input type="checkbox" id="ghost" checked> Show the other tab as an outline</label>
           <label class="check"><input type="checkbox" id="zoom"> Zoom in to the rear linkage</label>
           <label class="check"><input type="checkbox" id="pin" checked> Keep the side view pinned while scrolling</label>
         </div>
+        </details>
       </div>
 
       <div class="tiles" id="tiles"></div>
@@ -707,6 +736,16 @@ $('rPos').addEventListener('input', () => slide('r'));
   s.addEventListener('pointermove', e => { if (e.pointerType !== 'mouse' && s.hasPointerCapture(e.pointerId)) setFrom(e); }); });
 $('ghost').addEventListener('change', render);
 $('zoom').addEventListener('change', render);
+// Folding sections: tap a section's title to fold it away; remembered per device
+document.querySelectorAll('#sheet fieldset > legend, .board .card:not(.view-card):not(details) h2').forEach(h => {
+  const box = h.closest('fieldset, .card'), key = 'xl-fold-' + h.firstChild.textContent.trim().toLowerCase().replace(/\W+/g, '-');
+  h.classList.add('fold-h'); h.setAttribute('role', 'button'); h.tabIndex = 0;
+  const set = shut => { box.classList.toggle('collapsed', shut); h.setAttribute('aria-expanded', String(!shut)); };
+  set(store.get(key) === '1');
+  const flip = () => { const shut = !box.classList.contains('collapsed'); set(shut); store.set(key, shut ? '1' : '0'); };
+  h.addEventListener('click', flip);
+  h.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); flip(); } });
+});
 // Pinned side view: a per-device preference
 { const setPin = on => { document.body.classList.toggle('pinned', on); $('pin').checked = on; };
   setPin(store.get('xl-chassis-pin') !== '0');
