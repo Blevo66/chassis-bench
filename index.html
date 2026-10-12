@@ -645,6 +645,57 @@ fieldset.collapsed > :not(legend) { display: none !important; }
 .card.collapsed .card-head > :not(h2) { display: none !important; }
 .sliders input[type=range] { touch-action: none; height: 28px; }
 @media (max-width: 560px) { .sliders { grid-template-columns: auto minmax(0, 1fr) auto; } }
+
+/* Side view options tucked into a fold */
+.view-opts { margin-top: 6px; }
+.view-opts > summary { cursor: pointer; font-size: 12px; color: var(--muted); padding: 4px 0; }
+.view-opts .slider-tools { margin-top: 4px; }
+/* Measuring mode */
+.measure { position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,.35); display: flex; justify-content: center; align-items: stretch; }
+.measure[hidden], .msketch[hidden] { display: none !important; }
+body.measuring { overflow: hidden; }
+.mpanel { background: var(--bg); width: 100%; max-width: 640px; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: calc(14px + env(safe-area-inset-top)) 16px calc(16px + env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 12px; }
+.mpanel > * { flex-shrink: 0; }
+.mtop { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.mtop h2 { margin: 2px 0 0; font-family: var(--display); font-size: 26px; text-transform: uppercase; letter-spacing: .03em; }
+.mprog { height: 4px; background: var(--grid); border-radius: 2px; overflow: hidden; }
+.mprog i { display: block; height: 100%; background: var(--accent); transition: width .2s; }
+.msketch { width: 100%; height: auto; aspect-ratio: 1720 / 870; flex-shrink: 0; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; }
+.mtext { margin: 0; line-height: 1.5; }
+.mfield { display: flex; flex-direction: column; gap: 6px; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 10px 12px; margin-bottom: 8px; }
+.mlabel { font-weight: 600; }
+.mfield input[type=number] { font-size: 20px; padding: 8px 10px; width: 100%; font-family: var(--mono); }
+.mpair { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; gap: 8px; align-items: center; }
+.maxis { font-family: var(--mono); color: var(--muted); }
+.mseg { display: inline-flex; border: 1px solid var(--line); border-radius: 5px; overflow: hidden; flex-wrap: wrap; }
+.mseg button { border: 0; border-radius: 0; padding: 9px 11px; font-size: 13px; }
+.mseg button + button { border-left: 1px solid var(--line); }
+.mseg button[aria-pressed=true] { background: var(--ink); color: var(--bg); }
+.mreview { width: 100%; border-collapse: collapse; font-size: 14px; font-family: var(--body); }
+.mreview td { padding: 7px 4px; border-bottom: 1px solid var(--line); }
+.mreview td:last-child { text-align: right; font-family: var(--mono); white-space: nowrap; }
+.mnav { display: flex; gap: 8px; align-items: center; margin-top: auto; padding-top: 8px; position: sticky; bottom: 0; background: var(--bg); }
+.mnav .primary { margin-left: auto; padding: 10px 18px; font-size: 16px; }
+.mnav #mBack { padding: 10px 14px; font-size: 16px; }
+.mhead { margin: 10px 0 2px; font-family: var(--display); font-size: 15px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+.mgroup { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; width: 100%; text-align: left; padding: 14px 16px; margin-bottom: 10px; border-radius: 8px; background: var(--panel); }
+.mgroup b { font-family: var(--display); font-size: 21px; text-transform: uppercase; letter-spacing: .03em; }
+.mgroup span { color: var(--muted); font-size: 14px; }
+.mgroup i { font-style: normal; font-family: var(--mono); font-size: 12px; color: var(--accent); }
+.mgroup.review { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.mgroup.review span { color: var(--bg); opacity: .75; }
+.mnav [hidden] { display: none !important; }
+button.link { border: 0; background: none; color: var(--muted); text-decoration: underline; padding: 6px; font-size: 13px; }
+/* Folding sections */
+.fold-h { cursor: pointer; user-select: none; -webkit-user-select: none; }
+.fold-h::after { content: ""; display: inline-block; width: 7px; height: 7px; margin-left: 9px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: translateY(-3px) rotate(45deg); transition: transform .15s; opacity: .6; }
+.collapsed > .fold-h::after, .collapsed .card-head > .fold-h::after { transform: translateY(0) rotate(-45deg); }
+.fold-h:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+fieldset.collapsed > :not(legend) { display: none !important; }
+.card.collapsed > :not(h2):not(.card-head) { display: none !important; }
+.card.collapsed .card-head > :not(h2) { display: none !important; }
+.sliders input[type=range] { touch-action: none; height: 28px; }
+@media (max-width: 560px) { .sliders { grid-template-columns: auto minmax(0, 1fr) auto; } }
 /* Side view stays pinned while scrolling */
 .pinned .view-card { position: sticky; top: 0; z-index: 5; box-shadow: 0 6px 14px -10px rgba(0,0,0,.35); }
 .pinned .view-card .drawing { max-height: 46vh; }
@@ -671,7 +722,7 @@ body { padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-are
     </div>
     <div class="hdr-tools">
       <button type="button" class="primary" id="measureBtn">Measuring mode</button>
-      <span class="note">Version 12 Oct 15:23</span>
+      <span class="note">Version 12 Oct 15:42</span>
       <span class="note" id="saveNote" aria-live="polite"></span>
       <button type="button" id="exportBtn">Back up</button>
       <button type="button" id="importBtn">Restore</button>
@@ -1260,7 +1311,7 @@ const SK = {
 const XDIR = ['Behind', 'In front'], YDIR = ['Above', 'Below'];
 const MSTEPS = [
   { id: 'setup', title: 'Set up the laser', hl: 'laser',
-    text: 'Sit the frame on a bench or stand, roughly level. Aim the laser cross at the centre of the swingarm pivot hole (a bolt or bar through it makes this easier). The laser\'s horizontal line is your X (towards the back) and its vertical line is your Y (up). Every frame point from here on is measured from those two lines.' },
+    text: 'Sit the frame on a bench or stand with the straight part of the bottom frame rails level (a spirit level on the rails is plenty). It doesn\'t need to be perfect, but don\'t move the frame until you\'ve done every frame step. Aim the laser cross at the centre of the swingarm pivot hole (a bolt or bar through it makes this easier). The laser\'s horizontal line is your X (towards the back) and its vertical line is your Y (up). Every frame point from here on is measured from those two lines.' },
   { id: 'pivotHead', title: 'Pivot to head tube', hl: 'pivotHead', fields: [{ k: 'pivotHead', label: 'Pivot bolt centre to bottom of head tube', unit: 'mm' }],
     text: 'Tape straight from the centre of the pivot bolt to the bottom of the head tube, where it meets the bottom yoke. This one sets the scale of the whole frame, so take it twice.' },
   { id: 'rho', title: 'Steering angle', hl: 'rho', fields: [{ k: 'rho', label: 'Head tube angle from the laser\'s vertical line', unit: '°', step: 0.25 }],
