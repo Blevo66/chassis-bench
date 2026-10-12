@@ -1,0 +1,716 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Chassis">
+<meta name="theme-color" content="#EDEFEA" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#141A17" media="(prefers-color-scheme: dark)">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-192.png">
+<title>XL125R Chassis Bench</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a workshop drawing board. Inputs down the left like a spec sheet, the moving side-view drawing and curves on the right. */
+:root {
+  --bg: #EDEFEA; --panel: #F8F9F6; --ink: #1B2320; --muted: #5A6660; --line: #CBD1CB; --grid: #DDE2DC;
+  --accent: #C42430; --accent-soft: #C424301F; --cmp: #1F6FB0; --steel: #46524D; --warn: #8A5A00; --warn-bg: #F6E7C8;
+  --display: "Barlow Condensed", "Arial Narrow", system-ui, sans-serif;
+  --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #141A17; --panel: #1C2320; --ink: #E4E9E5; --muted: #9AA6A0; --line: #34413B; --grid: #26302C;
+  --accent: #EE5A62; --accent-soft: #EE5A6226; --cmp: #3F93D6; --steel: #A9B5AF; --warn: #F2C46D; --warn-bg: #3A3020; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #141A17; --panel: #1C2320; --ink: #E4E9E5; --muted: #9AA6A0; --line: #34413B; --grid: #26302C;
+  --accent: #EE5A62; --accent-soft: #EE5A6226; --cmp: #3F93D6; --steel: #A9B5AF; --warn: #F2C46D; --warn-bg: #3A3020; color-scheme: dark }
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 14px; line-height: 1.45; }
+.wrap { max-width: 1360px; margin: 0 auto; padding-inline: 20px; padding-block: 20px 48px; display: grid; gap: 16px; }
+.wrap > * { min-width: 0; }
+header { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 12px 24px; border-bottom: 2px solid var(--ink); padding-bottom: 10px; }
+h1 { font-family: var(--display); font-weight: 700; font-size: 34px; letter-spacing: .01em; margin: 0; line-height: 1; text-transform: uppercase; }
+h1 span { color: var(--accent); }
+.sub { color: var(--muted); margin: 4px 0 0; max-width: 70ch; }
+#preset { min-width: 0; max-width: 100%; flex: 1 1 200px; }
+header > div { min-width: 0; }
+#saveNote[data-ok="1"] { color: var(--ok, #2e7d32); }
+.hdr-tools { max-width: 100%; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+select, input, button, textarea { font: inherit; color: var(--ink); }
+select, input[type=number], textarea { background: var(--panel); border: 1px solid var(--line); border-radius: 4px; padding: 5px 7px; }
+input[type=number] { width: 100%; font-family: var(--mono); font-size: 13px; font-variant-numeric: tabular-nums; }
+button { background: var(--panel); border: 1px solid var(--line); border-radius: 4px; padding: 6px 11px; cursor: pointer; }
+button:hover { border-color: var(--ink); }
+button.primary { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.tabs { display: flex; flex-wrap: wrap; gap: 6px; border-bottom: 1px solid var(--line); }
+.tabs button { flex: 1 1 0; min-width: 0; max-width: 300px; border: 1px solid var(--line); border-bottom: 0; border-radius: 6px 6px 0 0; background: transparent; padding: 8px 14px; text-align: left; margin-bottom: -1px; }
+.tabs button b { display: block; font-family: var(--display); font-weight: 600; font-size: 17px; text-transform: uppercase; letter-spacing: .04em; }
+.tabs button span { font-size: 12px; color: var(--muted); }
+.tabs button[aria-selected=true] { background: var(--panel); border-color: var(--ink); border-bottom: 1px solid var(--panel); }
+.tabs button[aria-selected=true] b { color: var(--accent); }
+.banner { background: var(--warn-bg); color: var(--ink); border-left: 4px solid var(--warn); padding: 8px 12px; border-radius: 3px; }
+.banner b { color: var(--warn); }
+
+.main { display: grid; grid-template-columns: minmax(300px, 360px) minmax(0, 1fr); gap: 16px; align-items: start; }
+@media (max-width: 900px) { .main { grid-template-columns: minmax(0, 1fr); } }
+
+.sheet { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 4px 14px 14px; display: grid; gap: 4px; }
+fieldset { border: 0; border-top: 1px solid var(--line); margin: 0; padding: 10px 0 4px; display: grid; gap: 8px; min-width: 0; }
+fieldset:first-child { border-top: 0; }
+legend { font-family: var(--display); font-weight: 600; font-size: 15px; text-transform: uppercase; letter-spacing: .06em; padding: 0; float: left; width: 100%; margin-bottom: 2px; }
+legend + * { clear: both; }
+.hint { color: var(--muted); font-size: 12px; margin: 0; }
+.row { display: grid; grid-template-columns: minmax(0, 1fr) 86px 86px; gap: 6px; align-items: center; }
+.row.one { grid-template-columns: minmax(0, 1fr) 86px; }
+.row label { font-size: 13px; }
+.row .u { color: var(--muted); font-size: 11px; font-family: var(--mono); }
+.axes { display: grid; grid-template-columns: minmax(0, 1fr) 86px 86px; gap: 6px; font-size: 11px; color: var(--muted); font-family: var(--mono); text-transform: uppercase; letter-spacing: .05em; }
+.axes span:first-child { visibility: hidden; }
+.seg { display: grid; grid-template-columns: repeat(3, 1fr); border: 1px solid var(--line); border-radius: 5px; overflow: hidden; }
+.seg button { border: 0; border-radius: 0; border-left: 1px solid var(--line); padding: 7px 4px; font-size: 12px; line-height: 1.2; }
+.seg button:first-child { border-left: 0; }
+.seg button[aria-pressed=true] { background: var(--ink); color: var(--bg); }
+.seg button[aria-pressed=true] .note { color: inherit; opacity: .75; }
+.check { display: flex; gap: 8px; align-items: center; font-size: 13px; }
+.sel-row { display: grid; grid-template-columns: minmax(0, 1fr) 178px; gap: 6px; align-items: center; font-size: 13px; }
+
+.board { display: grid; gap: 16px; min-width: 0; }
+.tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+@media (max-width: 560px) { .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.tile { background: var(--panel); padding: 10px 12px; min-width: 0; }
+.tile .k { font-size: 11px; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); }
+.tile .v { font-family: var(--display); font-size: 28px; font-weight: 600; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.tile .v small { font-family: var(--body); font-size: 13px; font-weight: 400; color: var(--muted); }
+.tile .c { font-size: 12px; color: var(--muted); font-family: var(--mono); }
+.tile .c .cmpv { color: var(--cmp); }
+
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 12px 14px; min-width: 0; }
+.card h2 { font-family: var(--display); font-weight: 600; font-size: 18px; text-transform: uppercase; letter-spacing: .05em; margin: 0 0 6px; }
+.card-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 16px; }
+.drawing { width: 100%; height: auto; display: block; touch-action: pan-y; }
+.slider { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 10px; align-items: center; margin-top: 8px; font-family: var(--mono); font-size: 12px; }
+.slider input { width: 100%; accent-color: var(--accent); }
+.readout { display: flex; flex-wrap: wrap; gap: 4px 18px; font-family: var(--mono); font-size: 12px; color: var(--muted); margin-top: 6px; font-variant-numeric: tabular-nums; }
+.readout b { color: var(--ink); font-weight: 500; }
+.charts { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; }
+.chart { width: 100%; height: auto; display: block; overflow: visible; }
+.legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12px; color: var(--muted); }
+.legend i { display: inline-block; width: 18px; height: 0; border-top: 2px solid var(--accent); vertical-align: middle; margin-right: 6px; }
+.legend i.cmp { border-top: 2px dashed var(--cmp); }
+.tip { position: absolute; pointer-events: none; background: var(--ink); color: var(--bg); font-family: var(--mono); font-size: 11px; padding: 5px 7px; border-radius: 3px; white-space: nowrap; transform: translate(-50%, -110%); }
+.chart-box { position: relative; }
+.warnings { display: grid; gap: 6px; }
+.warnings p { margin: 0; }
+.tbl-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-family: var(--mono); font-size: 12px; font-variant-numeric: tabular-nums; }
+th, td { text-align: right; padding: 5px 8px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+th { font-family: var(--body); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+th:first-child, td:first-child { text-align: left; }
+.cmp-bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.cmp-bar input[type=text] { background: var(--panel); border: 1px solid var(--line); border-radius: 4px; padding: 5px 7px; min-width: 0; flex: 1 1 160px; }
+.io textarea { width: 100%; min-height: 90px; font-family: var(--mono); font-size: 11px; }
+.io-btns { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; align-items: center; }
+.note { color: var(--muted); font-size: 12px; }
+details summary { cursor: pointer; font-family: var(--display); font-weight: 600; font-size: 16px; text-transform: uppercase; letter-spacing: .05em; }
+.howto { display: grid; gap: 6px; max-width: 75ch; margin-top: 8px; }
+.howto p { margin: 0; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+
+.tiles { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+@media (max-width: 760px) { .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.states { display: flex; flex-wrap: wrap; gap: 6px; }
+.states button[aria-pressed=true] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.sliders { display: grid; grid-template-columns: auto minmax(0, 1fr) minmax(110px, auto); gap: 8px 12px; align-items: center; margin-top: 10px; font-family: var(--mono); font-size: 12px; }
+.sliders input { width: 100%; accent-color: var(--accent); }
+.sliders output { color: var(--muted); font-variant-numeric: tabular-nums; text-align: right; }
+.slider-tools { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 8px; }
+td small.cmpv { display: block; color: var(--muted); font-size: 11px; }
+.link-grid { display: grid; gap: 8px; margin-top: 8px; }
+details > summary.note { cursor: pointer; font-family: var(--body); font-size: 13px; text-transform: none; letter-spacing: 0; }
+body { padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>XL125R <span>Chassis</span> Bench</h1>
+      <p class="sub">The whole bike on its wheels. Set the forks, yokes, swingarm and Pro-Link, then move both ends through their travel to see head angle, trail, wheelbase, ground clearance and the rear leverage ratio.</p>
+    </div>
+    <div class="hdr-tools">
+      <span class="note" id="saveNote" aria-live="polite"></span>
+      <button type="button" id="exportBtn">Back up</button>
+      <button type="button" id="importBtn">Restore</button>
+      <input type="file" id="importFile" accept=".json,application/json" hidden>
+      <button type="button" id="resetTab">Reset this tab</button>
+    </div>
+  </header>
+
+  <div class="tabs" role="tablist" aria-label="Set-ups">
+    <button type="button" role="tab" data-tab="build" aria-selected="true"><b>Build: CR forks</b><span>'86-87 CR250R forks, long arm</span></button>
+    <button type="button" role="tab" data-tab="stock" aria-selected="false"><b>Stock XL125R</b><span>Reference, for comparison</span></button>
+  </div>
+
+  <div class="banner"><b>Educated guesses.</b> The frame shape comes from your LiDAR scan, scaled and set at an angle so a stock XL comes out at 28° and 1355 mm. The scan's head tube is too lumpy to read its angle. The fork stack, offsets, springs and linkage are estimates. Put in the real numbers as you measure them.</div>
+
+  <div class="main">
+    <form class="sheet" id="sheet" autocomplete="off">
+      <fieldset>
+        <legend>Frame <span class="note">(both tabs)</span></legend>
+        <div class="row one"><label for="pivotHead">Pivot centre to bottom of head tube <span class="u">mm</span></label><input type="number" id="pivotHead" step="1"></div>
+        <div class="row one"><label for="rho">Steering axis to frame vertical <span class="u">°</span></label><input type="number" id="rho" step="0.25"></div>
+        <div class="axes"><span>.</span><span>X / back</span><span>Y / up</span></div>
+        <div class="row"><label>Lowest point under engine</label><input type="number" id="engLow0" aria-label="Engine low point X"><input type="number" id="engLow1" aria-label="Engine low point Y"></div>
+        <div class="row"><label>Footpeg</label><input type="number" id="peg0" aria-label="Footpeg X"><input type="number" id="peg1" aria-label="Footpeg Y"></div>
+        <p class="hint">All points are from the swingarm pivot centre: X towards the back, Y up, in the frame's own level. The first number sets the scan's scale, so tape it from the pivot bolt to the bottom of the head tube.</p>
+      </fieldset>
+
+      <fieldset>
+        <legend>Forks and yokes</legend>
+        <div class="row one"><label for="forkLen">Axle to top of tube, extended <span class="u">mm</span></label><input type="number" id="forkLen" step="1"></div>
+        <div class="row one"><label for="stack">Top of tube to under bottom yoke, tubes flush <span class="u">mm</span></label><input type="number" id="stack" step="1"></div>
+        <div class="row one"><label for="slide">Tubes slid up through the yokes <span class="u">mm</span></label><input type="number" id="slide" step="5"></div>
+        <div class="row one"><label for="spacer">Internal travel spacer <span class="u">mm</span></label><input type="number" id="spacer" step="5"></div>
+        <div class="row one"><label for="travel">Fork travel without spacers <span class="u">mm</span></label><input type="number" id="travel" step="5"></div>
+        <div class="row one"><label for="offset">Total offset, yoke plus axle <span class="u">mm</span></label><input type="number" id="offset" step="1"></div>
+        <div class="row one"><label for="rf">Front tyre radius <span class="u">mm</span></label><input type="number" id="rf" step="1"></div>
+        <div class="row one"><label for="fk">Fork spring, each leg <span class="u">N/mm</span></label><input type="number" id="fk" step="0.1"></div>
+        <div class="row one"><label for="fpre">Fork preload <span class="u">mm</span></label><input type="number" id="fpre" step="1"></div>
+        <div class="row one"><label for="fUn">Sprung load on front, unladen <span class="u">kg</span></label><input type="number" id="fUn" step="1"></div>
+        <div class="row one"><label for="fLad">Sprung load on front, with rider <span class="u">kg</span></label><input type="number" id="fLad" step="1"></div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Swingarm and shock</legend>
+        <div class="row one"><label for="armLen">Pivot to axle <span class="u">mm</span></label><input type="number" id="armLen" step="5"></div>
+        <div class="row one"><label for="rr">Rear tyre radius <span class="u">mm</span></label><input type="number" id="rr" step="1"></div>
+        <div class="row one"><label for="eye">Shock eye to eye, extended <span class="u">mm</span></label><input type="number" id="eye" step="1"></div>
+        <div class="row one"><label for="stroke">Shock stroke <span class="u">mm</span></label><input type="number" id="stroke" step="1"></div>
+        <div class="row one"><label for="k">Shock spring <span class="u">N/mm</span></label><input type="number" id="k" step="1"></div>
+        <div class="row one"><label for="preload">Shock preload <span class="u">mm</span></label><input type="number" id="preload" step="0.5"></div>
+        <div class="row one"><label for="wUnladen">Sprung load on rear, unladen <span class="u">kg</span></label><input type="number" id="wUnladen" step="1"></div>
+        <div class="row one"><label for="wLaden">Sprung load on rear, with rider <span class="u">kg</span></label><input type="number" id="wLaden" step="1"></div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Rear linkage</legend>
+          <div class="link-grid">
+            <div class="row one"><label for="armAngle">Arm angle the points were measured at <span class="u">° below frame level</span></label><input type="number" id="armAngle" step="0.5"></div>
+            <div class="axes"><span>.</span><span>X / along</span><span>Y / above</span></div>
+            <div class="row"><label>Rocker pivot <span class="u">arm</span></label><input type="number" id="rockerArm0" aria-label="Rocker pivot along"><input type="number" id="rockerArm1" aria-label="Rocker pivot above"></div>
+            <div class="row"><label>Dogbone mount, bottom of frame</label><input type="number" id="frameLink0" aria-label="Dogbone mount X"><input type="number" id="frameLink1" aria-label="Dogbone mount Y"></div>
+            <div class="row"><label>Shock top mount <span class="u">frame</span></label><input type="number" id="shockTop0" aria-label="Shock top X"><input type="number" id="shockTop1" aria-label="Shock top Y"></div>
+            <div class="row one"><label for="dog">Dogbone eye to eye <span class="u">mm</span></label><input type="number" id="dog" step="0.5"></div>
+            <div class="row one"><label for="rD">Rocker: pivot to dogbone eye <span class="u">mm</span></label><input type="number" id="rD" step="0.5"></div>
+            <div class="row one"><label for="rS">Rocker: pivot to shock eye <span class="u">mm</span></label><input type="number" id="rS" step="0.5"></div>
+            <div class="row one"><label for="incl">Rocker: angle between eyes <span class="u">°</span></label><input type="number" id="incl" step="1"></div>
+            <label class="check"><input type="checkbox" id="branch"> Flip the rocker assembly</label>
+            <p class="hint">Rocker pivot is measured along the arm and above it. The dogbone mount and shock top are frame points from the pivot.</p>
+          </div>
+      </fieldset>
+    </form>
+
+    <div class="board">
+      <div class="warnings" id="warnings" aria-live="polite"></div>
+
+      <div class="card">
+        <div class="card-head">
+          <h2>Side view</h2>
+          <div class="states" role="group" aria-label="Load state">
+            <button type="button" data-state="top">Topped out</button>
+            <button type="button" data-state="unladen">Unladen</button>
+            <button type="button" data-state="rider" aria-pressed="true">Rider sag</button>
+            <button type="button" data-state="full">Full compression</button>
+          </div>
+        </div>
+        <svg class="drawing" id="drawing" role="img" aria-label="Side view of the whole bike on the ground"></svg>
+        <div class="sliders">
+          <label for="fPos">Front</label><input type="range" id="fPos" min="0" max="1000" value="0"><output id="fOut"></output>
+          <label for="rPos">Rear</label><input type="range" id="rPos" min="0" max="1000" value="0"><output id="rOut"></output>
+        </div>
+        <div class="slider-tools">
+          <label class="check"><input type="checkbox" id="linkEnds" checked> Move both ends together</label>
+          <label class="check"><input type="checkbox" id="ghost" checked> Show the other tab as an outline</label>
+          <label class="check"><input type="checkbox" id="zoom"> Zoom in to the rear linkage</label>
+        </div>
+      </div>
+
+      <div class="tiles" id="tiles"></div>
+
+      <div class="card">
+        <h2>At each load</h2>
+        <div class="tbl-wrap"><table id="table"></table></div>
+        <p class="note" style="margin:8px 0 0">Small grey figures are the other tab. Ground clearance is the lowest of the engine, footpeg, dogbone mount and rocker. Tyre gaps are to the underside of the bottom yoke at the front and to the frame tubes at the rear, so mudguards and the airbox come off that.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <h2>Rear linkage</h2>
+          <div class="legend" id="legend"></div>
+        </div>
+        <div class="charts">
+          <div class="chart-box"><div class="note">Leverage ratio (wheel ÷ shock) against rear wheel travel</div><svg class="chart" id="chartLR"></svg></div>
+          <div class="chart-box"><div class="note">Spring rate at the wheel (N/mm) against rear wheel travel</div><svg class="chart" id="chartWR"></svg></div>
+        </div>
+        <p class="note" style="margin:6px 0 0">Click or drag on a chart to move the rear wheel there. The dotted lines mark unladen and rider sag.</p>
+      </div>
+
+      <details class="card">
+        <summary>How it works</summary>
+        <div class="howto">
+          <p>Both tyres sit on flat ground. The front axle hangs off the steering axis by the fork length below the bottom yoke, minus what the fork has compressed, and sits forward of the axis by the offset. The rear axle comes from the swingarm angle, which the linkage and shock set. The tool tilts the whole frame until both tyres touch the ground, then measures everything in that position.</p>
+          <p>Sliding the tubes up through the yokes and fitting spacers both shorten the fork. A spacer also takes the same amount off the travel. Sliding the tubes doesn't, but it eats into the gap between the tyre and the bottom yoke, so watch that number at full compression.</p>
+          <p>Sag is where the springs hold up the sprung load. On the fork that's the load shared between two springs, less the preload. At the rear it goes through the linkage, as in the Linkage Bench. Air in the forks, damping and the rider's weight shifting under braking aren't modelled.</p>
+          <p>Trail is measured on the ground, from where the steering axis meets it back to the front contact patch. Arm angle is the swingarm against the ground, the way you quote it.</p>
+        </div>
+      </details>
+    </div>
+  </div>
+</div>
+
+<script>
+// ---------- Linkage solver (side view, mm). Origin = swingarm pivot, +x rearwards, +y up ----------
+const D2R = Math.PI / 180;
+const dist = (a, b) => Math.hypot(a[0]-b[0], a[1]-b[1]);
+const rot = (p, a) => { const c = Math.cos(a), s = Math.sin(a); return [p[0]*c - p[1]*s, p[0]*s + p[1]*c]; };
+function circles(c0, r0, c1, r1) {
+  const d = dist(c0, c1);
+  if (d < 1e-9 || d > r0 + r1 || d < Math.abs(r0 - r1)) return null;
+  const a = (r0*r0 - r1*r1 + d*d) / (2*d), h = Math.sqrt(Math.max(0, r0*r0 - a*a));
+  const ex = (c1[0]-c0[0]) / d, ey = (c1[1]-c0[1]) / d, m = [c0[0] + a*ex, c0[1] + a*ey];
+  return [[m[0] - h*ey, m[1] + h*ex], [m[0] + h*ey, m[1] - h*ex]];
+}
+// th: arm angle in radians, 0 = level, negative = axle below the pivot
+function pose(g, th, prevD) {
+  const axle = rot([g.armLen, 0], th), out = { th, axle };
+  if (g.layout === 'direct') { out.shA = g.shockTop; out.shB = rot(g.shockArm, th); out.L = dist(out.shA, out.shB); return out; }
+  let R, other;
+  if (g.layout === 'frame') { R = g.rocker; other = rot(g.lug, th); } else { R = rot(g.rockerArm, th); other = g.frameLink; }
+  const sols = circles(R, g.rD, other, g.dog);
+  if (!sols) return null;
+  const D = prevD ? (dist(sols[0], prevD) <= dist(sols[1], prevD) ? sols[0] : sols[1]) : sols[g.branch ? 1 : 0];
+  const ang = Math.atan2(D[1]-R[1], D[0]-R[0]) + g.incl * D2R;
+  const S = [R[0] + g.rS*Math.cos(ang), R[1] + g.rS*Math.sin(ang)];
+  const at = b => b === 'frame' ? null : b === 'arm' ? rot(g.shockArm, th) : S;
+  Object.assign(out, { R, D, S, other });
+  out.shA = g.topOn === 'frame' ? g.shockTop : S;
+  out.shB = g.botOn === 'frame' ? g.shockLow : at(g.botOn);
+  out.L = dist(out.shA, out.shB);
+  return out;
+}
+function analyse(g) {
+  if (g.layout !== 'direct' && g.topOn === 'rocker' && g.botOn === 'rocker') return { error: 'Both shock eyes are on the rocker, so the shock can never move. Put one end on the frame or the swingarm.' };
+  if (!(g.armLen > 0) || !(g.eye > 0) || !(g.stroke > 0)) return { error: 'Fill in the arm length, the shock eye to eye and the stroke.' };
+  const th0 = -g.armAngle * D2R, step = 0.05 * D2R;
+  const p0 = pose(g, th0, null);
+  if (!p0) return { error: 'The linkage won’t assemble at this arm angle: the dogbone can’t reach the rocker eye. Check the dogbone length and the rocker dimensions.' };
+  const up = [], down = [];
+  let prev = p0.D;
+  for (let th = th0 + step; th < th0 + 75*D2R; th += step) { const p = pose(g, th, prev); if (!p) break; up.push(p); prev = p.D; }
+  prev = p0.D;
+  for (let th = th0 - step; th > th0 - 75*D2R; th -= step) { const p = pose(g, th, prev); if (!p) break; down.push(p); prev = p.D; }
+  const pts = down.reverse().concat([p0], up), iRef = down.length;
+  const Lext = g.eye, Lbump = g.eye - g.stroke, warn = [];
+  const cross = (a, b, L) => a.th + (L - a.L) / (b.L - a.L) * (b.th - a.th);
+  const nxt = pts[Math.min(iRef+1, pts.length-1)];
+  if (nxt.L > p0.L) warn.push('The shock gets longer as the wheel rises, so it would be pulled instead of compressed. Check which part each shock eye is on, or flip the assembly.');
+  let top = null, bot = null;
+  if (p0.L > Lext + 0.01) {
+    for (let i = iRef; i < pts.length-1; i++) if ((pts[i].L - Lext) * (pts[i+1].L - Lext) <= 0) { top = cross(pts[i], pts[i+1], Lext); break; }
+    warn.push(`At the measured arm angle the shock would have to be ${p0.L.toFixed(1)} mm long, more than its ${Lext} mm extended length. So the arm can’t hang that low; it tops out higher.`);
+  } else {
+    for (let i = iRef; i > 0; i--) if ((pts[i].L - Lext) * (pts[i-1].L - Lext) <= 0) { top = cross(pts[i], pts[i-1], Lext); break; }
+  }
+  if (top === null) return { error: 'The shock never reaches its extended length within the linkage’s working range. Check the eye to eye against the mount positions.', ref: p0 };
+  const iTop = pts.findIndex(p => p.th >= top);
+  for (let i = Math.max(1, iTop); i < pts.length; i++) if ((pts[i-1].L - Lbump) * (pts[i].L - Lbump) <= 0) { bot = cross(pts[i-1], pts[i], Lbump); break; }
+  if (bot === null) { warn.push('The linkage goes over centre or runs out of reach before the shock uses its full stroke. The travel shown stops there.'); bot = pts[pts.length-1].th; }
+  const near = pts[Math.max(0, iTop)];
+  const N = 240, res = [];
+  let pd = near.D || null;
+  for (let k = 0; k <= N; k++) { const p = pose(g, top + (bot - top) * k / N, pd); if (!p) break; pd = p.D; res.push(p); }
+  if (res.length < 3) return { error: 'The linkage only moves a fraction of a degree before it locks. Check the dimensions.', ref: p0 };
+  const y0 = res[0].axle[1], L0 = res[0].L;
+  res.forEach(p => { p.wheel = p.axle[1] - y0; p.comp = L0 - p.L; });
+  res.forEach((p, i) => {
+    const a = res[Math.max(0, i-1)], b = res[Math.min(res.length-1, i+1)];
+    p.lr = (b.wheel - a.wheel) / (b.comp - a.comp);
+    p.wr = g.k / (p.lr * p.lr);
+  });
+  if (res.some(p => !(p.lr > 0))) warn.push('Part of the travel has the shock extending as the wheel rises. The linkage is probably over centre there.');
+  return { res, ref: p0, warn, travel: res[res.length-1].wheel, stroke: res[res.length-1].comp };
+}
+function sagAt(an, g, kg) {
+  if (!(kg > 0) || !(g.k > 0)) return null;
+  const W = kg * 9.81, r = an.res;
+  const f = p => g.k * ((g.preload || 0) + p.comp) / p.lr - W;
+  if (f(r[0]) >= 0) return { wheel: 0, th: r[0].th, topped: true };
+  for (let i = 1; i < r.length; i++) if (f(r[i]) >= 0) {
+    const a = r[i-1], b = r[i], t = -f(a) / (f(b) - f(a)), m = (x, y) => x + t*(y - x);
+    return { wheel: m(a.wheel, b.wheel), th: m(a.th, b.th), lr: m(a.lr, b.lr), comp: m(a.comp, b.comp) };
+  }
+  return { wheel: r[r.length-1].wheel, th: r[r.length-1].th, bottomed: true };
+}
+
+// ---------- Frame from the LiDAR scan (raw scan mm, relative to the pivot, frame datum) ----------
+// Simplified to straight tubes between the scan's key points: head tube, backbone/spine junction, pivot, front cradle corner, seat rail end
+const RAW = {"backbone":[[-572,520],[-110,405]],"seatRail":[[-110,405],[303,550]],"spine":[[-110,405],[0,0]],"downtube":[[-592,410],[-437,-38]],"cradle":[[-437,-38],[-20,-30],[0,0]],"strut":[[10,70],[198,495]]};
+const RAW_HEAD = [-605, 428], RAW_DIST = Math.hypot(RAW_HEAD[0], RAW_HEAD[1]);
+// Engine outline, a guess drawn to sit between the downtube, cradle and pivot plates (raw scan mm)
+const RAW_ENGINE = [[-425,-30],[-430,70],[-380,150],[-300,175],[-170,165],[-80,110],[-35,30],[-45,-25]];
+const RAW_BARREL = [[-330,165],[-395,330],[-300,365],[-235,170]];
+const HEAD_TUBE = 150; // mm, raw
+
+const DEF_FRAME = { pivotHead: 632, rho: 27.5, engLow: [-380, -70], peg: [-60, -85] };
+const LINK = { armAngle: 15, rockerArm: [203, 68], frameLink: [38, -66], shockTop: [-80, 300], dog: 100, rD: 127, rS: 88, incl: -74, branch: false };
+const DEF_TABS = {
+  build: Object.assign({ forkLen: 935, stack: 215, slide: 50, spacer: 100, travel: 300, offset: 47, rf: 346, fk: 4.4, fpre: 10, fUn: 35, fLad: 75,
+    armLen: 630, rr: 323, eye: 337, stroke: 75, k: 110, preload: 5, wUnladen: 40, wLaden: 100 }, LINK),
+  stock: Object.assign({ forkLen: 680, stack: 100, slide: 0, spacer: 0, travel: 215, offset: 65, rf: 346, fk: 5, fpre: 18, fUn: 35, fLad: 75,
+    armLen: 530, rr: 323, eye: 337, stroke: 75, k: 95, preload: 5, wUnladen: 40, wLaden: 100 }, LINK)
+};
+const TAB_NAMES = { build: 'Build', stock: 'Stock XL' };
+const clone = o => JSON.parse(JSON.stringify(o));
+const $ = id => document.getElementById(id);
+const store = { get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} } };
+
+let frame = clone(DEF_FRAME), tabs = clone(DEF_TABS), active = 'build';
+let pos = { state: 'rider', f: 0, r: 0 };
+try { const s = JSON.parse(store.get('xl-chassis-v2') || 'null'); if (s) { frame = Object.assign(frame, s.frame); ['build','stock'].forEach(k => { if (s.tabs && s.tabs[k]) tabs[k] = Object.assign(tabs[k], s.tabs[k]); }); if (s.active in tabs) active = s.active; } } catch (e) {}
+const other = () => active === 'build' ? 'stock' : 'build';
+
+// ---------- Whole-bike solver ----------
+function frameGeom(fr) {
+  const s = fr.pivotHead / RAW_DIST, r = fr.rho * D2R;
+  const u = [-Math.sin(r), -Math.cos(r)], n = [-Math.cos(r), Math.sin(r)]; // down the steering axis; square to it, forwards
+  const tubeBot = [RAW_HEAD[0] * s, RAW_HEAD[1] * s];
+  const H = [tubeBot[0] + u[0] * 15, tubeBot[1] + u[1] * 15]; // underside of the bottom yoke, 15 mm below the head tube
+  const sc = pts => pts.map(p => [p[0] * s, p[1] * s]);
+  const lines = {}; for (const k in RAW) lines[k] = sc(RAW[k]);
+  return { s, u, n, H, tubeBot, tubeTop: [tubeBot[0] - u[0] * HEAD_TUBE * s, tubeBot[1] - u[1] * HEAD_TUBE * s], lines, engine: sc(RAW_ENGINE), barrel: sc(RAW_BARREL) };
+}
+const forkL = c => c.forkLen - c.stack - c.slide - c.spacer;      // axle to underside of bottom yoke, extended
+const forkT = c => Math.max(0, c.travel - c.spacer);
+const forkSag = (c, kg) => Math.min(forkT(c), Math.max(0, kg * 9.81 / (2 * c.fk) - c.fpre));
+function linkCfg(c) {
+  return { layout: 'arm', armLen: c.armLen, armAngle: c.armAngle, rockerArm: c.rockerArm, frameLink: c.frameLink, rD: c.rD, rS: c.rS, incl: c.incl, dog: c.dog,
+    branch: c.branch, topOn: 'frame', botOn: 'rocker', shockTop: c.shockTop, shockLow: [0, 0], shockArm: [0, 0], lug: [0, 0], rocker: [0, 0],
+    eye: c.eye, stroke: c.stroke, k: c.k, preload: c.preload, wUnladen: c.wUnladen, wLaden: c.wLaden };
+}
+function prepare(c) {
+  const g = linkCfg(c), an = analyse(g);
+  if (an.error) return { error: an.error };
+  const rs1 = sagAt(an, g, c.wUnladen), rs2 = sagAt(an, g, c.wLaden);
+  return { c, g, an, fT: forkT(c), rT: an.travel, warn: an.warn,
+    sag: { top: [0, 0], unladen: [forkSag(c, c.fUn), rs1 ? rs1.wheel : 0], rider: [forkSag(c, c.fLad), rs2 ? rs2.wheel : 0], full: [forkT(c), an.travel] } };
+}
+function rearPose(P, w) {
+  const r = P.an.res; let i = 1;
+  while (i < r.length - 1 && r[i].wheel < w) i++;
+  const a = r[i-1], b = r[i], t = b.wheel === a.wheel ? 0 : Math.max(0, Math.min(1, (w - a.wheel) / (b.wheel - a.wheel)));
+  return pose(P.g, a.th + t * (b.th - a.th), a.D) || a;
+}
+function segDist(p, a, b) { const dx = b[0]-a[0], dy = b[1]-a[1], L = dx*dx + dy*dy; const t = L ? Math.max(0, Math.min(1, ((p[0]-a[0])*dx + (p[1]-a[1])*dy) / L)) : 0; return Math.hypot(p[0] - a[0] - t*dx, p[1] - a[1] - t*dy); }
+function solve(P, F, fc, rw) {
+  const c = P.c, L = forkL(c) - fc;
+  const Af = [F.H[0] + F.u[0]*L + F.n[0]*c.offset, F.H[1] + F.u[1]*L + F.n[1]*c.offset];
+  const rp = rearPose(P, rw), Ar = rp.axle;
+  const dx = Ar[0]-Af[0], dy = Ar[1]-Af[1], Dd = Math.hypot(dx, dy), gam = Math.atan2(dy, dx) - Math.asin((c.rr - c.rf) / Dd);
+  const cs = Math.cos(-gam), sn = Math.sin(-gam), Rv = p => [p[0]*cs - p[1]*sn, p[0]*sn + p[1]*cs];
+  const ground = Rv(Af)[1] - c.rf, W = p => { const q = Rv(p); return [q[0], q[1] - ground]; };
+  const uw = Rv(F.u), h = W(F.H), af = W(Af), ar = W(Ar), pv = W([0, 0]);
+  const t = -h[1] / uw[1], axisGround = h[0] + t * uw[0];
+  const low = [['engine', frame.engLow], ['footpeg', frame.peg], ['dogbone mount', c.frameLink], ['rocker', rp.D], ['rocker', rp.S]]
+    .filter(x => x[1]).map(([nm, p]) => [nm, W(p)[1]]).reduce((m, x) => x[1] < m[1] ? x : m, ['', 1e9]);
+  let rearGap = 1e9;
+  ['seatRail', 'strut', 'spine'].forEach(k => { const l = F.lines[k]; for (let i = 1; i < l.length; i++) rearGap = Math.min(rearGap, segDist(Ar, l[i-1], l[i]) - c.rr); });
+  return { W, Af, Ar, rp, L, fc, rw,
+    m: { head: Math.atan2(-uw[0], -uw[1]) / D2R, trail: af[0] - axisGround, wb: ar[0] - af[0], arm: Math.atan2(pv[1] - ar[1], ar[0] - pv[0]) / D2R,
+      pitch: gam / D2R, pivotH: pv[1], clear: low[1], clearAt: low[0], frontGap: L - c.rf, rearGap, fUsed: fc, rUsed: rw } };
+}
+
+// ---------- Form ----------
+const FRAME_SINGLE = ['pivotHead', 'rho'], FRAME_PAIRS = ['engLow', 'peg'];
+const TAB_SINGLE = ['forkLen','stack','slide','spacer','travel','offset','rf','fk','fpre','fUn','fLad','armLen','rr','eye','stroke','k','preload','wUnladen','wLaden','armAngle','dog','rD','rS','incl'];
+const TAB_PAIRS = ['rockerArm','frameLink','shockTop'];
+const num = (id, fb) => { const v = parseFloat($(id).value); return isFinite(v) ? v : fb; };
+function toForm() {
+  FRAME_SINGLE.forEach(k => $(k).value = frame[k]); FRAME_PAIRS.forEach(k => { $(k+'0').value = frame[k][0]; $(k+'1').value = frame[k][1]; });
+  const c = tabs[active];
+  TAB_SINGLE.forEach(k => $(k).value = c[k]); TAB_PAIRS.forEach(k => { $(k+'0').value = c[k][0]; $(k+'1').value = c[k][1]; });
+  $('branch').checked = !!c.branch;
+  document.querySelectorAll('[data-tab]').forEach(b => b.setAttribute('aria-selected', b.dataset.tab === active));
+}
+function fromForm() {
+  FRAME_SINGLE.forEach(k => frame[k] = num(k, frame[k])); FRAME_PAIRS.forEach(k => frame[k] = [num(k+'0', 0), num(k+'1', 0)]);
+  const c = tabs[active];
+  TAB_SINGLE.forEach(k => c[k] = num(k, c[k])); TAB_PAIRS.forEach(k => c[k] = [num(k+'0', 0), num(k+'1', 0)]);
+  c.branch = $('branch').checked;
+  if (!(frame.pivotHead > 100)) frame.pivotHead = DEF_FRAME.pivotHead;
+  if (!(c.fk > 0)) c.fk = 0.1;
+}
+
+// ---------- Render ----------
+let F, PA, PO, SA, SO;
+const fmt = (v, d = 0) => (v === undefined || v === null || !isFinite(v)) ? '–' : v.toFixed(d);
+function posFor(P, state, f, r) {
+  if (state && P.sag[state]) return P.sag[state];
+  return [Math.min(f, P.fT), Math.min(r, P.rT)];
+}
+function render() {
+  fromForm();
+  store.set('xl-chassis-v2', JSON.stringify({ frame, tabs, active })); cloudSave();
+  F = frameGeom(frame);
+  PA = prepare(tabs[active]); PO = prepare(tabs[other()]);
+  const Wn = $('warnings'); Wn.innerHTML = '';
+  const warn = t => { const p = document.createElement('p'); p.className = 'banner'; p.textContent = t; Wn.appendChild(p); };
+  if (PA.error) { warn('Rear linkage: ' + PA.error); $('drawing').innerHTML = ''; $('tiles').innerHTML = ''; $('table').innerHTML = ''; return; }
+  PA.warn.forEach(t => warn('Rear linkage: ' + t));
+  if (forkL(PA.c) - PA.fT - PA.c.rf < 0) warn(`At full compression the front tyre would hit the bottom yoke by ${fmt(-(forkL(PA.c) - PA.fT - PA.c.rf))} mm. Slide the tubes back down or fit more spacer.`);
+  const full = solve(PA, F, PA.sag.full[0], PA.sag.full[1]);
+  if (full.m.rearGap < 15) warn(`At full compression the rear tyre comes within ${fmt(full.m.rearGap)} mm of the frame tubes, before any mudguard or airbox.`);
+  const [f, r] = posFor(PA, pos.state, pos.f, pos.r);
+  pos.f = f; pos.r = r;
+  SA = solve(PA, F, f, r);
+  SO = PO.error ? null : (() => { const fr = PA.fT ? f / PA.fT : 0, rr = PA.rT ? r / PA.rT : 0; const [of, orr] = pos.state ? PO.sag[pos.state] : [fr * PO.fT, rr * PO.rT]; return solve(PO, F, of, orr); })();
+  $('fPos').value = PA.fT ? Math.round(f / PA.fT * 1000) : 0; $('rPos').value = PA.rT ? Math.round(r / PA.rT * 1000) : 0;
+  $('fOut').textContent = `${fmt(f)} of ${fmt(PA.fT)} mm`; $('rOut').textContent = `${fmt(r)} of ${fmt(PA.rT)} mm`;
+  document.querySelectorAll('[data-state]').forEach(b => b.setAttribute('aria-pressed', b.dataset.state === pos.state));
+  renderTiles(); renderTable(); draw(); drawChart('chartLR', 'lr'); drawChart('chartWR', 'wr');
+  $('legend').innerHTML = `<span><i></i>${TAB_NAMES[active]}</span>` + (PO.error ? '' : `<span><i class="cmp"></i>${TAB_NAMES[other()]}</span>`);
+}
+function tile(k, v, unit, cmpv, note) {
+  return `<div class="tile"><div class="k">${k}</div><div class="v">${v}${unit ? ` <small>${unit}</small>` : ''}</div><div class="c">${note || ''}${cmpv !== null ? `${note ? ' · ' : ''}<span class="cmpv">${TAB_NAMES[other()]} ${cmpv}</span>` : ''}</div></div>`;
+}
+function renderTiles() {
+  const a = SA.m, o = SO ? SO.m : null, ov = (k, d = 0, u = '') => o ? fmt(o[k], d) + u : null;
+  $('tiles').innerHTML =
+    tile('Head angle', fmt(a.head, 1) + '°', '', ov('head', 1, '°')) +
+    tile('Trail', fmt(a.trail), 'mm', ov('trail', 0, ' mm')) +
+    tile('Wheelbase', fmt(a.wb), 'mm', ov('wb', 0, ' mm')) +
+    tile('Arm angle', fmt(a.arm, 1) + '°', '', ov('arm', 1, '°'), 'below level') +
+    tile('Ground clearance', fmt(a.clear), 'mm', ov('clear', 0, ' mm'), a.clearAt) +
+    tile('Pivot height', fmt(a.pivotH), 'mm', ov('pivotH', 0, ' mm'), 'swingarm pivot') +
+    tile('Tyre to bottom yoke', fmt(a.frontGap), 'mm', ov('frontGap', 0, ' mm')) +
+    tile('Rear tyre to frame', fmt(a.rearGap), 'mm', ov('rearGap', 0, ' mm'));
+}
+const ROWS = [['Head angle', 'head', 1, '°'], ['Trail', 'trail', 0, ' mm'], ['Wheelbase', 'wb', 0, ' mm'], ['Arm angle below level', 'arm', 1, '°'],
+  ['Frame nose-up', 'pitch', 1, '°'], ['Swingarm pivot height', 'pivotH', 0, ' mm'], ['Ground clearance', 'clear', 0, ' mm'],
+  ['Fork travel used', 'fUsed', 0, ' mm'], ['Rear wheel travel used', 'rUsed', 0, ' mm'], ['Tyre to bottom yoke', 'frontGap', 0, ' mm'], ['Rear tyre to frame', 'rearGap', 0, ' mm']];
+function renderTable() {
+  const st = ['top', 'unladen', 'rider', 'full'], names = ['Topped out', 'Unladen', 'Rider sag', 'Full compression'];
+  const A = st.map(s => solve(PA, F, ...PA.sag[s]).m), O = PO.error ? null : st.map(s => solve(PO, F, ...PO.sag[s]).m);
+  $('table').innerHTML = `<thead><tr><th></th>${names.map(n => `<th>${n}</th>`).join('')}</tr></thead><tbody>` +
+    ROWS.map(([lab, k, d, u]) => `<tr><td>${lab}</td>${A.map((m, i) => `<td>${fmt(m[k], d)}${u}${O ? `<small class="cmpv">${fmt(O[i][k], d)}</small>` : ''}</td>`).join('')}</tr>`).join('') + '</tbody>';
+}
+
+// ---------- Drawing (ground level, bike facing left) ----------
+const NS = 'http://www.w3.org/2000/svg';
+function el(tag, attrs, parent) { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; }
+function bikeShapes(S, P) {
+  const W = S.W, c = P.c, rp = S.rp;
+  const legTop = [S.Af[0] - F.u[0] * (S.L + c.stack + c.slide) , S.Af[1] - F.u[1] * (S.L + c.stack + c.slide)];
+  const topYoke = [F.H[0] - F.u[0] * c.stack, F.H[1] - F.u[1] * c.stack];
+  const legAtBY = [F.H[0] + F.n[0] * c.offset * 0.75, F.H[1] + F.n[1] * c.offset * 0.75];
+  const legAtTY = [topYoke[0] + F.n[0] * c.offset * 0.75, topYoke[1] + F.n[1] * c.offset * 0.75];
+  return { W, lines: Object.values(F.lines).map(l => l.map(W)), engine: F.engine.map(W), barrel: F.barrel.map(W),
+    headTube: [W(F.tubeBot), W(F.tubeTop)], fork: [W(S.Af), W(legTop)], yokes: [[W(F.H), W(legAtBY)], [W(topYoke), W(legAtTY)]],
+    af: W(S.Af), ar: W(S.Ar), pivot: W([0, 0]), R: W(rp.R), D: W(rp.D), S: W(rp.S), other: W(rp.other), shA: W(rp.shA),
+    peg: W(frame.peg), junction: W(F.lines.spine[0]), cradleCorner: W(F.lines.downtube[1]), railEnd: W(F.lines.seatRail[1]) };
+}
+function draw() {
+  const svg = $('drawing'); svg.innerHTML = '';
+  const css = getComputedStyle(document.documentElement), C = n => css.getPropertyValue(n).trim();
+  const A = bikeShapes(SA, PA), O = SO && $('ghost').checked ? bikeShapes(SO, PO) : null;
+  const xs = [], ys = [0];
+  [A, O].filter(Boolean).forEach((B, i) => { const P = i ? PO : PA;
+    xs.push(B.af[0] - P.c.rf, B.ar[0] + P.c.rr); ys.push(B.af[1] + P.c.rf, B.ar[1] + P.c.rr);
+    B.lines.flat().forEach(p => { xs.push(p[0]); ys.push(p[1]); }); xs.push(B.fork[1][0]); ys.push(B.fork[1][1]); });
+  let x0 = Math.min(...xs) - 60, x1 = Math.max(...xs) + 60, y0 = -40, y1 = Math.max(...ys) + 60;
+  const zoom = $('zoom').checked;
+  if (zoom) {
+    const zp = [A.pivot, A.R, A.D, A.S, A.other, A.shA];
+    x0 = Math.min(...zp.map(p => p[0])) - 60; x1 = Math.max(...zp.map(p => p[0])) + 120; y0 = Math.min(...zp.map(p => p[1])) - 40; y1 = Math.max(...zp.map(p => p[1])) + 60;
+    const want = (y1 - y0) * 1.5; if (x1 - x0 < want) { const cx = (x0 + x1) / 2; x0 = cx - want / 2; x1 = cx + want / 2; }
+  }
+  svg.setAttribute('viewBox', `${x0} ${-y1} ${x1 - x0} ${y1 - y0}`);
+  const s = (x1 - x0) / (zoom ? 1100 : 900), P = q => `${q[0].toFixed(1)},${(-q[1]).toFixed(1)}`;
+  const grid = el('g', { stroke: C('--grid'), 'stroke-width': s }, svg);
+  const gs = zoom ? 50 : 100;
+  for (let x = Math.ceil(x0 / gs) * gs; x <= x1; x += gs) el('line', { x1: x, y1: -y1, x2: x, y2: Math.min(0, -y0) }, grid);
+  for (let y = Math.ceil(Math.max(0, y0) / gs) * gs; y <= y1; y += gs) el('line', { x1: x0, y1: -y, x2: x1, y2: -y }, grid);
+  el('rect', { x: x0, y: 0, width: x1 - x0, height: Math.max(0, -y0) + 40, fill: C('--grid') }, svg);
+  el('line', { x1: x0, y1: 0, x2: x1, y2: 0, stroke: C('--muted'), 'stroke-width': 2 * s }, svg);
+  const poly = (pts, attrs) => el('polyline', Object.assign({ points: pts.map(P).join(' '), fill: 'none', 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, attrs), svg);
+  const line = (a, b, attrs) => el('line', Object.assign({ x1: a[0], y1: -a[1], x2: b[0], y2: -b[1], 'stroke-linecap': 'round' }, attrs), svg);
+  if (O) {
+    const g = { stroke: C('--cmp'), 'stroke-width': 2.5 * s, 'stroke-dasharray': `${8*s} ${6*s}`, opacity: .9 };
+    el('circle', Object.assign({ cx: O.af[0], cy: -O.af[1], r: PO.c.rf, fill: 'none' }, g), svg);
+    el('circle', Object.assign({ cx: O.ar[0], cy: -O.ar[1], r: PO.c.rr, fill: 'none' }, g), svg);
+    O.lines.forEach(l => poly(l, g)); line(O.fork[0], O.fork[1], g); line(O.pivot, O.ar, g);
+  }
+  const B = A, c = PA.c;
+  [[B.af, c.rf], [B.ar, c.rr]].forEach(([p, r]) => {
+    el('circle', { cx: p[0], cy: -p[1], r: r - 40, fill: 'none', stroke: C('--steel'), 'stroke-width': 80, opacity: .28 }, svg);
+    el('circle', { cx: p[0], cy: -p[1], r: r * 0.62, fill: 'none', stroke: C('--steel'), 'stroke-width': 2 * s, opacity: .55 }, svg);
+    el('circle', { cx: p[0], cy: -p[1], r: 7 * s, fill: C('--ink') }, svg);
+  });
+  el('polygon', { points: B.engine.map(P).join(' '), fill: C('--steel'), opacity: .22 }, svg);
+  line(B.pivot, B.ar, { stroke: C('--steel'), 'stroke-width': 14 * s });
+  line(B.fork[0], B.fork[1], { stroke: C('--steel'), 'stroke-width': 16 * s });
+  B.yokes.forEach(([a, b]) => line(a, b, { stroke: C('--ink'), 'stroke-width': 10 * s }));
+  B.lines.forEach(l => poly(l, { stroke: C('--ink'), 'stroke-width': 7 * s }));
+  line(B.headTube[0], B.headTube[1], { stroke: C('--ink'), 'stroke-width': 18 * s });
+  const ls = s * (zoom ? 1.7 : 0.35); // linkage parts: slim on the whole bike, chunky in the zoom
+  // mounting gussets: a plate from the nearest frame tube out to the shock top and dogbone mount
+  const gusset = (foot, dir, q, half) => { const a = [foot[0] - dir[0] * half, foot[1] - dir[1] * half], b = [foot[0] + dir[0] * half, foot[1] + dir[1] * half];
+    el('polygon', { points: [a, q, b].map(P).join(' '), fill: C('--muted'), stroke: C('--ink'), 'stroke-width': 2 * ls, 'stroke-linejoin': 'round', opacity: .9 }, svg); };
+  const clevis = q => el('circle', { cx: q[0], cy: -q[1], r: 16 * ls, fill: C('--muted'), stroke: C('--ink'), 'stroke-width': 2 * ls, opacity: .9 }, svg);
+  [B.shA, B.other, B.R].forEach(clevis);
+  [PA.c.shockTop, PA.c.frameLink].forEach(q => { let best = null; Object.values(F.lines).forEach(l => { for (let i = 1; i < l.length; i++) { const a = l[i-1], b = l[i], dx = b[0]-a[0], dy = b[1]-a[1], L2 = dx*dx + dy*dy, t = Math.max(0, Math.min(1, ((q[0]-a[0])*dx + (q[1]-a[1])*dy) / L2)), f = [a[0] + t*dx, a[1] + t*dy], d = Math.hypot(q[0]-f[0], q[1]-f[1]); if (!best || d < best[0]) best = [d, f, a, b]; } });
+    if (!best) return; const fa = B.W(best[2]), fb = B.W(best[3]), Lf = Math.hypot(fb[0]-fa[0], fb[1]-fa[1]);
+    gusset(B.W(best[1]), [(fb[0]-fa[0]) / Lf, (fb[1]-fa[1]) / Lf], B.W(q), (zoom ? 1 : 0.6) * Math.max(28, best[0] * 0.6)); });
+  // rocker gusset welded on top of the swingarm
+  { const ad = [B.ar[0] - B.pivot[0], B.ar[1] - B.pivot[1]], al = Math.hypot(...ad), u = [ad[0] / al, ad[1] / al];
+    const along = (B.R[0] - B.pivot[0]) * u[0] + (B.R[1] - B.pivot[1]) * u[1], foot = [B.pivot[0] + u[0] * along, B.pivot[1] + u[1] * along];
+    gusset(foot, u, B.R, zoom ? 45 : 27); }
+  // shock: spring band, body on the top part, shaft below
+  { const A2 = B.shA, B2 = B.S, L = Math.hypot(B2[0]-A2[0], B2[1]-A2[1]), mid = [A2[0] + (B2[0]-A2[0]) * .55, A2[1] + (B2[1]-A2[1]) * .55];
+    line(A2, B2, { stroke: C('--accent'), 'stroke-width': 30 * ls, opacity: .2 });
+    line(A2, mid, { stroke: C('--accent'), 'stroke-width': 15 * ls });
+    line(mid, B2, { stroke: C('--accent'), 'stroke-width': 6 * ls }); }
+  line(B.D, B.other, { stroke: C('--ink'), 'stroke-width': 8 * ls });
+  el('polygon', { points: [B.R, B.D, B.S].map(P).join(' '), fill: C('--ink'), opacity: .88, stroke: C('--ink'), 'stroke-width': 4 * ls, 'stroke-linejoin': 'round' }, svg);
+  [B.shA, B.S, B.R, B.D, B.other].forEach(q => el('circle', { cx: q[0], cy: -q[1], r: 5 * ls, fill: C('--panel'), stroke: C('--ink'), 'stroke-width': 2 * ls }, svg));
+  el('rect', { x: B.peg[0] - 25 * s, y: -B.peg[1] - 6 * s, width: 50 * s, height: 12 * s, fill: C('--ink') }, svg);
+  [B.junction, B.cradleCorner, B.railEnd].forEach(q => el('circle', { cx: q[0], cy: -q[1], r: 6 * s, fill: C('--panel'), stroke: C('--ink'), 'stroke-width': 2.5 * s }, svg));
+  el('circle', { cx: B.pivot[0], cy: -B.pivot[1], r: 8 * s, fill: C('--panel'), stroke: C('--ink'), 'stroke-width': 3 * s }, svg);
+  const txt = (p, t, dx = 10, dy = -10) => { const e = el('text', { x: p[0] + dx * s, y: -p[1] + dy * s, 'font-size': 14 * s, fill: C('--muted'), 'font-family': 'IBM Plex Mono, monospace' }, svg); e.textContent = t; };
+  // dimension: wheelbase on the ground
+  const yb = 22;
+  el('line', { x1: B.af[0], y1: yb, x2: B.ar[0], y2: yb, stroke: C('--ink'), 'stroke-width': 1.5 * s }, svg);
+  [B.af[0], B.ar[0]].forEach(x => el('line', { x1: x, y1: yb - 8, x2: x, y2: yb + 8, stroke: C('--ink'), 'stroke-width': 1.5 * s }, svg));
+  const wbt = el('text', { x: (B.af[0] + B.ar[0]) / 2, y: yb - 6, 'text-anchor': 'middle', 'font-size': 14 * s, fill: C('--ink'), 'font-family': 'IBM Plex Mono, monospace' }, svg);
+  wbt.textContent = `${fmt(SA.m.wb)} mm`;
+  if (zoom) wbt.textContent = '';
+  // steering axis extended to the ground
+  const uw = [B.headTube[0][0] - B.headTube[1][0], B.headTube[0][1] - B.headTube[1][1]], t = -B.headTube[0][1] / uw[1];
+  line(B.headTube[1], [B.headTube[0][0] + uw[0] * t, 0], { stroke: C('--accent'), 'stroke-width': 1.5 * s, 'stroke-dasharray': `${6*s} ${5*s}` });
+  txt(B.headTube[1], `${fmt(SA.m.head, 1)}°`, 14, -4);
+  txt(B.pivot, 'pivot', 12, 22);
+  if (zoom) {
+    [[B.R, 'rocker pivot'], [B.D, 'dogbone eye'], [B.S, 'shock eye'], [B.other, 'dogbone mount'], [B.shA, 'shock top']].forEach(([q, t]) => {
+      txt(q, t, 32, -18); });
+    const dd = el('text', { x: x0 + 14 * s, y: -y1 + 22 * s, 'font-size': 14 * s, fill: C('--ink'), stroke: C('--panel'), 'stroke-width': 5 * s, 'paint-order': 'stroke', 'font-family': 'IBM Plex Mono, monospace' }, svg);
+    dd.textContent = `Shock ${fmt(SA.rp.L, 1)} mm, ${fmt(PA.c.eye - SA.rp.L, 1)} compressed · ratio ${fmt(rearLR(PA, SA.rw), 2)} · arm ${fmt(SA.m.arm, 1)}° to the ground`;
+  }
+}
+
+function rearLR(P, w) { const r = P.an.res; let b = r[1]; r.forEach(p => { if (Math.abs(p.wheel - w) < Math.abs(b.wheel - w)) b = p; }); return b.lr; }
+const CH = { w: 520, h: 230, l: 46, r: 14, t: 12, b: 34 };
+const chartState = {};
+function niceTicks(a, b, n) {
+  const raw = (b - a) / n, mag = Math.pow(10, Math.floor(Math.log10(raw))), st = [1, 2, 2.5, 5, 10].map(q => q * mag).find(q => q >= raw) || raw;
+  const out = []; for (let v = Math.floor(a / st) * st; v <= b + st * 0.999; v += st) out.push(+v.toFixed(6)); return out;
+}
+function drawChart(id, key) {
+  const svg = $(id); svg.innerHTML = ''; svg.setAttribute('viewBox', `0 0 ${CH.w} ${CH.h}`);
+  const css = getComputedStyle(document.documentElement), C = n => css.getPropertyValue(n).trim();
+  const curve = P => P && !P.error ? P.an.res.slice(1, -1).map(p => [p.wheel, key === 'lr' ? p.lr : p.wr]).filter(p => isFinite(p[1])) : [];
+  const cur = curve(PA), cc = curve(PO);
+  const xmax = Math.max(PA.rT, PO.error ? 0 : PO.rT);
+  const vals = cur.concat(cc).map(p => p[1]);
+  let ymin = Math.min(...vals), ymax = Math.max(...vals);
+  const span = Math.max(ymax - ymin, key === 'lr' ? 0.5 : 2); ymin = Math.max(0, ymin - span * .15); ymax += span * .15;
+  const nice = niceTicks(ymin, ymax, 5); ymin = nice[0]; ymax = nice[nice.length - 1];
+  const X = x => CH.l + x / xmax * (CH.w - CH.l - CH.r), Y = y => CH.t + (1 - (y - ymin) / (ymax - ymin)) * (CH.h - CH.t - CH.b);
+  const txt = (x, y, t, anchor) => { const e = el('text', { x, y, 'font-size': 11, 'text-anchor': anchor, fill: C('--muted'), 'font-family': 'IBM Plex Mono, monospace' }, svg); e.textContent = t; };
+  nice.forEach(v => { el('line', { x1: CH.l, x2: CH.w - CH.r, y1: Y(v), y2: Y(v), stroke: C('--grid') }, svg); txt(CH.l - 6, Y(v) + 4, key === 'lr' ? v.toFixed(1) : v.toFixed(0), 'end'); });
+  niceTicks(0, xmax, 6).filter(v => v <= xmax + .1).forEach(v => txt(X(v), CH.h - CH.b + 16, v.toFixed(0), 'middle'));
+  txt((CH.l + CH.w - CH.r) / 2, CH.h - 4, 'rear wheel travel, mm', 'middle');
+  el('line', { x1: CH.l, x2: CH.w - CH.r, y1: CH.h - CH.b, y2: CH.h - CH.b, stroke: C('--line') }, svg);
+  [['unladen', PA.sag.unladen[1]], ['rider', PA.sag.rider[1]]].forEach(([lab, w]) => {
+    el('line', { x1: X(w), x2: X(w), y1: CH.t, y2: CH.h - CH.b, stroke: C('--muted'), 'stroke-dasharray': '2 3' }, svg); txt(X(w) + 4, CH.t + 10, lab, 'start'); });
+  const path = (pts, color, dash) => el('path', { d: pts.map((p, i) => `${i ? 'L' : 'M'}${X(p[0]).toFixed(1)} ${Y(p[1]).toFixed(1)}`).join(''), fill: 'none', stroke: color, 'stroke-width': 2, 'stroke-dasharray': dash || '', 'stroke-linejoin': 'round' }, svg);
+  if (cc.length) path(cc, C('--cmp'), '6 4');
+  path(cur, C('--accent'));
+  const cross = el('line', { y1: CH.t, y2: CH.h - CH.b, stroke: C('--ink'), opacity: .5 }, svg);
+  const dot = el('circle', { r: 4.5, fill: C('--accent'), stroke: C('--panel'), 'stroke-width': 2 }, svg);
+  const nearest = (arr, w) => arr.reduce((b, p) => Math.abs(p[0] - w) < Math.abs(b[0] - w) ? p : b, arr[0]);
+  const w = SA.rw, p = nearest(cur, w); cross.setAttribute('x1', X(w)); cross.setAttribute('x2', X(w)); dot.setAttribute('cx', X(w)); dot.setAttribute('cy', Y(p[1]));
+  const hit = el('rect', { x: CH.l, y: CH.t, width: CH.w - CH.l - CH.r, height: CH.h - CH.t - CH.b, fill: 'transparent', style: 'cursor:crosshair' }, svg);
+  const box = svg.parentElement; let tip = box.querySelector('.tip'); if (!tip) { tip = document.createElement('div'); tip.className = 'tip'; tip.hidden = true; box.appendChild(tip); }
+  const atW = evt => { const r = svg.getBoundingClientRect(); return Math.max(0, Math.min(xmax, ((evt.clientX - r.left) / r.width * CH.w - CH.l) / (CH.w - CH.l - CH.r) * xmax)); };
+  const go = wv => { const fr = Math.min(1, wv / PA.rT), link = $('linkEnds').checked; pos = { state: null, f: link ? fr * PA.fT : pos.f, r: fr * PA.rT }; render(); };
+  hit.addEventListener('pointermove', evt => {
+    const wv = atW(evt), q = nearest(cur, wv), o = cc.length ? nearest(cc, wv) : null, r = svg.getBoundingClientRect(), br = box.getBoundingClientRect();
+    tip.hidden = false; tip.style.left = (evt.clientX - br.left) + 'px'; tip.style.top = (r.top - br.top + Y(q[1]) / CH.h * r.height) + 'px';
+    const f = v => key === 'lr' ? v.toFixed(2) : v.toFixed(1);
+    tip.textContent = `${wv.toFixed(0)} mm · ${f(q[1])}` + (o && wv <= PO.rT ? ` · ${TAB_NAMES[other()]} ${f(o[1])}` : '');
+    if (evt.buttons) go(wv);
+  });
+  hit.addEventListener('pointerdown', evt => go(atW(evt)));
+  hit.addEventListener('pointerleave', () => { tip.hidden = true; });
+}
+
+// ---------- Wiring ----------
+$('sheet').addEventListener('input', render);
+document.querySelectorAll('[data-tab]').forEach(b => b.addEventListener('click', () => { if (b.dataset.tab === active) return; fromForm(); active = b.dataset.tab; toForm(); render(); }));
+document.querySelectorAll('[data-state]').forEach(b => b.addEventListener('click', () => { pos.state = b.dataset.state; render(); }));
+function slide(which) {
+  const fv = $('fPos').value / 1000, rv = $('rPos').value / 1000, link = $('linkEnds').checked;
+  const ff = which === 'f' ? fv : (link ? rv : fv), rf = which === 'r' ? rv : (link ? fv : rv);
+  pos = { state: null, f: ff * PA.fT, r: rf * PA.rT }; render();
+}
+$('fPos').addEventListener('input', () => slide('f'));
+$('rPos').addEventListener('input', () => slide('r'));
+$('ghost').addEventListener('change', render);
+$('zoom').addEventListener('change', render);
+$('resetTab').addEventListener('click', () => { tabs[active] = clone(DEF_TABS[active]); frame = clone(DEF_FRAME); toForm(); render(); });
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', render);
+new MutationObserver(render).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+// ---------- Saving (installed app) ----------
+// The app keeps everything in this phone's storage. Back up writes a JSON file you can keep in Files; Restore reads one back.
+const saveNote = t => { $('saveNote').textContent = t; };
+function applySaved(s) {
+  if (!s) return;
+  frame = Object.assign(clone(DEF_FRAME), s.frame || {});
+  ['build', 'stock'].forEach(k => { tabs[k] = Object.assign(clone(DEF_TABS[k]), (s.tabs || {})[k] || {}); });
+  if (s.active in tabs) active = s.active;
+}
+function cloudSave() { saveNote('Saved on this phone · ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })); }
+$('exportBtn').addEventListener('click', async () => {
+  fromForm();
+  const name = 'xl125r-chassis-' + new Date().toISOString().slice(0, 10) + '.json';
+  const blob = new Blob([JSON.stringify({ app: 'xl125r-chassis-bench', v: 1, frame, tabs, active }, null, 2)], { type: 'application/json' });
+  try {
+    const file = new File([blob], name, { type: 'application/json' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], title: 'XL125R Chassis Bench backup' }); saveNote('Backup shared'); return; }
+  } catch (e) { if (e && e.name === 'AbortError') return; }
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); a.remove();
+  saveNote('Backup saved');
+});
+$('importBtn').addEventListener('click', () => $('importFile').click());
+$('importFile').addEventListener('change', async e => {
+  const f = e.target.files[0]; e.target.value = ''; if (!f) return;
+  try { const s = JSON.parse(await f.text()); if (!s.frame || !s.tabs) throw new Error('not a bench backup');
+    applySaved(s); toForm(); render(); saveNote('Restored from ' + f.name);
+  } catch (err) { saveNote('That file isn\'t a Chassis Bench backup'); }
+});
+if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(() => {});
+toForm(); render();
+
+</script>
+</body>
+</html>
