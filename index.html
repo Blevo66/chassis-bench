@@ -1017,6 +1017,66 @@ fieldset.collapsed > :not(legend) { display: none !important; }
 .card.collapsed .card-head > :not(h2) { display: none !important; }
 .sliders input[type=range] { touch-action: none; height: 28px; }
 @media (max-width: 560px) { .sliders { grid-template-columns: auto minmax(0, 1fr) auto; } }
+
+/* padlock on each number row */
+.row.lk { grid-template-columns: minmax(0, 1fr) 86px 86px 34px; }
+.row.one.lk { grid-template-columns: minmax(0, 1fr) 86px 34px; }
+.axes { grid-template-columns: minmax(0, 1fr) 86px 86px 34px; }
+.lockBtn { width: 34px; height: 34px; padding: 0; border: 0; background: none; font-size: 17px; line-height: 1; cursor: pointer; opacity: .3; filter: grayscale(1); }
+.lockBtn[aria-pressed="true"] { opacity: 1; filter: none; }
+.row.locked input { background: var(--line, #ddd); color: var(--muted); }
+/* iPhone zooms the page into any text box under 16px; keep them at 16px on touch screens */
+@media (pointer: coarse), (max-width: 900px) { input[type=number], input[type=text], select, textarea { font-size: 16px; } }
+/* Side view options tucked into a fold */
+.view-opts { margin-top: 6px; }
+.view-opts > summary { cursor: pointer; font-size: 12px; color: var(--muted); padding: 4px 0; }
+.view-opts .slider-tools { margin-top: 4px; }
+/* Measuring mode */
+.measure { position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,.35); display: flex; justify-content: center; align-items: stretch; }
+.measure[hidden], .msketch[hidden] { display: none !important; }
+body.measuring { overflow: hidden; }
+.mpanel { background: var(--bg); width: 100%; max-width: 640px; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: calc(14px + env(safe-area-inset-top)) 16px calc(16px + env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 12px; }
+.mpanel > * { flex-shrink: 0; }
+.mtop { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.mtop h2 { margin: 2px 0 0; font-family: var(--display); font-size: 26px; text-transform: uppercase; letter-spacing: .03em; }
+.mprog { height: 4px; background: var(--grid); border-radius: 2px; overflow: hidden; }
+.mprog i { display: block; height: 100%; background: var(--accent); transition: width .2s; }
+.msketch { width: 100%; height: auto; aspect-ratio: 1720 / 870; flex-shrink: 0; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; }
+.mtext { margin: 0; line-height: 1.5; }
+.mfield { display: flex; flex-direction: column; gap: 6px; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 10px 12px; margin-bottom: 8px; }
+.mlabel { font-weight: 600; }
+.mfield input[type=number] { font-size: 20px; padding: 8px 10px; width: 100%; font-family: var(--mono); }
+.mpair { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; gap: 8px; align-items: center; }
+.maxis { font-family: var(--mono); color: var(--muted); }
+.mseg { display: inline-flex; border: 1px solid var(--line); border-radius: 5px; overflow: hidden; flex-wrap: wrap; }
+.mseg button { border: 0; border-radius: 0; padding: 9px 11px; font-size: 13px; }
+.mseg button + button { border-left: 1px solid var(--line); }
+.mseg button[aria-pressed=true] { background: var(--ink); color: var(--bg); }
+.mreview { width: 100%; border-collapse: collapse; font-size: 14px; font-family: var(--body); }
+.mreview td { padding: 7px 4px; border-bottom: 1px solid var(--line); }
+.mreview td:last-child { text-align: right; font-family: var(--mono); white-space: nowrap; }
+.mnav { display: flex; gap: 8px; align-items: center; margin-top: auto; padding-top: 8px; position: sticky; bottom: 0; background: var(--bg); }
+.mnav .primary { margin-left: auto; padding: 10px 18px; font-size: 16px; }
+.mnav #mBack { padding: 10px 14px; font-size: 16px; }
+.mhead { margin: 10px 0 2px; font-family: var(--display); font-size: 15px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+.mgroup { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; width: 100%; text-align: left; padding: 14px 16px; margin-bottom: 10px; border-radius: 8px; background: var(--panel); }
+.mgroup b { font-family: var(--display); font-size: 21px; text-transform: uppercase; letter-spacing: .03em; }
+.mgroup span { color: var(--muted); font-size: 14px; }
+.mgroup i { font-style: normal; font-family: var(--mono); font-size: 12px; color: var(--accent); }
+.mgroup.review { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.mgroup.review span { color: var(--bg); opacity: .75; }
+.mnav [hidden] { display: none !important; }
+button.link { border: 0; background: none; color: var(--muted); text-decoration: underline; padding: 6px; font-size: 13px; }
+/* Folding sections */
+.fold-h { cursor: pointer; user-select: none; -webkit-user-select: none; }
+.fold-h::after { content: ""; display: inline-block; width: 7px; height: 7px; margin-left: 9px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: translateY(-3px) rotate(45deg); transition: transform .15s; opacity: .6; }
+.collapsed > .fold-h::after, .collapsed .card-head > .fold-h::after { transform: translateY(0) rotate(-45deg); }
+.fold-h:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+fieldset.collapsed > :not(legend) { display: none !important; }
+.card.collapsed > :not(h2):not(.card-head) { display: none !important; }
+.card.collapsed .card-head > :not(h2) { display: none !important; }
+.sliders input[type=range] { touch-action: none; height: 28px; }
+@media (max-width: 560px) { .sliders { grid-template-columns: auto minmax(0, 1fr) auto; } }
 /* Side view stays pinned while scrolling */
 .pinned .view-card { position: sticky; top: 0; z-index: 5; box-shadow: 0 6px 14px -10px rgba(0,0,0,.35); }
 .pinned .view-card .drawing { max-height: 46vh; }
@@ -1043,7 +1103,7 @@ body { padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-are
     </div>
     <div class="hdr-tools">
       <button type="button" class="primary" id="measureBtn">Measuring mode</button>
-      <span class="note">Version 12 Oct 19:00</span>
+      <span class="note">Version 12 Oct 19:20</span>
       <span class="note" id="saveNote" aria-live="polite"></span>
       <button type="button" id="exportBtn">Back up</button>
       <button type="button" id="importBtn">Restore</button>
@@ -1292,17 +1352,19 @@ const RAW_BARREL = [[-330,165],[-395,330],[-300,365],[-235,170]];
 const HEAD_TUBE = 150; // mm, raw
 
 const DEF_FRAME = { pivotHead: 632, rho: 27.5, engLow: [-380, -70], peg: [-60, -85] };
-const LINK = { armAngle: 15, rockerArm: [203, 68], frameLink: [38, -66], shockTop: [-80, 300], dog: 100, rD: 127, rS: 88, incl: -74, branch: false };
+// Early Pro-Link: a C-shaped rocker. Its top end pivots on the arm, its bottom end takes the dogbone forward to the frame lug, and the shock bolts into the middle of the C.
+// Fitted guesses until measured: 216 mm travel on the stock arm, ratio about 4.5 falling to 2.9.
+const LINK = { armAngle: 15, rockerArm: [170, 10], frameLink: [38, -66], shockTop: [-80, 300], dog: 110, rD: 70, rS: 70, incl: -70, branch: false, shape: 'c' };
 const DEF_TABS = {
   build: Object.assign({ forkLen: 935, stack: 215, slide: 50, spacer: 100, travel: 300, offset: 47, rf: 346, fk: 4.4, fpre: 10, fUn: 35, fLad: 75,
-    armLen: 630, rr: 323, eye: 337, stroke: 75, k: 110, preload: 5, wUnladen: 40, wLaden: 100 }, LINK),
+    armLen: 630, rr: 323, eye: 378, stroke: 60, k: 110, preload: 5, wUnladen: 40, wLaden: 100 }, LINK),
   stock: Object.assign({ forkLen: 680, stack: 100, slide: 0, spacer: 0, travel: 215, offset: 65, rf: 346, fk: 5, fpre: 18, fUn: 35, fLad: 75,
-    armLen: 530, rr: 323, eye: 337, stroke: 75, k: 95, preload: 5, wUnladen: 40, wLaden: 100 }, LINK)
+    armLen: 530, rr: 323, eye: 378, stroke: 60, k: 95, preload: 5, wUnladen: 40, wLaden: 100 }, LINK)
 };
 const clone = o => JSON.parse(JSON.stringify(o));
 // CRF style: Joel's '02-03 CRF450R rocker (eyes 48.5 / 77 / 70 mm) hung under the arm, CR forks as Build.
 // Rocker spot on the arm, the dogbone lug and the dogbone are fitted guesses (266 mm travel, ratio 4.2 to 2.6) until measured.
-DEF_TABS.crf = Object.assign(clone(DEF_TABS.build), { rockerArm: [120, -30], frameLink: [10, -88], dog: 96, rD: 48.5, rS: 77, incl: -63, eye: 406 });
+DEF_TABS.crf = Object.assign(clone(DEF_TABS.build), { rockerArm: [120, -30], frameLink: [10, -88], dog: 96, rD: 48.5, rS: 77, incl: -63, eye: 406, stroke: 75, shape: 'tri' });
 const TAB_NAMES = { build: 'Build', stock: 'Stock XL', crf: 'CRF style' };
 const $ = id => document.getElementById(id);
 const store = { get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} } };
@@ -1367,7 +1429,16 @@ const FRAME_SINGLE = ['pivotHead', 'rho'], FRAME_PAIRS = ['engLow', 'peg'];
 const TAB_SINGLE = ['forkLen','stack','slide','spacer','travel','offset','rf','fk','fpre','fUn','fLad','armLen','rr','eye','stroke','k','preload','wUnladen','wLaden','armAngle','dog','rD','rS','incl'];
 const TAB_PAIRS = ['rockerArm','frameLink','shockTop'];
 const num = (id, fb) => { const v = parseFloat($(id).value); return isFinite(v) ? v : fb; };
+// Tabs saved before the C-shaped rocker still hold the old made-up top-of-arm rocker; swap in the new guesses unless locked
+const OLD_LINK = { rockerArm: [203, 68], dog: 100, rD: 127, rS: 88, incl: -74, eye: 337, stroke: 75 };
+function migrateLink() {
+  ['build', 'stock'].forEach(t => { const c = tabs[t];
+    if (!c.rockerArm || c.rockerArm[0] !== 203 || c.rockerArm[1] !== 68 || c.rD !== 127 || c.rS !== 88) return;
+    Object.keys(OLD_LINK).forEach(k => { if (JSON.stringify(c[k]) === JSON.stringify(OLD_LINK[k]) && !isLocked(c, k)) c[k] = clone(DEF_TABS[t][k]); });
+    c.shape = 'c'; });
+}
 function toForm() {
+  migrateLink();
   FRAME_SINGLE.forEach(k => $(k).value = frame[k]); FRAME_PAIRS.forEach(k => { $(k+'0').value = frame[k][0]; $(k+'1').value = frame[k][1]; });
   const c = tabs[active];
   TAB_SINGLE.forEach(k => $(k).value = c[k]); TAB_PAIRS.forEach(k => { $(k+'0').value = c[k][0]; $(k+'1').value = c[k][1]; });
@@ -1526,7 +1597,7 @@ function draw() {
   [PA.c.shockTop, PA.c.frameLink].forEach(q => { let best = null; Object.values(F.lines).forEach(l => { for (let i = 1; i < l.length; i++) { const a = l[i-1], b = l[i], dx = b[0]-a[0], dy = b[1]-a[1], L2 = dx*dx + dy*dy, t = Math.max(0, Math.min(1, ((q[0]-a[0])*dx + (q[1]-a[1])*dy) / L2)), f = [a[0] + t*dx, a[1] + t*dy], d = Math.hypot(q[0]-f[0], q[1]-f[1]); if (!best || d < best[0]) best = [d, f, a, b]; } });
     if (!best) return; const fa = B.W(best[2]), fb = B.W(best[3]), Lf = Math.hypot(fb[0]-fa[0], fb[1]-fa[1]);
     gusset(B.W(best[1]), [(fb[0]-fa[0]) / Lf, (fb[1]-fa[1]) / Lf], B.W(q), (zoom ? 1 : 0.6) * Math.max(28, best[0] * 0.6)); });
-  // rocker gusset welded on top of the swingarm
+  // rocker bracket on the swingarm
   { const ad = [B.ar[0] - B.pivot[0], B.ar[1] - B.pivot[1]], al = Math.hypot(...ad), u = [ad[0] / al, ad[1] / al];
     const along = (B.R[0] - B.pivot[0]) * u[0] + (B.R[1] - B.pivot[1]) * u[1], foot = [B.pivot[0] + u[0] * along, B.pivot[1] + u[1] * along];
     gusset(foot, u, B.R, zoom ? 45 : 27); }
@@ -1536,7 +1607,10 @@ function draw() {
     line(A2, mid, { stroke: C('--accent'), 'stroke-width': 15 * ls });
     line(mid, B2, { stroke: C('--accent'), 'stroke-width': 6 * ls }); }
   line(B.D, B.other, { stroke: C('--ink'), 'stroke-width': 8 * ls });
-  el('polygon', { points: [B.R, B.D, B.S].map(P).join(' '), fill: C('--ink'), opacity: .88, stroke: C('--ink'), 'stroke-width': 4 * ls, 'stroke-linejoin': 'round' }, svg);
+  if (PA.c.shape === 'c') { // C-shaped rocker: a curve from the arm end to the dogbone end, passing through the shock eye
+    const cp = [2 * B.S[0] - (B.R[0] + B.D[0]) / 2, 2 * B.S[1] - (B.R[1] + B.D[1]) / 2];
+    el('path', { d: `M${P(B.R)} Q${P(cp)} ${P(B.D)}`, fill: 'none', stroke: C('--ink'), opacity: .88, 'stroke-width': 22 * ls, 'stroke-linecap': 'round' }, svg);
+  } else el('polygon', { points: [B.R, B.D, B.S].map(P).join(' '), fill: C('--ink'), opacity: .88, stroke: C('--ink'), 'stroke-width': 4 * ls, 'stroke-linejoin': 'round' }, svg);
   [B.shA, B.S, B.R, B.D, B.other].forEach(q => el('circle', { cx: q[0], cy: -q[1], r: 5 * ls, fill: C('--panel'), stroke: C('--ink'), 'stroke-width': 2 * ls }, svg));
   el('rect', { x: B.peg[0] - 25 * s, y: -B.peg[1] - 6 * s, width: 50 * s, height: 12 * s, fill: C('--ink') }, svg);
   [B.junction, B.cradleCorner, B.railEnd].forEach(q => el('circle', { cx: q[0], cy: -q[1], r: 6 * s, fill: C('--panel'), stroke: C('--ink'), 'stroke-width': 2.5 * s }, svg));
@@ -1654,7 +1728,7 @@ const D2 = Math.PI / 180;
 // Sketch of the bike in the bench's own frame coordinates (mm from the pivot, x back, y up)
 const SK = {
   P: [0, 0], H: [-516, 365], HT: [-488, 444], J: [-94, 345], RE: [258, 469], CC: [-373, -32], CF: [-17, -26], SA: [9, 60], SB: [169, 422],
-  A: [560, -110], FA: [-700, -105], S0: [-80, 300], DM: [38, -66], R: [214, 13], D: [136, -87], S: [132, 46], E: [-380, -70], PEG: [-60, -85]
+  A: [560, -110], FA: [-700, -105], S0: [-80, 300], DM: [38, -66], R: [167, -34], D: [176, -122], S: [128, -76], E: [-380, -70], PEG: [-60, -85]
 };
 // Signed inputs: iPhone number pads have no minus key, so each X and Y gets a direction toggle instead
 const XDIR = ['Behind', 'In front'], YDIR = ['Above', 'Below'];
@@ -1674,7 +1748,7 @@ const MSTEPS = [
   { id: 'rockerPivot', title: 'Rocker pivot on the arm', hl: 'rockerPivot', fields: [{ k: 'rockerAlong', label: 'Along the arm, from the pivot', unit: 'mm' }, { k: 'rockerAbove', label: 'Above the pivot-to-axle line', unit: 'mm' }],
     text: 'Measure this on the swingarm itself, not the frame. Stretch a string from the centre of the arm\'s pivot hole to the axle centre. Measure along the string from the pivot to where a square from the rocker bolt meets it, then up from the string to the rocker bolt centre.' },
   { id: 'rocker', title: 'The rocker itself', hl: 'rocker', fields: [{ k: 'rD', label: 'Rocker pivot to dogbone eye', unit: 'mm', step: 0.5 }, { k: 'rS', label: 'Rocker pivot to shock eye', unit: 'mm', step: 0.5 }, { k: 'eyes', label: 'Dogbone eye to shock eye', unit: 'mm', step: 0.5 }],
-    text: 'Measure the rocker\'s three bolt centres against each other: pivot to dogbone eye, pivot to shock eye, and the two eyes to each other. Easiest with it off the bike and a vernier.' },
+    text: 'The rocker is the C-shaped forging: its top end pivots on the arm, its bottom end takes the dogbone, and the shock bolts into the middle. Measure its three bolt centres against each other: pivot to dogbone eye, pivot to shock eye, and the two eyes to each other. Easiest with it off the bike and a vernier.' },
   { id: 'dog', title: 'Dogbone', hl: 'dog', fields: [{ k: 'dog', label: 'Dogbone eye centre to eye centre', unit: 'mm', step: 0.5 }],
     text: 'Bolt centre to bolt centre along the dogbone.' },
   { id: 'shock', title: 'Shock', hl: 'shock', fields: [{ k: 'eye', label: 'Shock eye to eye, fully extended', unit: 'mm' }, { k: 'stroke', label: 'Shock stroke', unit: 'mm' }],
@@ -1725,7 +1799,8 @@ function measSketch(svg, hl) {
   ln(SK.P, SK.A, { stroke: C('--steel'), 'stroke-width': 18 });
   ln([-470, 520], SK.FA, { stroke: C('--steel'), 'stroke-width': 20 });
   ln(SK.S0, SK.S, { stroke: C('--muted'), 'stroke-width': 14 });
-  el('polygon', { points: [SK.R, SK.D, SK.S].map(q => P(q).join(',')).join(' '), fill: C('--muted') }, svg);
+  { const cp = [2 * SK.S[0] - (SK.R[0] + SK.D[0]) / 2, 2 * SK.S[1] - (SK.R[1] + SK.D[1]) / 2]; // C-shaped rocker through the shock eye
+    el('path', { d: `M${P(SK.R).join(' ')} Q${P(cp).join(' ')} ${P(SK.D).join(' ')}`, fill: 'none', stroke: C('--muted'), 'stroke-width': 26 * k, 'stroke-linecap': 'round' }, svg); }
   ln(SK.D, SK.DM, { stroke: C('--muted'), 'stroke-width': 10 });
   el('rect', { x: SK.PEG[0] - 40, y: -SK.PEG[1] - 8 * k, width: 80, height: 16 * k, fill: C('--ink') }, svg);
   // laser cross through the pivot
