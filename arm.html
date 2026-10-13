@@ -6,8 +6,8 @@
 <meta name="theme-color" content="#EDEFEA" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#141A17" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="icon-192-v2.png">
-<title>Swingarm Measuring Guide</title>
-<meta name="description" content="A step-by-step guide to measuring a stock Honda XL125R swingarm, rocker, dogbone and shock.">
+<title>Swingarm &amp; Linkage Calculator</title>
+<meta name="description" content="A step-by-step guide to measuring a swingarm, rocker, dogbone and shock.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
@@ -92,7 +92,7 @@ svg text.big { font-family: var(--display); font-size: 17px; font-weight: 700; f
 <body>
 <div class="wrap">
   <header>
-    <h1>XL125R <span>swingarm</span> measuring</h1>
+    <h1><span>Swingarm &amp; linkage</span> calculator</h1>
     <div class="bar"><i id="bar"></i></div>
   </header>
   <main id="main"></main>
@@ -100,7 +100,7 @@ svg text.big { font-family: var(--display); font-size: 17px; font-weight: 700; f
 <nav class="nav"><div><button type="button" id="back">Back</button><button type="button" class="primary" id="next">Next</button></div></nav>
 
 <script>
-// Where Joel's bench lives: the results link opens it with these numbers waiting in its measuring mode
+// Where the bench lives: the results link opens it with these numbers waiting in its measuring mode
 const BENCH = 'https://blevo66.github.io/chassis-bench/';
 const KEY = 'xl-arm-measure-v1';
 const $ = id => document.getElementById(id);
@@ -160,27 +160,32 @@ const SK = {
     <text class="big" x="190" y="152" text-anchor="middle">1 EYE TO EYE</text>
     <line class="hot" x1="212" y1="34" x2="298" y2="34"/><text class="big" x="255" y="24" text-anchor="middle">2 SHINY ROD</text>
     <text x="96" y="76" class="m">spring and body</text>`, '0 8 400 152'),
-  widths: svg(`<polygon class="part" points="112,40 130,40 116,196 98,196"/><polygon class="part" points="270,40 288,40 302,196 284,196"/>
-    <rect class="part" x="104" y="24" width="192" height="18" rx="4"/><rect class="part" x="124" y="72" width="152" height="12"/>
-    <rect class="part" x="178" y="84" width="10" height="22"/><rect class="part" x="212" y="84" width="10" height="22"/>
-    <circle class="hole" cx="107" cy="190" r="4"/><circle class="hole" cx="293" cy="190" r="4"/>
-    <line class="hot" x1="104" y1="12" x2="296" y2="12"/><text class="big" x="310" y="18">1</text>
-    <line class="hot" x1="117" y1="176" x2="283" y2="176"/><text class="big" x="194" y="170">2</text>
-    <line class="hot" x1="188" y1="116" x2="212" y2="116"/><text class="big" x="195" y="138">3</text>
-    <text x="10" y="38" class="m">pivot tube</text><text x="306" y="200" class="m">axle end</text><text x="232" y="100" class="m">rocker lugs</text>`, '0 0 400 210')
+  widths: svg(`<line class="str" x1="200" y1="4" x2="200" y2="206"/>
+    <polygon class="part" points="112,40 130,40 116,196 98,196"/><polygon class="part" points="270,40 288,40 302,196 284,196"/>
+    <rect class="part" x="104" y="24" width="192" height="18" rx="4"/><rect class="part" x="124" y="62" width="152" height="12"/>
+    <rect class="part" x="156" y="74" width="8" height="24"/><rect class="part" x="184" y="74" width="8" height="24"/>${ctr([174, 86])}
+    <line class="hot" x1="104" y1="12" x2="296" y2="12"/><text class="big" x="306" y="18">1</text>
+    <line class="hot" x1="174" y1="116" x2="200" y2="116"/><line class="hotd" x1="174" y1="86" x2="174" y2="122"/><text class="big" x="182" y="138">2</text>
+    <line class="hot" x1="156" y1="156" x2="192" y2="156"/><line class="hotd" x1="156" y1="98" x2="156" y2="162"/><line class="hotd" x1="192" y1="98" x2="192" y2="162"/><text class="big" x="168" y="178">3</text>
+    <text x="10" y="38" class="m">pivot tube</text><text x="306" y="200" class="m">axle end</text><text x="206" y="96" class="m">rocker mount</text><text x="206" y="200" class="m">centre line</text>`, '0 0 400 210')
 };
 
 // ---- Steps ----
-// Fields: k is the key the Chassis Bench understands (armLen, rockerAlong, rockerAbove, rD, rS, eyes, dog, eye, stroke); x_ keys are extras for Joel
+// Fields: k is the key the Chassis Bench understands (armLen, rockerAlong, rockerAbove, rD, rS, eyes, dog, eye, stroke); x_ keys are extras that only go in the message
 const STEPS = [
   { id: 'hello', title: 'Hi! A few measurements', sketch: 'overview', html: `
     <p>All in <b>millimetres</b>, from the <b>centre</b> of one hole to the <b>centre</b> of another.</p>
-    <p class="small">Tip: measuring from the left edge of one hole to the left edge of the other gives the same number.</p>` },
+    <p class="small">Tip: measuring from the left edge of one hole to the left edge of the other gives the same number.</p>`,
+    fields: [{ k: 'x_parts', label: 'What are you measuring?', line: true, placeholder: 'Bike, model and year of each part' }] },
   { id: 'armLen', title: 'Swingarm length', sketch: 'armLen', html: `<p>Pivot hole to axle hole.</p>`,
     fields: [{ k: 'armLen', label: 'Pivot to axle', range: [380, 700] }] },
   { id: 'rockerPos', title: 'Rocker bolt position', sketch: 'rockerPos', html: `<p>From the rocker's top bolt to the pivot hole, then to the axle hole.</p>`,
     fields: [{ k: 'rP', label: '1. Pivot to rocker bolt', range: [40, 400] },
              { k: 'rA', label: '2. Rocker bolt to axle', range: [100, 600] }] },
+  { id: 'widths', title: 'Widths', sketch: 'widths', html: `<p>Looking down from above, front at the top. Left and right are as if sitting on the bike.</p>`,
+    fields: [{ k: 'x_pivotWidth', label: '1. Pivot tube, end to end' },
+             { k: 'x_rockerOffset', label: '2. Rocker mount, centre line to middle of mount', opts: ['Left', 'Right'] },
+             { k: 'x_rockerWidth', label: '3. Rocker mount, outside width' }] },
   { id: 'rocker', title: 'Rocker', sketch: 'rocker', html: `<p>Between its three holes.</p>`,
     fields: [{ k: 'rD', label: 'A. Top to bottom', range: [30, 200] },
              { k: 'rS', label: 'B. Top to middle', range: [20, 200] },
@@ -194,7 +199,7 @@ const STEPS = [
 ];
 
 const SUMMARY = [
-  ['Swingarm: pivot to axle', 'armLen'], ['Pivot to rocker bolt', 'rP'], ['Rocker bolt to axle', 'rA'],
+  ['Swingarm: pivot to axle', 'armLen'], ['Pivot to rocker bolt', 'rP'], ['Rocker bolt to axle', 'rA'], ['Pivot tube width', 'x_pivotWidth'], ['Rocker mount offset', 'x_rockerOffset'], ['Rocker mount width', 'x_rockerWidth'],
   ['Rocker A: top to bottom hole', 'rD'], ['Rocker B: top to middle hole', 'rS'], ['Rocker C: middle to bottom hole', 'eyes'],
   ['Dogbone hole to hole', 'dog'], ['Shock hole to hole', 'eye'], ['Shock rod showing', 'stroke']
 ];
@@ -207,7 +212,7 @@ function rockerXY() {
   return [Math.round(along), Math.round(Math.sqrt(h2))];
 }
 const num = k => { const v = st.v[k]; return v === '' || v === undefined || v === null || !isFinite(+v) ? null : +v; };
-const show = k => { const n = num(k); return n === null ? null : `${n} mm`; };
+const show = k => { const n = num(k); return n === null ? null : `${n} mm${st.v[k + 'Side'] ? ' ' + st.v[k + 'Side'].toLowerCase() : ''}`; };
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
 function hint(f) {
@@ -218,27 +223,29 @@ function hint(f) {
 }
 
 function fieldHTML(f) {
+  if (f.line) return `<label class="field"><span class="lab">${f.label}</span><input type="text" data-k="${f.k}" placeholder="${f.placeholder || ''}" value="${esc(st.v[f.k] ?? '')}"></label>`;
+  const seg = f.opts ? `<div class="seg">${f.opts.map(o => `<button type="button" data-seg="${f.k}Side" data-v="${o}" aria-pressed="${st.v[f.k + 'Side'] === o}">${o}</button>`).join('')}</div>` : '';
   if (f.text) return `<label class="field"><span class="lab">${f.label}</span><textarea data-k="${f.k}">${esc(st.v[f.k] ?? '')}</textarea></label>`;
   return `<label class="field"><span class="lab">${f.label}${f.small ? ` <small>${f.small}</small>` : ''}</span>
     <span class="inrow"><input type="number" inputmode="decimal" step="0.5" min="0" data-k="${f.k}" value="${esc(st.v[f.k] ?? '')}"><span class="unit">mm</span></span>
-    <div class="hint" data-h="${f.k}">${hint(f)}</div></label>`;
+    ${seg}<div class="hint" data-h="${f.k}">${hint(f)}</div></label>`;
 }
 
 function summaryText() {
   const lines = SUMMARY.map(([t, k]) => show(k) ? `${t}: ${show(k)}` : null).filter(Boolean);
   const xy0 = rockerXY(); if (xy0) lines.push(`Worked out: rocker bolt ${xy0[0]} mm along the pivot-to-axle line, ${xy0[1]} mm above it`);
-  const notes = (st.v.x_notes || '').trim();
+  const notes = (st.v.x_notes || '').trim(), parts = (st.v.x_parts || '').trim();
   const data = {}; BENCH_KEYS.forEach(k => { const n = num(k); if (n !== null) data[k] = n; });
   const xy = rockerXY(); if (xy) { data.rockerAlong = xy[0]; data.rockerAbove = xy[1]; }
   const link = BENCH + '#m=' + encodeURIComponent(JSON.stringify(data));
-  return `XL125R stock swingarm and linkage measurements\n\n${lines.join('\n') || '(nothing filled in yet)'}${notes ? `\n\nNotes: ${notes}` : ''}\n\nData link:\n${link}`;
+  return `Swingarm and linkage measurements${parts ? `\n${parts}` : ''}\n\n${lines.join('\n') || '(nothing filled in yet)'}${notes ? `\n\nNotes: ${notes}` : ''}\n\nData link:\n${link}`;
 }
 
 function reviewHTML() {
   const rows = SUMMARY.map(([t, k]) => `<tr class="${show(k) ? '' : 'miss'}"><td>${t}</td><td>${show(k) || 'skipped'}</td></tr>`).join('')
     + (() => { const xy = rockerXY(); return xy ? `<tr><td>Rocker bolt along the arm (worked out)</td><td>${xy[0]} mm</td></tr><tr><td>Rocker bolt height (worked out)</td><td>${xy[1]} mm</td></tr>` : ''; })();
-  return `<table class="sum">${rows}</table>
-    <div class="send"><button type="button" class="primary" id="share">Send to Joel</button><button type="button" id="copy">Copy</button></div>
+  return `${(st.v.x_parts || '').trim() ? `<p><b>${esc(st.v.x_parts.trim())}</b></p>` : ''}<table class="sum">${rows}</table>
+    <div class="send"><button type="button" class="primary" id="share">Send results</button><button type="button" id="copy">Copy</button></div>
     <p class="done" id="sent"></p>`;
 }
 
@@ -254,10 +261,12 @@ function render() {
   $('main').querySelectorAll('[data-k]').forEach(inp => inp.addEventListener('input', () => {
     st.v[inp.dataset.k] = inp.value; store.set(st);
     const f = (s.fields || []).find(x => x.k === inp.dataset.k), h = $('main').querySelector(`[data-h="${inp.dataset.k}"]`); if (f && h) h.textContent = hint(f); }));
+  $('main').querySelectorAll('[data-seg]').forEach(b => b.addEventListener('click', e => { e.preventDefault(); st.v[b.dataset.seg] = b.dataset.v; store.set(st);
+    b.parentElement.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b)); }));
   if (s.review) {
     $('share').addEventListener('click', async () => {
       const text = summaryText();
-      if (navigator.share) { try { await navigator.share({ title: 'XL125R swingarm measurements', text }); $('sent').textContent = 'Sent. Thanks so much!'; return; } catch (e) { if (e && e.name === 'AbortError') return; } }
+      if (navigator.share) { try { await navigator.share({ title: 'Swingarm measurements', text }); $('sent').textContent = 'Sent. Thanks so much!'; return; } catch (e) { if (e && e.name === 'AbortError') return; } }
       copy(text);
     });
     $('copy').addEventListener('click', () => copy(summaryText()));
@@ -266,7 +275,7 @@ function render() {
 }
 
 async function copy(text) {
-  try { await navigator.clipboard.writeText(text); $('sent').textContent = 'Copied. Paste it into a message or email to Joel.'; }
+  try { await navigator.clipboard.writeText(text); $('sent').textContent = 'Copied. Paste it into a message or email.'; }
   catch (e) { // Old browsers: show the text so it can be selected by hand
     $('sent').innerHTML = `<textarea readonly style="min-height:200px">${esc(text)}</textarea>`; }
 }
