@@ -112,11 +112,11 @@ let st = store.get() || { step: 0, v: {} };
 if (!st.v) st.v = {};
 
 // ---- Sketches (side view: pivot on the left, axle on the right) ----
-const P = [44, 84], A = [356, 100], R = [150, 108], S = [176, 140], D = [142, 174], F = [62, 186], T = [104, 14];
+const P = [44, 84], A = [356, 100], R = [150, 62], S = [190, 120], D = [142, 174], F = [62, 186], T = [104, 14];
 const arm = `<polygon class="part" points="30,70 200,76 368,90 368,110 200,102 30,98"/>
   <circle class="hole" cx="${P[0]}" cy="${P[1]}" r="9"/><circle class="hole" cx="${A[0]}" cy="${A[1]}" r="6"/>
-  <path class="part" d="M140,101 L160,102 L156,114 L144,114 Z"/>`;
-const rockerC = `<path class="rod" d="M${R} C190,118 192,158 ${D}"/><path class="rodin" d="M${R} C190,118 192,158 ${D}"/>
+  <path class="part" d="M140,77 L160,78 L156,62 L144,62 Z"/>`;
+const rockerC = `<path class="rod" d="M${R} C205,80 205,160 ${D}"/><path class="rodin" d="M${R} C205,80 205,160 ${D}"/>
   ${[R, S, D].map(q => `<circle class="hole" cx="${q[0]}" cy="${q[1]}" r="5"/>`).join('')}`;
 const dogbone = `<line class="rod" x1="${D[0]}" y1="${D[1]}" x2="${F[0]}" y2="${F[1]}"/><circle class="hole" cx="${F[0]}" cy="${F[1]}" r="5"/>`;
 const shock = `<line x1="${S[0]}" y1="${S[1]}" x2="${T[0]}" y2="${T[1]}" stroke="var(--steel)" stroke-width="14" stroke-linecap="round" opacity=".35"/>`;
@@ -143,8 +143,7 @@ const SK = {
   rockerPos: svg(`${arm}${rockerC}<line class="str" x1="${P[0]}" y1="${P[1]}" x2="${A[0] + 20}" y2="${A[1] + 1}"/>
     ${ctr(P)}${ctr(R)}
     <line class="hot" x1="${P[0]}" y1="${P[1]}" x2="${foot[0]}" y2="${foot[1]}"/><line class="hot" x1="${foot[0]}" y1="${foot[1]}" x2="${R[0]}" y2="${R[1]}"/>
-    <text class="big" x="70" y="58">1 ALONG</text><text class="big" x="160" y="200">2 UP OR DOWN</text>
-    <line class="hotd" x1="158" y1="186" x2="${R[0] + 4}" y2="${R[1] + 6}"/>
+    <text class="big" x="70" y="58">1 ALONG</text><text class="big" x="160" y="40">2 UP OR DOWN</text>
     <text x="226" y="134" class="m">string: pivot centre to axle centre</text>`),
   rocker: svg(`<path class="rod" d="M110,40 C230,70 236,200 100,236" transform="translate(30,-10)"/>
     <path class="rodin" d="M110,40 C230,70 236,200 100,236" transform="translate(30,-10)"/>
@@ -184,7 +183,7 @@ const STEPS = [
     <div class="tip">Please write everything in <b>millimetres</b>. If your tape is in centimetres, 23.5 cm is 235 mm.</div>` },
   { id: 'parts', title: 'Which bit is which', sketch: 'overview', html: `
     <p><b>Swingarm:</b> the long arm that holds the back wheel. It pivots on a bolt at the front, and the wheel axle goes through the back.</p>
-    <p><b>Rocker:</b> a curved, C-shaped piece hanging under the swingarm. It has three bolt holes: top, middle and bottom.</p>
+    <p><b>Rocker:</b> a curved, C-shaped piece. Its top end bolts onto the top of the swingarm, and it curves down past the arm. It has three bolt holes: top, middle and bottom.</p>
     <p><b>Dogbone:</b> a short link with a hole at each end. It joins the bottom of the rocker to the frame.</p>
     <p><b>Shock:</b> the spring and damper. Its bottom end bolts into the middle of the rocker.</p>
     <p class="small">The sketch is roughly how they fit together. The real parts look chunkier.</p>` },
