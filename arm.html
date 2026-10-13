@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#141A17" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="icon-192-v2.png">
 <title>Swingarm Measuring Guide</title>
-<meta name="description" content="A step-by-step guide to measuring a stock Honda XL125R swingarm, rocker, dogbone and shock for Joel.">
+<meta name="description" content="A step-by-step guide to measuring a stock Honda XL125R swingarm, rocker, dogbone and shock.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
@@ -177,7 +177,7 @@ const SK = {
 // Fields: k is the key the Chassis Bench understands (armLen, rockerAlong, rockerAbove, rD, rS, eyes, dog, eye, stroke); x_ keys are extras for Joel
 const STEPS = [
   { id: 'hello', title: 'Hello, and thank you!', html: `
-    <p>Joel is building a 1982 Honda XL125R into a rally bike, and needs a few sizes off a standard swingarm and its suspension linkage. This walks you through them one at a time, with a sketch for each.</p>
+    <p>This walks you through a few measurements of a standard swingarm and its suspension linkage, one at a time, with a sketch for each.</p>
     <p><b>You'll need:</b></p>
     <ul><li>A tape measure (a steel ruler or vernier calipers is even better for the small parts)</li><li>A length of string and some tape</li><li>Your phone for a few photos</li></ul>
     <p>It takes about 20 to 30 minutes. Anything you type is saved on this phone as you go, so you can stop and come back to this page later.</p>
@@ -267,7 +267,7 @@ function summaryText() {
   const notes = (st.v.x_notes || '').trim();
   const data = {}; BENCH_KEYS.forEach(k => { const n = signed(k); if (n !== null) data[k] = n; });
   const link = BENCH + '#m=' + encodeURIComponent(JSON.stringify(data));
-  return `XL125R stock swingarm and linkage measurements\n\n${lines.join('\n') || '(nothing filled in yet)'}${notes ? `\n\nNotes: ${notes}` : ''}\n\nJoel, open this to load them into the Chassis Bench:\n${link}`;
+  return `XL125R stock swingarm and linkage measurements\n\n${lines.join('\n') || '(nothing filled in yet)'}${notes ? `\n\nNotes: ${notes}` : ''}\n\nData link:\n${link}`;
 }
 
 function reviewHTML() {
@@ -279,7 +279,7 @@ function reviewHTML() {
     ${(st.v.x_notes || '').trim() ? `<p class="small"><b>Notes:</b> ${esc(st.v.x_notes.trim())}</p>` : ''}
     <div class="send"><button type="button" class="primary" id="share">Send to Joel</button><button type="button" id="copy">Copy the results</button></div>
     <p class="done" id="sent"></p>
-    <p class="small">"Send to Joel" opens your phone's share menu, so pick Messages, WhatsApp or email and send it to him. It includes a link that loads the numbers straight into his app. Remember the photos too!</p>`;
+    <p class="small">"Send to Joel" opens your phone's share menu, so pick Messages, WhatsApp or email and send it to him. Remember the photos too!</p>`;
 }
 
 function render() {
