@@ -226,6 +226,7 @@ function fieldHTML(f) {
 
 function summaryText() {
   const lines = SUMMARY.map(([t, k]) => show(k) ? `${t}: ${show(k)}` : null).filter(Boolean);
+  const xy0 = rockerXY(); if (xy0) lines.push(`Worked out: rocker bolt ${xy0[0]} mm along the pivot-to-axle line, ${xy0[1]} mm above it`);
   const notes = (st.v.x_notes || '').trim();
   const data = {}; BENCH_KEYS.forEach(k => { const n = num(k); if (n !== null) data[k] = n; });
   const xy = rockerXY(); if (xy) { data.rockerAlong = xy[0]; data.rockerAbove = xy[1]; }
@@ -234,7 +235,8 @@ function summaryText() {
 }
 
 function reviewHTML() {
-  const rows = SUMMARY.map(([t, k]) => `<tr class="${show(k) ? '' : 'miss'}"><td>${t}</td><td>${show(k) || 'skipped'}</td></tr>`).join('');
+  const rows = SUMMARY.map(([t, k]) => `<tr class="${show(k) ? '' : 'miss'}"><td>${t}</td><td>${show(k) || 'skipped'}</td></tr>`).join('')
+    + (() => { const xy = rockerXY(); return xy ? `<tr><td>Rocker bolt along the arm (worked out)</td><td>${xy[0]} mm</td></tr><tr><td>Rocker bolt height (worked out)</td><td>${xy[1]} mm</td></tr>` : ''; })();
   return `<table class="sum">${rows}</table>
     <div class="send"><button type="button" class="primary" id="share">Send to Joel</button><button type="button" id="copy">Copy</button></div>
     <p class="done" id="sent"></p>`;
