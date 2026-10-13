@@ -140,11 +140,9 @@ const SK = {
   armLen: svg(`${arm}${ctr(P)}${ctr(A)}<line class="hot" x1="${P[0]}" y1="${P[1] + 36}" x2="${A[0]}" y2="${A[1] + 36}"/>
     <line class="hotd" x1="${P[0]}" y1="${P[1]}" x2="${P[0]}" y2="${P[1] + 42}"/><line class="hotd" x1="${A[0]}" y1="${A[1]}" x2="${A[0]}" y2="${A[1] + 42}"/>
     <text class="big" x="200" y="160" text-anchor="middle">PIVOT TO AXLE</text><text x="12" y="62">pivot</text><text x="340" y="72">axle</text>`, '0 30 400 150'),
-  rockerPos: svg(`${arm}${rockerC}<line class="str" x1="${P[0]}" y1="${P[1]}" x2="${A[0] + 20}" y2="${A[1] + 1}"/>
-    ${ctr(P)}${ctr(R)}
-    <line class="hot" x1="${P[0]}" y1="${P[1]}" x2="${foot[0]}" y2="${foot[1]}"/><line class="hot" x1="${foot[0]}" y1="${foot[1]}" x2="${R[0]}" y2="${R[1]}"/>
-    <text class="big" x="70" y="58">1 ALONG</text><text class="big" x="160" y="40">2 UP OR DOWN</text>
-    <text x="226" y="134" class="m">string: pivot centre to axle centre</text>`),
+  rockerPos: svg(`${arm}${rockerC}${ctr(P)}${ctr(R)}${ctr(A)}
+    <line class="hot" x1="${P[0]}" y1="${P[1]}" x2="${R[0]}" y2="${R[1]}"/><line class="hot" x1="${R[0]}" y1="${R[1]}" x2="${A[0]}" y2="${A[1]}"/>
+    <text class="big" x="70" y="56">1</text><text class="big" x="260" y="64">2</text>`),
   rocker: svg(`<path class="rod" d="M260,30 C140,60 134,190 270,226"/>
     <path class="rodin" d="M260,30 C140,60 134,190 270,226"/>
     ${[[260, 30], [178, 128], [270, 226]].map(q => `<circle class="hole" cx="${q[0]}" cy="${q[1]}" r="9"/>${ctr(q)}`).join('')}
@@ -175,110 +173,71 @@ const SK = {
 // ---- Steps ----
 // Fields: k is the key the Chassis Bench understands (armLen, rockerAlong, rockerAbove, rD, rS, eyes, dog, eye, stroke); x_ keys are extras for Joel
 const STEPS = [
-  { id: 'hello', title: 'Hello, and thank you!', html: `
-    <p>This walks you through a few measurements of a standard swingarm and its suspension linkage, one at a time, with a sketch for each.</p>
-    <p><b>You'll need:</b></p>
-    <ul><li>A tape measure (a steel ruler or vernier calipers is even better for the small parts)</li><li>A length of string and some tape</li><li>Your phone for a few photos</li></ul>
-    <p>It takes about 20 to 30 minutes. Anything you type is saved on this phone as you go, so you can stop and come back to this page later.</p>
-    <div class="tip">Please write everything in <b>millimetres</b>. If your tape is in centimetres, 23.5 cm is 235 mm.</div>` },
-  { id: 'parts', title: 'Which bit is which', sketch: 'overview', html: `
-    <p><b>Swingarm:</b> the long arm that holds the back wheel. It pivots on a bolt at the front, and the wheel axle goes through the back.</p>
-    <p><b>Rocker:</b> a curved, C-shaped piece. Its top end bolts onto the top of the swingarm, and it curves down past the arm. It has three bolt holes: top, middle and bottom.</p>
-    <p><b>Dogbone:</b> a short link with a hole at each end. It joins the bottom of the rocker to the frame.</p>
-    <p><b>Shock:</b> the spring and damper. Its bottom end bolts into the middle of the rocker.</p>
-    <p class="small">The sketch is roughly how they fit together. The real parts look chunkier.</p>` },
-  { id: 'holes', title: 'The one trick', sketch: 'holes', html: `
-    <p>Every measurement here is from the <b>centre</b> of one bolt hole to the <b>centre</b> of another.</p>
-    <p>The centre is hard to find, so here's the trick: when two holes are the same size, measure from the <b>left edge</b> of one hole to the <b>left edge</b> of the other. That gives exactly the same number as centre to centre.</p>
-    <p>If the bolts are still in, you can measure to the middle of each bolt head instead.</p>` },
-  { id: 'armLen', title: 'Swingarm length', sketch: 'armLen', html: `
-    <p>Measure from the centre of the big pivot hole at the front of the swingarm to the centre of the axle hole at the back.</p>
-    <p>If the axle sits in slots with chain adjusters, put it in the <b>middle</b> of its slot first.</p>`,
-    fields: [{ k: 'armLen', label: 'Pivot centre to axle centre', range: [380, 700] }] },
-  { id: 'rockerPos', title: 'Where the rocker bolts on', sketch: 'rockerPos', html: `
-    <p>This finds where the top of the rocker is fixed to the swingarm. It works with the swingarm on or off the bike.</p>
-    <ol><li>Tape a string tight from the centre of the pivot hole to the centre of the axle.</li>
-    <li><b>Along:</b> from the pivot centre, measure along the string to the spot that's straight across from the rocker's top bolt (hold a set square or a book against the string to line it up).</li>
-    <li><b>Up or down:</b> from that spot on the string, measure straight to the centre of the rocker's top bolt. Then tap whether the bolt is above or below the string.</li></ol>`,
-    fields: [{ k: 'rockerAlong', label: '1. Along the string, from the pivot', range: [40, 400] },
-             { k: 'rockerAbove', label: '2. String to the rocker bolt', range: [0, 120], side: ['Bolt is above the string', 'Bolt is below the string'] }] },
-  { id: 'rocker', title: 'The rocker', sketch: 'rocker', html: `
-    <p>Now the rocker on its own (it's easiest off the bike). It has three holes: <b>top</b> (bolts to the swingarm), <b>middle</b> (the shock), and <b>bottom</b> (the dogbone). Measure the three straight lines between them.</p>
-    <p class="small">The holes might be different sizes here, so aim for the centres, or measure to the middle of the bolts with them fitted.</p>`,
-    fields: [{ k: 'rD', label: 'A. Top hole to bottom hole', range: [30, 200] },
-             { k: 'rS', label: 'B. Top hole to middle hole', range: [20, 200] },
-             { k: 'eyes', label: 'C. Middle hole to bottom hole', range: [20, 200] }] },
-  { id: 'dog', title: 'The dogbone', sketch: 'dog', html: `
-    <p>Centre of one hole to the centre of the other. If it's a pair of plates, measure one plate.</p>`,
-    fields: [{ k: 'dog', label: 'Dogbone eye to eye', range: [40, 200] }] },
-  { id: 'shock', title: 'The shock', sketch: 'shock', optional: true, html: `
-    <p>If the shock is there, measure it with it <b>not</b> fitted to the bike, so it's fully stretched out. No shock? Just tap Next.</p>
-    <ol><li><b>Eye to eye:</b> centre of the top mounting hole to the centre of the bottom one.</li>
-    <li><b>Shiny rod:</b> how much of the shiny shaft you can see between the body and the bottom end. If there's a rubber bump stop on the shaft, measure from the bump stop instead.</li></ol>`,
-    fields: [{ k: 'eye', label: '1. Eye to eye, fully stretched out', range: [200, 450] },
+  { id: 'hello', title: 'Hi! A few quick measurements', sketch: 'overview', html: `
+    <p>All in <b>millimetres</b>, from the <b>centre</b> of one hole to the <b>centre</b> of another.</p>
+    <p class="small">Tip: measuring from the left edge of one hole to the left edge of the other gives the same number.</p>` },
+  { id: 'armLen', title: 'Swingarm length', sketch: 'armLen', html: `<p>Pivot hole to axle hole.</p>`,
+    fields: [{ k: 'armLen', label: 'Pivot to axle', range: [380, 700] }] },
+  { id: 'rockerPos', title: 'Rocker bolt position', sketch: 'rockerPos', html: `<p>From the rocker's top bolt to the pivot hole, then to the axle hole.</p>`,
+    fields: [{ k: 'rP', label: '1. Pivot to rocker bolt', range: [40, 400] },
+             { k: 'rA', label: '2. Rocker bolt to axle', range: [100, 600] }] },
+  { id: 'rocker', title: 'Rocker', sketch: 'rocker', html: `<p>Between its three holes.</p>`,
+    fields: [{ k: 'rD', label: 'A. Top to bottom', range: [30, 200] },
+             { k: 'rS', label: 'B. Top to middle', range: [20, 200] },
+             { k: 'eyes', label: 'C. Middle to bottom', range: [20, 200] }] },
+  { id: 'dog', title: 'Dogbone', sketch: 'dog', html: `<p>Hole to hole.</p>`,
+    fields: [{ k: 'dog', label: 'Hole to hole', range: [40, 200] }] },
+  { id: 'shock', title: 'Shock', sketch: 'shock', optional: true, html: `<p>Only if it's there. Off the bike.</p>`,
+    fields: [{ k: 'eye', label: '1. Hole to hole', range: [200, 450] },
              { k: 'stroke', label: '2. Shiny rod showing', range: [20, 140] }] },
-  { id: 'widths', title: 'A few widths', sketch: 'widths', optional: true, html: `
-    <p>Looking down on the swingarm from above. These are a bonus, so skip any that are awkward.</p>`,
-    fields: [{ k: 'x_pivotWidth', label: '1. Pivot tube, end to end' }, { k: 'x_tyreGap', label: '2. Gap between the two arms, at the back where the tyre sits' },
-             { k: 'x_rockerGap', label: '3. Gap between the rocker\'s mounting lugs on the arm' },
-             { k: 'x_pivotBolt', label: 'Pivot bolt thickness', small: 'across the shank' }, { k: 'x_axle', label: 'Rear axle thickness' }] },
-  { id: 'notes', title: 'Photos and notes', html: `
-    <p>Photos help Joel a lot. If you can, take these and send them to him with your results:</p>
-    <ul><li>The swingarm from the side, with a tape measure lying along it</li><li>The rocker, dogbone and shock laid flat next to each other</li><li>Anything that looked odd, bent or worn</li></ul>
-    <p>Anything else worth saying? For example which bike the parts came off, any part numbers stamped on them, or a measurement you weren't sure about.</p>`,
-    fields: [{ k: 'x_notes', label: 'Notes', text: true }] },
-  { id: 'send', title: 'All done!', review: true }
+  { id: 'send', title: 'Done, thank you!', review: true }
 ];
 
-// Labels for the summary, in the order Joel reads them
 const SUMMARY = [
-  ['Swingarm: pivot to axle', 'armLen'], ['Rocker bolt: along the string', 'rockerAlong'], ['Rocker bolt: string to bolt', 'rockerAbove'],
+  ['Swingarm: pivot to axle', 'armLen'], ['Pivot to rocker bolt', 'rP'], ['Rocker bolt to axle', 'rA'],
   ['Rocker A: top to bottom hole', 'rD'], ['Rocker B: top to middle hole', 'rS'], ['Rocker C: middle to bottom hole', 'eyes'],
-  ['Dogbone eye to eye', 'dog'], ['Shock eye to eye', 'eye'], ['Shock rod showing', 'stroke'],
-  ['Pivot tube width', 'x_pivotWidth'], ['Gap at the tyre', 'x_tyreGap'], ['Rocker lug gap', 'x_rockerGap'], ['Pivot bolt', 'x_pivotBolt'], ['Rear axle', 'x_axle']
+  ['Dogbone hole to hole', 'dog'], ['Shock hole to hole', 'eye'], ['Shock rod showing', 'stroke']
 ];
-const BENCH_KEYS = ['armLen', 'rockerAlong', 'rockerAbove', 'rD', 'rS', 'eyes', 'dog', 'eye', 'stroke'];
+const BENCH_KEYS = ['armLen', 'rD', 'rS', 'eyes', 'dog', 'eye', 'stroke'];
 
+// The bench wants the rocker bolt along the pivot-to-axle line and its height above it; work them out from the triangle pivot, rocker bolt, axle
+function rockerXY() {
+  const L = num('armLen'), p = num('rP'), q = num('rA'); if (!L || !p || !q) return null;
+  const along = (L * L + p * p - q * q) / (2 * L), h2 = p * p - along * along; if (h2 < 0) return null;
+  return [Math.round(along), Math.round(Math.sqrt(h2))];
+}
 const num = k => { const v = st.v[k]; return v === '' || v === undefined || v === null || !isFinite(+v) ? null : +v; };
-// The rocker height is stored signed, the way the bench reads it: positive is above the pivot-to-axle line
-const signed = k => { const n = num(k); if (n === null) return null; return k === 'rockerAbove' && st.v.rockerSide === 1 ? -n : n; };
-const show = k => { const n = num(k); if (n === null) return null;
-  if (k === 'rockerAbove') return n === 0 ? '0 mm (on the string)' : `${n} mm ${st.v.rockerSide === 1 ? 'below' : 'above'}`; return `${n} mm`; };
+const show = k => { const n = num(k); return n === null ? null : `${n} mm`; };
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
 function hint(f) {
   const n = num(f.k); if (n === null || !f.range) return '';
-  if (n < f.range[0] / 5) return 'That looks like centimetres or inches. Please use millimetres.';
-  if (n < f.range[0] || n > f.range[1]) return 'That\'s a bit unexpected. Worth measuring again, but if it\'s right, leave it.';
+  if (n < f.range[0] / 5) return 'Millimetres please.';
+  if (n < f.range[0] || n > f.range[1]) return 'Double-check this one.';
   return '';
 }
 
 function fieldHTML(f) {
   if (f.text) return `<label class="field"><span class="lab">${f.label}</span><textarea data-k="${f.k}">${esc(st.v[f.k] ?? '')}</textarea></label>`;
-  const side = f.side ? `<div class="seg">${f.side.map((t, i) => `<button type="button" data-side="${i}" aria-pressed="${(st.v.rockerSide || 0) === i}">${t}</button>`).join('')}</div>` : '';
   return `<label class="field"><span class="lab">${f.label}${f.small ? ` <small>${f.small}</small>` : ''}</span>
     <span class="inrow"><input type="number" inputmode="decimal" step="0.5" min="0" data-k="${f.k}" value="${esc(st.v[f.k] ?? '')}"><span class="unit">mm</span></span>
-    ${side}<div class="hint" data-h="${f.k}">${hint(f)}</div></label>`;
+    <div class="hint" data-h="${f.k}">${hint(f)}</div></label>`;
 }
 
 function summaryText() {
   const lines = SUMMARY.map(([t, k]) => show(k) ? `${t}: ${show(k)}` : null).filter(Boolean);
   const notes = (st.v.x_notes || '').trim();
-  const data = {}; BENCH_KEYS.forEach(k => { const n = signed(k); if (n !== null) data[k] = n; });
+  const data = {}; BENCH_KEYS.forEach(k => { const n = num(k); if (n !== null) data[k] = n; });
+  const xy = rockerXY(); if (xy) { data.rockerAlong = xy[0]; data.rockerAbove = xy[1]; }
   const link = BENCH + '#m=' + encodeURIComponent(JSON.stringify(data));
   return `XL125R stock swingarm and linkage measurements\n\n${lines.join('\n') || '(nothing filled in yet)'}${notes ? `\n\nNotes: ${notes}` : ''}\n\nData link:\n${link}`;
 }
 
 function reviewHTML() {
   const rows = SUMMARY.map(([t, k]) => `<tr class="${show(k) ? '' : 'miss'}"><td>${t}</td><td>${show(k) || 'skipped'}</td></tr>`).join('');
-  const missing = ['armLen', 'rockerAlong', 'rockerAbove', 'rD', 'rS', 'eyes', 'dog'].filter(k => num(k) === null).length;
-  return `<p>Thank you! Here's everything you entered. Tap <b>Back</b> to fix anything.</p>
-    ${missing ? `<div class="tip">${missing} of the main measurements ${missing === 1 ? 'is' : 'are'} still blank. That's fine if you couldn't get ${missing === 1 ? 'it' : 'them'}, Joel will work around it.</div>` : ''}
-    <table class="sum">${rows}</table>
-    ${(st.v.x_notes || '').trim() ? `<p class="small"><b>Notes:</b> ${esc(st.v.x_notes.trim())}</p>` : ''}
-    <div class="send"><button type="button" class="primary" id="share">Send to Joel</button><button type="button" id="copy">Copy the results</button></div>
-    <p class="done" id="sent"></p>
-    <p class="small">"Send to Joel" opens your phone's share menu, so pick Messages, WhatsApp or email and send it to him. Remember the photos too!</p>`;
+  return `<table class="sum">${rows}</table>
+    <div class="send"><button type="button" class="primary" id="share">Send to Joel</button><button type="button" id="copy">Copy</button></div>
+    <p class="done" id="sent"></p>`;
 }
 
 function render() {
@@ -289,12 +248,10 @@ function render() {
     ${s.sketch ? `<div class="sketch">${SK[s.sketch]}</div>` : ''}${body}`;
   $('back').disabled = i === 0;
   $('next').hidden = !!s.review;
-  $('next').textContent = i === 0 ? 'Let\'s start' : (i === STEPS.length - 2 ? 'See my results' : 'Next');
+  $('next').textContent = i === 0 ? 'Start' : (i === STEPS.length - 2 ? 'Finish' : 'Next');
   $('main').querySelectorAll('[data-k]').forEach(inp => inp.addEventListener('input', () => {
     st.v[inp.dataset.k] = inp.value; store.set(st);
     const f = (s.fields || []).find(x => x.k === inp.dataset.k), h = $('main').querySelector(`[data-h="${inp.dataset.k}"]`); if (f && h) h.textContent = hint(f); }));
-  $('main').querySelectorAll('[data-side]').forEach(b => b.addEventListener('click', e => { e.preventDefault(); st.v.rockerSide = +b.dataset.side; store.set(st);
-    b.parentElement.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b)); }));
   if (s.review) {
     $('share').addEventListener('click', async () => {
       const text = summaryText();
