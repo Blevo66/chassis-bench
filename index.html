@@ -2264,6 +2264,15 @@ $('importFile').addEventListener('change', async e => {
 if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(() => {});
 toForm(); render();
+// A results link from the swingarm measuring page (arm.html) carries its numbers after #m=: load them into measuring mode and open the review to check and apply
+(function () {
+  const m = /[#&]m=([^&]*)/.exec(location.hash); if (!m) return;
+  history.replaceState(null, '', location.pathname + location.search);
+  let v; try { v = JSON.parse(decodeURIComponent(m[1])); } catch (e) { return; }
+  if (!v || typeof v !== 'object') return;
+  ['armLen', 'rockerAlong', 'rockerAbove', 'rD', 'rS', 'eyes', 'dog', 'eye', 'stroke'].forEach(k => { if (isFinite(+v[k]) && v[k] !== null && v[k] !== '') meas.v[k] = String(+v[k]); });
+  measOpen(); meas.group = 'link'; meas.step = 0; measSave(); measRender();
+})();
 
 </script>
 </body>

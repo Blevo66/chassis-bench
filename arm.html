@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#EDEFEA" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#141A17" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="icon-192-v2.png">
+<title>Swingarm Measuring Guide</title>
+<meta name="description" content="A step-by-step guide to measuring a stock Honda XL125R swingarm, rocker, dogbone and shock for Joel.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Same workshop look as the Chassis Bench, sized for a phone held in one hand in a garage */
+:root {
+  --bg: #EDEFEA; --panel: #F8F9F6; --ink: #1B2320; --muted: #5A6660; --line: #CBD1CB; --soft: #DDE2DC;
+  --accent: #C42430; --accent-soft: #C424301F; --steel: #46524D; --warn: #8A5A00; --warn-bg: #F6E7C8; --ok: #2E7D32;
+  --display: "Barlow Condensed", "Arial Narrow", system-ui, sans-serif;
+  --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #141A17; --panel: #1C2320; --ink: #E4E9E5; --muted: #9AA6A0; --line: #34413B; --soft: #26302C;
+  --accent: #EE5A62; --accent-soft: #EE5A6226; --steel: #A9B5AF; --warn: #F2C46D; --warn-bg: #3A3020; --ok: #7BC47F; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #141A17; --panel: #1C2320; --ink: #E4E9E5; --muted: #9AA6A0; --line: #34413B; --soft: #26302C;
+  --accent: #EE5A62; --accent-soft: #EE5A6226; --steel: #A9B5AF; --warn: #F2C46D; --warn-bg: #3A3020; --ok: #7BC47F; color-scheme: dark }
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 16px; line-height: 1.5; }
+.wrap { max-width: 640px; margin: 0 auto; padding: 16px 16px calc(110px + env(safe-area-inset-bottom)); }
+header { border-bottom: 2px solid var(--ink); padding-bottom: 8px; margin-bottom: 12px; }
+h1 { font-family: var(--display); font-weight: 700; font-size: 28px; line-height: 1; margin: 0; text-transform: uppercase; letter-spacing: .01em; }
+h1 span { color: var(--accent); }
+.bar { height: 4px; background: var(--soft); border-radius: 2px; margin-top: 10px; overflow: hidden; }
+.bar i { display: block; height: 100%; width: 0; background: var(--accent); transition: width .2s; }
+.stepno { font-family: var(--display); font-size: 15px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 14px 0 2px; }
+h2 { font-family: var(--display); font-weight: 700; font-size: 26px; line-height: 1.1; margin: 0 0 10px; text-transform: uppercase; }
+p { margin: 0 0 12px; }
+ul, ol { margin: 0 0 12px; padding-left: 22px; }
+li { margin-bottom: 4px; }
+.sketch { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 6px; margin: 4px 0 14px; }
+.sketch svg { display: block; width: 100%; height: auto; }
+.cap { font-size: 13px; color: var(--muted); margin: 4px 4px 0; }
+.field { display: block; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 10px 12px; margin-bottom: 10px; }
+.field .lab { display: block; font-weight: 600; margin-bottom: 6px; }
+.field .lab small { font-weight: 400; color: var(--muted); }
+.inrow { display: flex; align-items: center; gap: 8px; }
+input[type=number], input[type=text], textarea { font: inherit; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 5px; padding: 10px 12px; width: 100%; min-width: 0; }
+input[type=number] { font-family: var(--mono); font-size: 20px; font-variant-numeric: tabular-nums; }
+.unit { font-family: var(--mono); color: var(--muted); }
+textarea { min-height: 96px; resize: vertical; }
+.seg { display: flex; gap: 6px; margin-top: 8px; }
+.seg button { flex: 1; }
+.hint { font-size: 14px; margin-top: 6px; color: var(--warn); }
+button { font: inherit; color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 12px 14px; cursor: pointer; min-height: 48px; }
+button[aria-pressed=true] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+button.primary { background: var(--accent); color: #fff; border-color: var(--accent); font-weight: 600; }
+button:disabled { opacity: .4; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.tip { background: var(--warn-bg); border-left: 4px solid var(--warn); padding: 10px 12px; border-radius: 4px; margin-bottom: 12px; font-size: 15px; }
+.nav { position: fixed; left: 0; right: 0; bottom: 0; background: var(--bg); border-top: 1px solid var(--line); padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); }
+.nav div { max-width: 640px; margin: 0 auto; display: flex; gap: 10px; }
+.nav button { flex: 1; }
+.nav button.primary { flex: 2; }
+table.sum { width: 100%; border-collapse: collapse; margin-bottom: 14px; font-size: 15px; }
+table.sum td { padding: 7px 4px; border-bottom: 1px solid var(--line); vertical-align: top; }
+table.sum td:last-child { text-align: right; font-family: var(--mono); white-space: nowrap; }
+table.sum tr.miss td:last-child { color: var(--muted); }
+.send { display: grid; gap: 10px; margin: 6px 0 14px; }
+.done { color: var(--ok); font-weight: 600; min-height: 1.5em; }
+.small { font-size: 14px; color: var(--muted); }
+
+/* Sketch styling: steel parts, red for the thing being measured */
+svg .part { fill: var(--soft); stroke: var(--steel); stroke-width: 2.5; stroke-linejoin: round; }
+svg .rod { fill: none; stroke: var(--steel); stroke-width: 10; stroke-linecap: round; }
+svg .rodin { fill: none; stroke: var(--soft); stroke-width: 5; stroke-linecap: round; }
+svg .ghost { fill: none; stroke: var(--muted); stroke-width: 2; stroke-dasharray: 6 5; }
+svg .hole { fill: var(--panel); stroke: var(--steel); stroke-width: 2.5; }
+svg .ctr { fill: var(--accent); }
+svg .hot { fill: none; stroke: var(--accent); stroke-width: 3; stroke-linecap: round; }
+svg .hotd { fill: none; stroke: var(--accent); stroke-width: 2; stroke-dasharray: 5 4; }
+svg .str { fill: none; stroke: var(--ink); stroke-width: 1.5; stroke-dasharray: 2 4; }
+svg text { font-family: var(--body); font-size: 13px; fill: var(--ink); }
+svg text.h { fill: var(--accent); font-weight: 600; }
+svg text.m { fill: var(--muted); font-size: 12px; }
+svg text.big { font-family: var(--display); font-size: 17px; font-weight: 700; fill: var(--accent); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>XL125R <span>swingarm</span> measuring</h1>
+    <div class="bar"><i id="bar"></i></div>
+  </header>
+  <main id="main"></main>
+</div>
+<nav class="nav"><div><button type="button" id="back">Back</button><button type="button" class="primary" id="next">Next</button></div></nav>
+
+<script>
+// Where Joel's bench lives: the results link opens it with these numbers waiting in its measuring mode
+const BENCH = 'https://blevo66.github.io/chassis-bench/';
+const KEY = 'xl-arm-measure-v1';
+const $ = id => document.getElementById(id);
+const store = {
+  get() { try { return JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { return null; } },
+  set(v) { try { localStorage.setItem(KEY, JSON.stringify(v)); } catch (e) {} }
+};
+let st = store.get() || { step: 0, v: {} };
+if (!st.v) st.v = {};
+
+// ---- Sketches (side view: pivot on the left, axle on the right) ----
+const P = [44, 84], A = [356, 100], R = [150, 108], S = [176, 140], D = [142, 174], F = [62, 186], T = [104, 14];
+const arm = `<polygon class="part" points="30,70 200,76 368,90 368,110 200,102 30,98"/>
+  <circle class="hole" cx="${P[0]}" cy="${P[1]}" r="9"/><circle class="hole" cx="${A[0]}" cy="${A[1]}" r="6"/>
+  <path class="part" d="M140,101 L160,102 L156,114 L144,114 Z"/>`;
+const rockerC = `<path class="rod" d="M${R} C190,118 192,158 ${D}"/><path class="rodin" d="M${R} C190,118 192,158 ${D}"/>
+  ${[R, S, D].map(q => `<circle class="hole" cx="${q[0]}" cy="${q[1]}" r="5"/>`).join('')}`;
+const dogbone = `<line class="rod" x1="${D[0]}" y1="${D[1]}" x2="${F[0]}" y2="${F[1]}"/><circle class="hole" cx="${F[0]}" cy="${F[1]}" r="5"/>`;
+const shock = `<line x1="${S[0]}" y1="${S[1]}" x2="${T[0]}" y2="${T[1]}" stroke="var(--steel)" stroke-width="14" stroke-linecap="round" opacity=".35"/>`;
+const svg = (body, vb = '0 0 400 210') => `<svg viewBox="${vb}" role="img" aria-hidden="true">${body}</svg>`;
+const ctr = q => `<circle class="ctr" cx="${q[0]}" cy="${q[1]}" r="3"/>`;
+
+// The point on the pivot-to-axle string square below the rocker bolt, for the rocker-position sketch
+const foot = (() => { const ux = A[0] - P[0], uy = A[1] - P[1], L = Math.hypot(ux, uy), t = ((R[0] - P[0]) * ux + (R[1] - P[1]) * uy) / L / L; return [P[0] + t * ux, P[1] + t * uy]; })();
+
+const SK = {
+  overview: svg(`${shock}${arm}${dogbone}${rockerC}
+    <text x="250" y="72">swingarm</text><text x="12" y="62">pivot</text><text x="330" y="128">axle</text>
+    <text x="196" y="140" class="h">rocker</text><text x="66" y="208">dogbone</text><text x="122" y="30" class="m">shock goes up to the frame</text>
+    <text x="22" y="168" class="m">to frame</text>`),
+  holes: svg(`<rect class="part" x="30" y="50" width="340" height="60" rx="30"/>
+    <circle class="hole" cx="80" cy="80" r="18"/><circle class="hole" cx="320" cy="80" r="18"/>
+    ${ctr([80, 80])}${ctr([320, 80])}
+    <line class="hot" x1="62" y1="140" x2="302" y2="140"/><line class="hotd" x1="62" y1="80" x2="62" y2="146"/><line class="hotd" x1="302" y1="80" x2="302" y2="146"/>
+    <text class="h" x="182" y="162" text-anchor="middle">left edge to left edge = centre to centre</text>
+    <line class="str" x1="80" y1="30" x2="320" y2="30"/><text x="200" y="22" text-anchor="middle" class="m">(the same as centre to centre)</text>`, '0 0 400 175'),
+  armLen: svg(`${arm}${ctr(P)}${ctr(A)}<line class="hot" x1="${P[0]}" y1="${P[1] + 36}" x2="${A[0]}" y2="${A[1] + 36}"/>
+    <line class="hotd" x1="${P[0]}" y1="${P[1]}" x2="${P[0]}" y2="${P[1] + 42}"/><line class="hotd" x1="${A[0]}" y1="${A[1]}" x2="${A[0]}" y2="${A[1] + 42}"/>
+    <text class="big" x="200" y="160" text-anchor="middle">PIVOT TO AXLE</text><text x="12" y="62">pivot</text><text x="340" y="72">axle</text>`, '0 30 400 150'),
+  rockerPos: svg(`${arm}${rockerC}<line class="str" x1="${P[0]}" y1="${P[1]}" x2="${A[0] + 20}" y2="${A[1] + 1}"/>
+    ${ctr(P)}${ctr(R)}
+    <line class="hot" x1="${P[0]}" y1="${P[1]}" x2="${foot[0]}" y2="${foot[1]}"/><line class="hot" x1="${foot[0]}" y1="${foot[1]}" x2="${R[0]}" y2="${R[1]}"/>
+    <text class="big" x="70" y="58">1 ALONG</text><text class="big" x="160" y="200">2 UP OR DOWN</text>
+    <line class="hotd" x1="158" y1="186" x2="${R[0] + 4}" y2="${R[1] + 6}"/>
+    <text x="226" y="134" class="m">string: pivot centre to axle centre</text>`),
+  rocker: svg(`<path class="rod" d="M110,40 C230,70 236,200 100,236" transform="translate(30,-10)"/>
+    <path class="rodin" d="M110,40 C230,70 236,200 100,236" transform="translate(30,-10)"/>
+    ${[[140, 30], [222, 128], [130, 226]].map(q => `<circle class="hole" cx="${q[0]}" cy="${q[1]}" r="9"/>${ctr(q)}`).join('')}
+    <line class="hot" x1="140" y1="30" x2="130" y2="226"/><line class="hot" x1="140" y1="30" x2="222" y2="128"/><line class="hot" x1="222" y1="128" x2="130" y2="226"/>
+    <text x="160" y="22">top: bolts to the swingarm</text><text x="236" y="132">middle: the shock</text><text x="150" y="246">bottom: the dogbone</text>
+    <text class="big" x="96" y="132">A</text><text class="big" x="186" y="72">B</text><text class="big" x="184" y="196">C</text>`, '0 0 400 256'),
+  dog: svg(`<line class="rod" x1="70" y1="70" x2="330" y2="70" style="stroke-width:30"/><line class="rodin" x1="70" y1="70" x2="330" y2="70" style="stroke-width:22"/>
+    <circle class="hole" cx="70" cy="70" r="11"/><circle class="hole" cx="330" cy="70" r="11"/>${ctr([70, 70])}${ctr([330, 70])}
+    <line class="hot" x1="70" y1="118" x2="330" y2="118"/><line class="hotd" x1="70" y1="70" x2="70" y2="124"/><line class="hotd" x1="330" y1="70" x2="330" y2="124"/>
+    <text class="big" x="200" y="142" text-anchor="middle">EYE TO EYE</text><text x="200" y="30" text-anchor="middle" class="m">sometimes a pair of flat plates, sometimes one bar</text>`, '0 10 400 145'),
+  shock: svg(`<rect class="part" x="40" y="48" width="170" height="44" rx="8"/><rect class="part" x="210" y="62" width="90" height="16"/>
+    <rect class="part" x="300" y="54" width="40" height="32" rx="6"/><circle class="hole" cx="26" cy="70" r="12"/><circle class="hole" cx="356" cy="70" r="12"/>
+    <path class="part" d="M14,70 a12,12 0 0 1 24,-0"/><circle class="hole" cx="26" cy="70" r="7"/><circle class="hole" cx="356" cy="70" r="7"/>${ctr([26, 70])}${ctr([356, 70])}
+    <line class="hot" x1="26" y1="130" x2="356" y2="130"/><line class="hotd" x1="26" y1="70" x2="26" y2="136"/><line class="hotd" x1="356" y1="70" x2="356" y2="136"/>
+    <text class="big" x="190" y="152" text-anchor="middle">1 EYE TO EYE</text>
+    <line class="hot" x1="212" y1="34" x2="298" y2="34"/><text class="big" x="255" y="24" text-anchor="middle">2 SHINY ROD</text>
+    <text x="96" y="76" class="m">spring and body</text>`, '0 8 400 152'),
+  widths: svg(`<polygon class="part" points="112,40 130,40 116,196 98,196"/><polygon class="part" points="270,40 288,40 302,196 284,196"/>
+    <rect class="part" x="104" y="24" width="192" height="18" rx="4"/><rect class="part" x="124" y="72" width="152" height="12"/>
+    <rect class="part" x="178" y="84" width="10" height="22"/><rect class="part" x="212" y="84" width="10" height="22"/>
+    <circle class="hole" cx="107" cy="190" r="4"/><circle class="hole" cx="293" cy="190" r="4"/>
+    <line class="hot" x1="104" y1="12" x2="296" y2="12"/><text class="big" x="310" y="18">1</text>
+    <line class="hot" x1="117" y1="176" x2="283" y2="176"/><text class="big" x="194" y="170">2</text>
+    <line class="hot" x1="188" y1="116" x2="212" y2="116"/><text class="big" x="195" y="138">3</text>
+    <text x="10" y="38" class="m">pivot tube</text><text x="306" y="200" class="m">axle end</text><text x="232" y="100" class="m">rocker lugs</text>`, '0 0 400 210')
+};
+
+// ---- Steps ----
+// Fields: k is the key the Chassis Bench understands (armLen, rockerAlong, rockerAbove, rD, rS, eyes, dog, eye, stroke); x_ keys are extras for Joel
+const STEPS = [
+  { id: 'hello', title: 'Hello, and thank you!', html: `
+    <p>Joel is building a 1982 Honda XL125R into a rally bike, and needs a few sizes off a standard swingarm and its suspension linkage. This walks you through them one at a time, with a sketch for each.</p>
+    <p><b>You'll need:</b></p>
+    <ul><li>A tape measure (a steel ruler or vernier calipers is even better for the small parts)</li><li>A length of string and some tape</li><li>Your phone for a few photos</li></ul>
+    <p>It takes about 20 to 30 minutes. Anything you type is saved on this phone as you go, so you can stop and come back to this page later.</p>
+    <div class="tip">Please write everything in <b>millimetres</b>. If your tape is in centimetres, 23.5 cm is 235 mm.</div>` },
+  { id: 'parts', title: 'Which bit is which', sketch: 'overview', html: `
+    <p><b>Swingarm:</b> the long arm that holds the back wheel. It pivots on a bolt at the front, and the wheel axle goes through the back.</p>
+    <p><b>Rocker:</b> a curved, C-shaped piece hanging under the swingarm. It has three bolt holes: top, middle and bottom.</p>
+    <p><b>Dogbone:</b> a short link with a hole at each end. It joins the bottom of the rocker to the frame.</p>
+    <p><b>Shock:</b> the spring and damper. Its bottom end bolts into the middle of the rocker.</p>
+    <p class="small">The sketch is roughly how they fit together. The real parts look chunkier.</p>` },
+  { id: 'holes', title: 'The one trick', sketch: 'holes', html: `
+    <p>Every measurement here is from the <b>centre</b> of one bolt hole to the <b>centre</b> of another.</p>
+    <p>The centre is hard to find, so here's the trick: when two holes are the same size, measure from the <b>left edge</b> of one hole to the <b>left edge</b> of the other. That gives exactly the same number as centre to centre.</p>
+    <p>If the bolts are still in, you can measure to the middle of each bolt head instead.</p>` },
+  { id: 'armLen', title: 'Swingarm length', sketch: 'armLen', html: `
+    <p>Measure from the centre of the big pivot hole at the front of the swingarm to the centre of the axle hole at the back.</p>
+    <p>If the axle sits in slots with chain adjusters, put it in the <b>middle</b> of its slot first.</p>`,
+    fields: [{ k: 'armLen', label: 'Pivot centre to axle centre', range: [380, 700] }] },
+  { id: 'rockerPos', title: 'Where the rocker bolts on', sketch: 'rockerPos', html: `
+    <p>This finds where the top of the rocker is fixed to the swingarm. It works with the swingarm on or off the bike.</p>
+    <ol><li>Tape a string tight from the centre of the pivot hole to the centre of the axle.</li>
+    <li><b>Along:</b> from the pivot centre, measure along the string to the spot that's straight across from the rocker's top bolt (hold a set square or a book against the string to line it up).</li>
+    <li><b>Up or down:</b> from that spot on the string, measure straight to the centre of the rocker's top bolt. Then tap whether the bolt is above or below the string.</li></ol>`,
+    fields: [{ k: 'rockerAlong', label: '1. Along the string, from the pivot', range: [40, 400] },
+             { k: 'rockerAbove', label: '2. String to the rocker bolt', range: [0, 120], side: ['Bolt is above the string', 'Bolt is below the string'] }] },
+  { id: 'rocker', title: 'The rocker', sketch: 'rocker', html: `
+    <p>Now the rocker on its own (it's easiest off the bike). It has three holes: <b>top</b> (bolts to the swingarm), <b>middle</b> (the shock), and <b>bottom</b> (the dogbone). Measure the three straight lines between them.</p>
+    <p class="small">The holes might be different sizes here, so aim for the centres, or measure to the middle of the bolts with them fitted.</p>`,
+    fields: [{ k: 'rD', label: 'A. Top hole to bottom hole', range: [30, 200] },
+             { k: 'rS', label: 'B. Top hole to middle hole', range: [20, 200] },
+             { k: 'eyes', label: 'C. Middle hole to bottom hole', range: [20, 200] }] },
+  { id: 'dog', title: 'The dogbone', sketch: 'dog', html: `
+    <p>Centre of one hole to the centre of the other. If it's a pair of plates, measure one plate.</p>`,
+    fields: [{ k: 'dog', label: 'Dogbone eye to eye', range: [40, 200] }] },
+  { id: 'shock', title: 'The shock', sketch: 'shock', optional: true, html: `
+    <p>If the shock is there, measure it with it <b>not</b> fitted to the bike, so it's fully stretched out. No shock? Just tap Next.</p>
+    <ol><li><b>Eye to eye:</b> centre of the top mounting hole to the centre of the bottom one.</li>
+    <li><b>Shiny rod:</b> how much of the shiny shaft you can see between the body and the bottom end. If there's a rubber bump stop on the shaft, measure from the bump stop instead.</li></ol>`,
+    fields: [{ k: 'eye', label: '1. Eye to eye, fully stretched out', range: [200, 450] },
+             { k: 'stroke', label: '2. Shiny rod showing', range: [20, 140] }] },
+  { id: 'widths', title: 'A few widths', sketch: 'widths', optional: true, html: `
+    <p>Looking down on the swingarm from above. These are a bonus, so skip any that are awkward.</p>`,
+    fields: [{ k: 'x_pivotWidth', label: '1. Pivot tube, end to end' }, { k: 'x_tyreGap', label: '2. Gap between the two arms, at the back where the tyre sits' },
+             { k: 'x_rockerGap', label: '3. Gap between the rocker\'s mounting lugs on the arm' },
+             { k: 'x_pivotBolt', label: 'Pivot bolt thickness', small: 'across the shank' }, { k: 'x_axle', label: 'Rear axle thickness' }] },
+  { id: 'notes', title: 'Photos and notes', html: `
+    <p>Photos help Joel a lot. If you can, take these and send them to him with your results:</p>
+    <ul><li>The swingarm from the side, with a tape measure lying along it</li><li>The rocker, dogbone and shock laid flat next to each other</li><li>Anything that looked odd, bent or worn</li></ul>
+    <p>Anything else worth saying? For example which bike the parts came off, any part numbers stamped on them, or a measurement you weren't sure about.</p>`,
+    fields: [{ k: 'x_notes', label: 'Notes', text: true }] },
+  { id: 'send', title: 'All done!', review: true }
+];
+
+// Labels for the summary, in the order Joel reads them
+const SUMMARY = [
+  ['Swingarm: pivot to axle', 'armLen'], ['Rocker bolt: along the string', 'rockerAlong'], ['Rocker bolt: string to bolt', 'rockerAbove'],
+  ['Rocker A: top to bottom hole', 'rD'], ['Rocker B: top to middle hole', 'rS'], ['Rocker C: middle to bottom hole', 'eyes'],
+  ['Dogbone eye to eye', 'dog'], ['Shock eye to eye', 'eye'], ['Shock rod showing', 'stroke'],
+  ['Pivot tube width', 'x_pivotWidth'], ['Gap at the tyre', 'x_tyreGap'], ['Rocker lug gap', 'x_rockerGap'], ['Pivot bolt', 'x_pivotBolt'], ['Rear axle', 'x_axle']
+];
+const BENCH_KEYS = ['armLen', 'rockerAlong', 'rockerAbove', 'rD', 'rS', 'eyes', 'dog', 'eye', 'stroke'];
+
+const num = k => { const v = st.v[k]; return v === '' || v === undefined || v === null || !isFinite(+v) ? null : +v; };
+// The rocker height is stored signed, the way the bench reads it: positive is above the pivot-to-axle line
+const signed = k => { const n = num(k); if (n === null) return null; return k === 'rockerAbove' && st.v.rockerSide === 1 ? -n : n; };
+const show = k => { const n = num(k); if (n === null) return null;
+  if (k === 'rockerAbove') return n === 0 ? '0 mm (on the string)' : `${n} mm ${st.v.rockerSide === 1 ? 'below' : 'above'}`; return `${n} mm`; };
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+function hint(f) {
+  const n = num(f.k); if (n === null || !f.range) return '';
+  if (n < f.range[0] / 5) return 'That looks like centimetres or inches. Please use millimetres.';
+  if (n < f.range[0] || n > f.range[1]) return 'That\'s a bit unexpected. Worth measuring again, but if it\'s right, leave it.';
+  return '';
+}
+
+function fieldHTML(f) {
+  if (f.text) return `<label class="field"><span class="lab">${f.label}</span><textarea data-k="${f.k}">${esc(st.v[f.k] ?? '')}</textarea></label>`;
+  const side = f.side ? `<div class="seg">${f.side.map((t, i) => `<button type="button" data-side="${i}" aria-pressed="${(st.v.rockerSide || 0) === i}">${t}</button>`).join('')}</div>` : '';
+  return `<label class="field"><span class="lab">${f.label}${f.small ? ` <small>${f.small}</small>` : ''}</span>
+    <span class="inrow"><input type="number" inputmode="decimal" step="0.5" min="0" data-k="${f.k}" value="${esc(st.v[f.k] ?? '')}"><span class="unit">mm</span></span>
+    ${side}<div class="hint" data-h="${f.k}">${hint(f)}</div></label>`;
+}
+
+function summaryText() {
+  const lines = SUMMARY.map(([t, k]) => show(k) ? `${t}: ${show(k)}` : null).filter(Boolean);
+  const notes = (st.v.x_notes || '').trim();
+  const data = {}; BENCH_KEYS.forEach(k => { const n = signed(k); if (n !== null) data[k] = n; });
+  const link = BENCH + '#m=' + encodeURIComponent(JSON.stringify(data));
+  return `XL125R stock swingarm and linkage measurements\n\n${lines.join('\n') || '(nothing filled in yet)'}${notes ? `\n\nNotes: ${notes}` : ''}\n\nJoel, open this to load them into the Chassis Bench:\n${link}`;
+}
+
+function reviewHTML() {
+  const rows = SUMMARY.map(([t, k]) => `<tr class="${show(k) ? '' : 'miss'}"><td>${t}</td><td>${show(k) || 'skipped'}</td></tr>`).join('');
+  const missing = ['armLen', 'rockerAlong', 'rockerAbove', 'rD', 'rS', 'eyes', 'dog'].filter(k => num(k) === null).length;
+  return `<p>Thank you! Here's everything you entered. Tap <b>Back</b> to fix anything.</p>
+    ${missing ? `<div class="tip">${missing} of the main measurements ${missing === 1 ? 'is' : 'are'} still blank. That's fine if you couldn't get ${missing === 1 ? 'it' : 'them'}, Joel will work around it.</div>` : ''}
+    <table class="sum">${rows}</table>
+    ${(st.v.x_notes || '').trim() ? `<p class="small"><b>Notes:</b> ${esc(st.v.x_notes.trim())}</p>` : ''}
+    <div class="send"><button type="button" class="primary" id="share">Send to Joel</button><button type="button" id="copy">Copy the results</button></div>
+    <p class="done" id="sent"></p>
+    <p class="small">"Send to Joel" opens your phone's share menu, so pick Messages, WhatsApp or email and send it to him. It includes a link that loads the numbers straight into his app. Remember the photos too!</p>`;
+}
+
+function render() {
+  const i = Math.max(0, Math.min(STEPS.length - 1, st.step)), s = STEPS[i]; st.step = i;
+  $('bar').style.width = (i / (STEPS.length - 1) * 100) + '%';
+  const body = s.review ? reviewHTML() : (s.html || '') + (s.fields || []).map(fieldHTML).join('');
+  $('main').innerHTML = `<div class="stepno">Step ${i + 1} of ${STEPS.length}${s.optional ? ' · optional' : ''}</div><h2>${s.title}</h2>
+    ${s.sketch ? `<div class="sketch">${SK[s.sketch]}</div>` : ''}${body}`;
+  $('back').disabled = i === 0;
+  $('next').hidden = !!s.review;
+  $('next').textContent = i === 0 ? 'Let\'s start' : (i === STEPS.length - 2 ? 'See my results' : 'Next');
+  $('main').querySelectorAll('[data-k]').forEach(inp => inp.addEventListener('input', () => {
+    st.v[inp.dataset.k] = inp.value; store.set(st);
+    const f = (s.fields || []).find(x => x.k === inp.dataset.k), h = $('main').querySelector(`[data-h="${inp.dataset.k}"]`); if (f && h) h.textContent = hint(f); }));
+  $('main').querySelectorAll('[data-side]').forEach(b => b.addEventListener('click', e => { e.preventDefault(); st.v.rockerSide = +b.dataset.side; store.set(st);
+    b.parentElement.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b)); }));
+  if (s.review) {
+    $('share').addEventListener('click', async () => {
+      const text = summaryText();
+      if (navigator.share) { try { await navigator.share({ title: 'XL125R swingarm measurements', text }); $('sent').textContent = 'Sent. Thanks so much!'; return; } catch (e) { if (e && e.name === 'AbortError') return; } }
+      copy(text);
+    });
+    $('copy').addEventListener('click', () => copy(summaryText()));
+  }
+  window.scrollTo(0, 0);
+}
+
+async function copy(text) {
+  try { await navigator.clipboard.writeText(text); $('sent').textContent = 'Copied. Paste it into a message or email to Joel.'; }
+  catch (e) { // Old browsers: show the text so it can be selected by hand
+    $('sent').innerHTML = `<textarea readonly style="min-height:200px">${esc(text)}</textarea>`; }
+}
+
+$('back').addEventListener('click', () => { st.step--; store.set(st); render(); });
+$('next').addEventListener('click', () => { st.step++; store.set(st); render(); });
+render();
+</script>
+</body>
+</html>
