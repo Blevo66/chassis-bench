@@ -166,7 +166,7 @@ const SK = {
     <rect class="part" x="156" y="74" width="8" height="24"/><rect class="part" x="184" y="74" width="8" height="24"/>${ctr([174, 86])}
     <line class="hot" x1="104" y1="12" x2="296" y2="12"/><text class="big" x="306" y="18">1</text>
     <line class="hot" x1="174" y1="116" x2="200" y2="116"/><line class="hotd" x1="174" y1="86" x2="174" y2="122"/><text class="big" x="182" y="138">2</text>
-    <line class="hot" x1="156" y1="156" x2="192" y2="156"/><line class="hotd" x1="156" y1="98" x2="156" y2="162"/><line class="hotd" x1="192" y1="98" x2="192" y2="162"/><text class="big" x="168" y="178">3</text>
+    <line class="hot" x1="164" y1="156" x2="184" y2="156"/><line class="hotd" x1="164" y1="98" x2="164" y2="162"/><line class="hotd" x1="184" y1="98" x2="184" y2="162"/><text class="big" x="168" y="178">3</text>
     <text x="10" y="38" class="m">pivot tube</text><text x="306" y="200" class="m">axle end</text><text x="206" y="96" class="m">rocker mount</text><text x="206" y="200" class="m">centre line</text>`, '0 0 400 210')
 };
 
@@ -185,7 +185,7 @@ const STEPS = [
   { id: 'widths', title: 'Widths', sketch: 'widths', html: `<p>Looking down from above, front at the top. Left and right are as if sitting on the bike.</p>`,
     fields: [{ k: 'x_pivotWidth', label: '1. Pivot tube, end to end' },
              { k: 'x_rockerOffset', label: '2. Rocker mount, centre line to middle of mount', opts: ['Left', 'Right'] },
-             { k: 'x_rockerWidth', label: '3. Rocker mount, outside width' }] },
+             { k: 'x_rockerWidth', label: '3. Rocker mount, inside width (gap between the lugs)' }] },
   { id: 'rocker', title: 'Rocker', sketch: 'rocker', html: `<p>Between its three holes.</p>`,
     fields: [{ k: 'rD', label: 'A. Top to bottom', range: [30, 200] },
              { k: 'rS', label: 'B. Top to middle', range: [20, 200] },
@@ -199,7 +199,7 @@ const STEPS = [
 ];
 
 const SUMMARY = [
-  ['Swingarm: pivot to axle', 'armLen'], ['Pivot to rocker bolt', 'rP'], ['Rocker bolt to axle', 'rA'], ['Pivot tube width', 'x_pivotWidth'], ['Rocker mount offset', 'x_rockerOffset'], ['Rocker mount width', 'x_rockerWidth'],
+  ['Swingarm: pivot to axle', 'armLen'], ['Pivot to rocker bolt', 'rP'], ['Rocker bolt to axle', 'rA'], ['Pivot tube width', 'x_pivotWidth'], ['Rocker mount offset', 'x_rockerOffset'], ['Rocker mount inside width', 'x_rockerWidth'],
   ['Rocker A: top to bottom hole', 'rD'], ['Rocker B: top to middle hole', 'rS'], ['Rocker C: middle to bottom hole', 'eyes'],
   ['Dogbone hole to hole', 'dog'], ['Shock hole to hole', 'eye'], ['Shock rod showing', 'stroke']
 ];
