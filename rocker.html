@@ -142,6 +142,13 @@ svg .dim { stroke: var(--ink); stroke-width: .8; stroke-dasharray: 3 2; fill: no
         <p>Put in where everything bolts to, the shock and the angle it runs at. It then designs a rocker and dogbone that give the wheel travel and rising rate you ask for. All positions are in mm from the centre of the swingarm pivot, with the bike seen from the right.</p>
         <div class="btns"><button type="button" class="primary" id="genBtn">Design the linkage</button></div>
       </div>
+      <div class="card">
+        <h2>From the Chassis Bench</h2>
+        <p class="small">Takes the swingarm, rocker pivot, frame mounts and shock from the bench on this phone, including where the shock sits when it's fully extended. While it's kept in step, it picks up the bench's latest numbers every time you open this page. Changing one of those numbers here stops that until you load again.</p>
+        <div class="field"><span class="lab">Bench tab to use</span><div class="seg wide" id="linkTab"></div></div>
+        <div class="btns"><button type="button" id="linkBtn">Load from the bench and keep in step</button></div>
+        <div id="linkMsg" class="small" style="margin-top:8px"></div>
+      </div>
       <div id="forms"></div>
       <details class="card" id="tuneCard">
         <summary>Fine tune the result</summary>
@@ -172,7 +179,7 @@ svg .dim { stroke: var(--ink); stroke-width: .8; stroke-dasharray: 3 2; fill: no
         </div>
       </details>
       <div class="btns"><button type="button" id="resetBtn">Put everything back to default</button></div>
-      <p class="small" style="margin-top:12px">Defaults are the CRF style guesses from the bench: CRF450 arm, the XL's own shock top and lower dogbone mount. Swap them for real measurements when you have them. The page keeps your numbers on this phone.</p>
+      <p class="small" style="margin-top:12px">Without the bench, the defaults are its CRF style guesses: CRF450 arm, the XL's own shock top and lower dogbone mount. The page keeps your numbers on this phone.</p>
     </section>
   </div>
 </div>
@@ -356,8 +363,11 @@ const DEF = {
   lenMode: 'fixed', eye: 450, eyeMin: 380, eyeMax: 480, stroke: 75, shockAng: 24,
   travel: 280, prog: 40, maxRocker: 120, dogMin: 60, dogMax: 260, underArm: true, minTA: 30,
   offset: 10, pivotHole: 22, pivotBoss: 36, pivotWidth: 30, eyeHole: 12, eyeBoss: 28, eyeWidth: 22, plate: 10,
-  dogHole: 12, dogBoss: 26, dogThick: 16
+  dogHole: 12, dogBoss: 26, dogThick: 16, link: 'crf', linkTab: 'crf'
 };
+// Numbers the bench owns while this page is kept in step with it
+const LINKED = ['armLen', 'topAng', 'rocker', 'shockTop', 'dogMount', 'eye', 'stroke', 'shockAng'];
+const BENCH_TABS = [['crf', 'CRF style'], ['build', 'Build'], ['stock', 'Stock XL']];
 const $ = id => document.getElementById(id);
 const clone = o => JSON.parse(JSON.stringify(o));
 const store = { get() { try { return JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { return null; } }, set(v) { try { localStorage.setItem(KEY, JSON.stringify(v)); } catch (e) {} } };
@@ -429,6 +439,7 @@ const PRINT_KEYS = PRINT.map(f => f.k);
 function setVal(s, k, i, v) { const o = scopeObj(s); if (i >= 0) o[k][i] = v; else o[k] = v; }
 function getVal(s, k, i) { const o = scopeObj(s); return i >= 0 ? o[k][i] : o[k]; }
 function changed(s, k) {
+  if (s === 'inp' && inp.link && LINKED.includes(k)) { inp.link = null; drawLink(); }
   save();
   if (s === 'des') { design.hand = true; save(); analyseDesign(); draw(); return; }
   if (PRINT_KEYS.includes(k)) { drawRockerSketch(); return; }
@@ -706,13 +717,60 @@ $('svgRocker').onclick = () => {
   download(new Blob([s], { type: 'image/svg+xml' }), `rocker-${stamp()}.svg`);
 };
 
+// ---------- Taking numbers from the Chassis Bench (same site, so the same browser storage) ----------
+function benchTab(t) {
+  let s = null; try { s = JSON.parse(localStorage.getItem('xl-chassis-v2') || 'null'); } catch (e) {}
+  return s && s.tabs && s.tabs[t] ? s.tabs[t] : null;
+}
+// Returns a note saying what happened, or null if nothing changed
+function pullBench(t) {
+  const c = benchTab(t), name = BENCH_TABS.find(b => b[0] === t)[1];
+  if (!c) return { note: `No saved Chassis Bench numbers on this phone yet, so this page is using its own defaults (the same as the bench's ${name} defaults). Open the bench once, change anything, and they'll come through.`, changed: false };
+  const before = JSON.stringify(LINKED.map(k => inp[k]));
+  ['armLen', 'eye', 'stroke'].forEach(k => { if (isFinite(c[k])) inp[k] = c[k]; });
+  if (Array.isArray(c.rockerArm)) inp.rocker = c.rockerArm.slice();
+  if (Array.isArray(c.shockTop)) inp.shockTop = c.shockTop.slice();
+  if (Array.isArray(c.frameLink)) inp.dogMount = c.frameLink.slice();
+  // Where the bench's own linkage tops out sets the arm angle and shock angle at full extension
+  let note = '';
+  const g = { layout: 'arm', armLen: c.armLen, armAngle: c.armAngle, rockerArm: c.rockerArm, frameLink: c.frameLink, rD: c.rD, rS: c.rS, incl: c.incl, dog: c.dog,
+    branch: !!c.branch, topOn: 'frame', botOn: 'rocker', shockTop: c.shockTop, shockLow: [0, 0], shockArm: [0, 0], lug: [0, 0], rocker: [0, 0], eye: c.eye, stroke: c.stroke, k: 1 };
+  let a = null; try { a = analyse(g); } catch (e) {}
+  if (a && a.res) {
+    const q = a.res[0];
+    inp.topAng = Math.round(-q.th / D2R * 10) / 10;
+    inp.shockAng = Math.round(Math.atan2(q.S[0] - c.shockTop[0], c.shockTop[1] - q.S[1]) / D2R * 10) / 10;
+  } else {
+    if (isFinite(c.armAngle)) inp.topAng = c.armAngle;
+    note = ' The bench\u2019s linkage on that tab doesn\u2019t assemble, so the arm angle is its measured angle and the shock angle is left as it was.';
+  }
+  return { note: `Using the bench's ${name} tab: arm ${inp.armLen} mm, shock ${inp.eye} mm with ${inp.stroke} mm stroke, topping out at ${fmt(inp.topAng, 1)}° with the shock at ${fmt(inp.shockAng, 1)}°.` + note, changed: JSON.stringify(LINKED.map(k => inp[k])) !== before };
+}
+let linkNote = '';
+function drawLink() {
+  $('linkTab').innerHTML = BENCH_TABS.map(([v, t]) => `<button type="button" data-lt="${v}" aria-pressed="${inp.linkTab === v}">${t}</button>`).join('');
+  $('linkMsg').innerHTML = (inp.link ? '<span class="ok">Kept in step with the bench.</span> ' : 'Not kept in step: these are your own numbers. ') + linkNote;
+}
+function syncBench(force) {
+  if (!inp.link && !force) return false;
+  if (force) inp.link = inp.linkTab;
+  const r = pullBench(inp.link);
+  linkNote = r.note; save(); drawLink();
+  return r.changed;
+}
+document.addEventListener('click', e => { const b = e.target.closest('[data-lt]'); if (!b) return; inp.linkTab = b.dataset.lt; save(); drawLink(); });
+$('linkBtn').onclick = () => { syncBench(true); renderForms(); runGen(); };
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && syncBench(false)) { renderForms(); runGen(); } });
+
 // ---------- Wiring ----------
 $('pos').oninput = e => { posK = e.target.value / 1000; drawView(); drawChart(); };
 $('zoomBtn').onclick = () => { zoom = !zoom; save(); draw(); };
 $('ghostBtn').onclick = () => { ghosts = !ghosts; save(); draw(); };
 $('genBtn').onclick = () => { clearTimeout(timer); runGen(); };
-$('resetBtn').onclick = () => { if (!confirm('Put every number on this page back to the default?')) return; inp = clone(DEF); design = null; renderForms(); runGen(); };
+$('resetBtn').onclick = () => { if (!confirm('Put every number on this page back to the default?')) return; inp = clone(DEF); design = null; syncBench(false); renderForms(); runGen(); };
+const benchMoved = syncBench(false);
 renderForms();
+if (benchMoved) design = null;
 if (design) { renderTune(); analyseDesign(); draw(); if (!an || !an.res) runGen(); } else runGen();
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(() => {});
 </script>
