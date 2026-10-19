@@ -879,6 +879,105 @@ fieldset.collapsed > :not(legend) { display: none !important; }
   .view-card .slider-tools { font-size: 12px; gap: 2px 12px; }
 }
 body { padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
+
+/* ==rocker designer== (the second view: everything under #rk came from the stand-alone rocker page) */
+.views { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.views button { text-align: left; line-height: 1.2; padding: 10px 14px; border-radius: 8px; border: 2px solid var(--line); background: var(--panel); min-height: 54px; color: var(--ink); }
+.views button b { display: block; font-family: var(--display); font-size: 19px; font-weight: 700; text-transform: uppercase; letter-spacing: .03em; }
+.views button span { font-size: 12px; color: var(--muted); }
+.views button[aria-pressed=true] { border-color: var(--accent); background: var(--accent-soft); }
+.views button[aria-pressed=true] b { color: var(--accent); }
+#bikeView { display: contents; }
+#bikeView > * { min-width: 0; }
+#bikeView[hidden], #rk[hidden] { display: none !important; }
+.sent { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; justify-content: space-between; }
+#rk { --soft: var(--grid); --ok: #2E7D32; font-size: 16px; line-height: 1.45; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) #rk { --ok: #7BC47F; } }
+:root[data-theme="dark"] #rk { --ok: #7BC47F; }
+#rk .tabs { margin-bottom: 6px; }
+#rk p { margin: 0 0 10px; }
+#rk .grid { display: grid; gap: 14px; }
+#rk .grid > * { min-width: 0; }
+@media (min-width: 900px) { #rk .grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); align-items: start; }
+#rk .out { position: sticky; top: 12px; order: 2; }
+#rk .ins { order: 1; } }
+#rk .card { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 12px; margin-bottom: 12px; }
+#rk details.card { padding: 0; }
+#rk details.card > summary { list-style: none; cursor: pointer; padding: 12px; font-family: var(--display); font-weight: 700; font-size: 20px; text-transform: uppercase; display: flex; justify-content: space-between; gap: 10px; }
+#rk details.card > summary::-webkit-details-marker { display: none; }
+#rk details.card > summary::after { content: '+'; color: var(--muted); }
+#rk details.card[open] > summary::after { content: '−'; }
+#rk details.card > .in { padding: 0 12px 12px; }
+#rk .small { font-size: 14px; color: var(--muted); }
+#rk .field { display: block; border-top: 1px solid var(--line); padding: 10px 0; }
+#rk .field:first-of-type { border-top: 0; }
+#rk .field .lab { display: block; font-weight: 600; margin-bottom: 6px; font-size: 15px; }
+#rk .field .lab.lockrow { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+#rk .lockBtn { flex: none; width: 40px; height: 40px; min-height: 40px; padding: 0; border: 0; background: none; font-size: 19px; line-height: 1; opacity: .35; filter: grayscale(1); }
+#rk .lockBtn[aria-pressed="true"] { opacity: 1; filter: none; background: none; border: 0; }
+#rk .field.locked input[type=number] { background: var(--soft); color: var(--muted); }
+#rk .field .lab small { display: block; font-weight: 400; color: var(--muted); font-size: 13px; }
+#rk .inrow { display: flex; align-items: center; gap: 8px; }
+#rk .inrow .ax { font-family: var(--mono); color: var(--muted); min-width: 1.2em; font-size: 14px; }
+#rk .inrow + .inrow { margin-top: 8px; }
+#rk input[type=number] { font: inherit; font-family: var(--mono); font-size: 19px; font-variant-numeric: tabular-nums; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 5px; padding: 8px 10px; width: 100%; min-width: 0; flex: 1; }
+#rk .unit { font-family: var(--mono); color: var(--muted); min-width: 1.6em; }
+#rk .seg { display: flex; border: 1px solid var(--line); border-radius: 5px; overflow: hidden; flex: 1.3; }
+#rk .seg button { flex: 1; border: 0; border-radius: 0; border-left: 1px solid var(--line); padding: 6px 4px; font-size: 13px; min-height: 42px; line-height: 1.15; }
+#rk .seg button:first-child { border-left: 0; }
+#rk .seg.wide { margin-top: 8px; }
+#rk :where(button:not([role=tab])) { font: inherit; color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 10px 14px; cursor: pointer; min-height: 44px; }
+#rk :where(button:not([role=tab]))[aria-pressed=true] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+#rk button.primary { background: var(--accent); color: #fff; border-color: var(--accent); font-weight: 600; }
+#rk .btns { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+#rk .btns button { flex: 1 1 140px; }
+#rk .tip { background: var(--warn-bg); border-left: 4px solid var(--warn); padding: 8px 12px; border-radius: 4px; margin: 8px 0; font-size: 15px; }
+#rk .ok { color: var(--ok); font-weight: 600; }
+#rk .view svg { display: block; width: 100%; height: auto; background: var(--bg); border-radius: 6px; touch-action: pan-y; }
+#rk .slider { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
+#rk .slider input { flex: 1; accent-color: var(--accent); }
+#rk .slider output { font-family: var(--mono); min-width: 6.5em; text-align: right; font-size: 14px; }
+#rk .viewbtns { display: flex; gap: 6px; margin-top: 8px; }
+#rk .viewbtns button { flex: 1; font-size: 14px; padding: 6px; min-height: 38px; }
+#rk .stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 10px; }
+@media (min-width: 520px) { #rk .stats { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+#rk .stat { background: var(--bg); border-radius: 6px; padding: 8px 10px; }
+#rk .stat b { display: block; font-family: var(--mono); font-size: 20px; font-weight: 500; }
+#rk .stat span { font-size: 12px; color: var(--muted); }
+#rk .opts { display: grid; gap: 8px; margin-top: 10px; }
+#rk .opts button { text-align: left; font-size: 14px; display: block; width: 100%; }
+#rk .opts button b { font-family: var(--display); font-size: 17px; text-transform: uppercase; display: block; }
+#rk table.sum { width: 100%; border-collapse: collapse; font-size: 15px; }
+#rk table.sum td { padding: 6px 4px; border-bottom: 1px solid var(--line); vertical-align: top; }
+#rk table.sum td:last-child { text-align: right; font-family: var(--mono); white-space: nowrap; }
+#rk table.sum tr.h td { font-family: var(--display); font-weight: 700; text-transform: uppercase; font-size: 16px; padding-top: 12px; border-bottom: 2px solid var(--ink); }
+#rk .chart svg { display: block; width: 100%; height: auto; }
+#rk svg .frame { stroke: var(--muted); stroke-linecap: round; fill: none; opacity: .55; }
+#rk svg .arm { stroke: var(--steel); stroke-width: 22; stroke-linecap: round; fill: none; opacity: .8; }
+#rk svg .lug { stroke: var(--steel); stroke-width: 12; stroke-linecap: round; fill: none; opacity: .8; }
+#rk svg .tyre { stroke: var(--steel); stroke-width: 3; fill: none; opacity: .35; }
+#rk svg .shock { stroke: var(--cmp); stroke-width: 26; stroke-linecap: round; fill: none; opacity: .75; }
+#rk svg .shaft { stroke: var(--cmp); stroke-width: 9; stroke-linecap: round; fill: none; }
+#rk svg .rocker { fill: var(--accent); fill-opacity: .55; stroke: var(--accent); stroke-linejoin: round; }
+#rk svg .dog { stroke: var(--accent); stroke-linecap: round; fill: none; opacity: .85; }
+#rk svg .eye { fill: var(--panel); stroke: var(--ink); stroke-width: 3; }
+#rk svg .fix { fill: var(--ink); }
+#rk svg .ghost { fill: none; stroke: var(--muted); stroke-width: 2.5; stroke-dasharray: 8 6; }
+#rk svg .gridl { stroke: var(--line); stroke-width: 1; }
+#rk svg .curve { stroke: var(--accent); stroke-width: 2.5; fill: none; }
+#rk svg .mark { fill: var(--accent); }
+#rk svg text { font-family: var(--body); fill: var(--ink); }
+#rk svg text.m { fill: var(--muted); }
+#rk svg .plate { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 1.2; fill-rule: evenodd; }
+#rk svg .dim { stroke: var(--ink); stroke-width: .8; stroke-dasharray: 3 2; fill: none; }
+#rk .tip { position: static; transform: none; pointer-events: auto; white-space: normal; color: var(--ink); font-family: var(--body); }
+#rk table.sum, #rk table.sum td:first-child { font-family: var(--body); }
+#rk table.sum td:last-child { white-space: normal; min-width: 7em; }
+#rk table.sum tr.h td { text-align: left; }
+#rk .check { display: flex; gap: 8px; align-items: center; margin-top: 10px; font-size: 15px; }
+#rk .check input { width: 20px; height: 20px; accent-color: var(--accent); }
+#rk button:disabled { opacity: .5; cursor: default; }
+/* ==end rocker designer== */
 </style>
 
 </head>
@@ -887,12 +986,11 @@ body { padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-are
   <header>
     <div>
       <h1>XL125R <span>Chassis</span> Bench</h1>
-      <p class="sub">The whole bike on its wheels. Set the forks, yokes, swingarm and Pro-Link, then move both ends through their travel to see head angle, trail, wheelbase, ground clearance and the rear leverage ratio.</p>
+      <p class="sub">The whole bike on its wheels. Set the forks, yokes, swingarm and Pro-Link, then move both ends through their travel to see head angle, trail, wheelbase, ground clearance and the rear leverage ratio. The rocker &amp; dogbone designer, next door, designs the linkage to suit and puts it straight on the bike.</p>
     </div>
     <div class="hdr-tools">
       <button type="button" class="primary" id="measureBtn">Measuring mode</button>
-      <a href="rocker.html" style="display:inline-flex;align-items:center;min-height:36px;padding:6px 12px;border:2px solid var(--accent);border-radius:6px;color:var(--accent);font-weight:600;text-decoration:none">Rocker &amp; dogbone designer</a>
-      <span class="note">Version 19 Oct 16:40</span>
+      <span class="note">Version 19 Oct 23:30</span>
       <span class="note" id="saveNote" aria-live="polite"></span>
       <button type="button" id="exportBtn">Back up</button>
       <button type="button" id="importBtn">Restore</button>
@@ -900,6 +998,14 @@ body { padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-are
       <button type="button" id="resetTab">Put this tab back to default</button>
     </div>
   </header>
+
+  <div class="views" role="group" aria-label="What to show">
+    <button type="button" data-view="bike" aria-pressed="true"><b>Whole bike</b><span>Geometry, sag, clearance, linkage</span></button>
+    <button type="button" data-view="rocker" aria-pressed="false"><b>Rocker &amp; dogbone</b><span>Design the linkage, print a mock-up</span></button>
+  </div>
+
+  <div id="bikeView">
+  <div class="banner sent" id="rkSent" hidden><span id="rkSentText"></span><button type="button" id="rkBack">Back to the designer</button></div>
 
   <div class="tabs" role="tablist" aria-label="Set-ups">
     <button type="button" role="tab" data-tab="build" aria-selected="true"><b>Build: CR forks</b><span>'86-87 CR250R forks, long arm</span></button>
@@ -1032,6 +1138,70 @@ body { padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-are
       </details>
     </div>
   </div>
+  </div>
+<section id="rk" hidden aria-label="Rocker and dogbone designer">
+<div class="tabs" role="tablist" id="rk-tabs"></div>
+  <p class="small" id="rk-tabNote" style="margin:0 0 12px"></p>
+  <div class="grid">
+    <section class="out">
+      <div class="card">
+        <div class="view" id="rk-view"></div>
+        <div class="slider"><input type="range" id="rk-pos" min="0" max="1000" value="0" aria-label="Wheel position through the travel"><output id="rk-posOut"></output></div>
+        <div class="viewbtns">
+          <button type="button" id="rk-zoomBtn" aria-pressed="true">Linkage close-up</button>
+          <button type="button" id="rk-ghostBtn" aria-pressed="true">Show top and bottom</button>
+        </div>
+        <div id="rk-msg"></div>
+        <div class="stats" id="rk-stats"></div>
+        <div class="opts" id="rk-opts"></div>
+      </div>
+      <div class="card chart"><h2>Spring and sag</h2><p class="small">How stiff the back feels at the wheel through the travel, with your spring. The dashed line is the spring that would give the rider sag you're after. The marks are where it sits with just the bike, and with you on it.</p><div id="rk-sagStats" class="stats"></div><div id="rk-sagChart"></div></div>
+      <div class="card chart"><h2>Leverage ratio</h2><p class="small">Wheel movement per mm of shock movement, through the travel. Falling from left to right is a rising rate: the rear gets stiffer as it compresses.</p><div id="rk-chart"></div></div>
+    </section>
+
+    <section class="ins">
+      <div class="card">
+        <p>Put in where everything bolts to, the shock and the angle it runs at. It then designs a rocker and dogbone that give the wheel travel and rising rate you ask for. All positions are in mm from the centre of the swingarm pivot, with the bike seen from the right.</p>
+        <div class="btns"><button type="button" class="primary" id="rk-genBtn">Design the linkage</button></div>
+      </div>
+      <div id="rk-forms"></div>
+      <details class="card" id="rk-tuneCard">
+        <summary>Fine tune the result</summary>
+        <div class="in">
+          <p class="small">These are the rocker and dogbone it came up with. Change any of them by hand and everything updates. Pressing Design the linkage again puts its own answer back.</p>
+          <div id="rk-tune"></div>
+        </div>
+      </details>
+      <details class="card" open>
+        <summary>Put it on the whole bike</summary>
+        <div class="in">
+          <p class="small">Sends this rocker, dogbone, shock and the mounts to a tab of the whole-bike view, so you can see head angle, trail, wheelbase, sag and ground clearance with it. Padlocked numbers on that tab are left as they are.</p>
+          <div class="field"><span class="lab">Whole-bike tab to put it on</span><div class="seg wide" id="rk-sendTab"></div></div>
+          <label class="check"><input type="checkbox" id="rk-sendSpring"> Send the spring, preload and weights too</label>
+          <div class="btns"><button type="button" class="primary" id="rk-sendBtn">Put it on the bike and show me</button></div>
+          <div id="rk-sendMsg"></div>
+          <p class="small" style="margin-top:12px">These are the numbers it sends, if you'd rather type them in:</p>
+          <table class="sum" id="rk-bench"></table>
+        </div>
+      </details>
+      <details class="card">
+        <summary>Print a mock-up</summary>
+        <div class="in">
+          <p class="small">Makes STL files for a PLA test print on the Bambu, at full size. The rocker is a dog-leg: its pivot boss sits on the swingarm's lug, and its shock and dogbone bosses sit over to the side by the offset below, so the shock and dogbone run straight. Set the holes to suit your bolts and bearings, and allow for the printer's tolerance.</p>
+          <div id="rk-printForm"></div>
+          <div id="rk-rockerSketch"></div>
+          <div id="rk-printMsg"></div>
+          <div class="btns">
+            <button type="button" id="rk-stlRocker">Rocker STL</button>
+            <button type="button" id="rk-stlDog">Dogbone STL</button>
+            <button type="button" id="rk-svgRocker">Rocker drawing (SVG)</button>
+          </div>
+        </div>
+      </details>
+      <p class="small" style="margin-top:12px">The defaults are the bench's CRF style guesses: CRF450 arm, the XL's own shock top and lower dogbone mount. The Put this tab back to default button at the top resets just the designer tab you’re on. Tap a padlock to lock a number so it can't be changed by accident. The page keeps your numbers on this phone.</p>
+    </section>
+  </div>
+</section>
 </div>
 
 <div class="measure" id="measure" hidden role="dialog" aria-modal="true" aria-labelledby="mTitle">
@@ -1273,7 +1443,7 @@ function fromForm() {
 const lockScope = k => FRAME_SINGLE.includes(k) || FRAME_PAIRS.includes(k) ? frame : tabs[active];
 const isLocked = (o, k) => !!(o.locks && o.locks.includes(k));
 function showLocks() {
-  document.querySelectorAll('.lockBtn').forEach(b => {
+  document.querySelectorAll('#sheet .lockBtn').forEach(b => {
     const k = b.dataset.k, on = isLocked(lockScope(k), k);
     b.setAttribute('aria-pressed', on); b.textContent = on ? '🔒' : '🔓'; b.title = on ? 'Locked. Tap to unlock' : 'Tap to lock this number';
     b.parentElement.classList.toggle('locked', on);
@@ -1583,6 +1753,7 @@ document.querySelectorAll('#sheet fieldset > legend, .board .card:not(.view-card
   $('pin').addEventListener('change', e => { setPin(e.target.checked); store.set('xl-chassis-pin', e.target.checked ? '1' : '0'); }); }
 // Only the tab you're on goes back to its starting numbers, padlocks included; the other tabs and the shared frame numbers stay as they are
 $('resetTab').addEventListener('click', () => {
+  if (view === 'rocker') { RK.reset(); return; }
   if (!confirm(`Put every number on the ${TAB_NAMES[active]} tab back to its default? Padlocked numbers on this tab get reset too. The other tabs aren't touched.`)) return;
   tabs[active] = clone(DEF_TABS[active]); toForm(); render(); });
 window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', render);
@@ -1797,6 +1968,23 @@ $('mNext').addEventListener('click', () => {
 $('mClear').addEventListener('click', () => { if (!confirm('Clear all the measurements you have entered?')) return; meas = { group: null, step: 0, v: {} }; measSave(); measRender(); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('measure').hidden) measClose(); });
 
+
+// ---------- Two views: the whole bike, and the rocker & dogbone designer ----------
+// The designer's code is in the next script; it starts the first time its view is opened.
+let view = 'bike';
+function setView(v, remember = true) {
+  view = v === 'rocker' ? 'rocker' : 'bike';
+  $('bikeView').hidden = view !== 'bike'; $('rk').hidden = view !== 'rocker';
+  document.querySelectorAll('[data-view]').forEach(b => b.setAttribute('aria-pressed', b.dataset.view === view));
+  if (remember) store.set('xl-view', view);
+  if (view === 'rocker') RK.start(); else render();
+}
+document.querySelectorAll('[data-view]').forEach(b => b.addEventListener('click', () => { if (b.dataset.view !== view) { setView(b.dataset.view); window.scrollTo(0, 0); } }));
+$('rkBack').addEventListener('click', () => { $('rkSent').hidden = true; setView('rocker'); window.scrollTo(0, 0); });
+// What the designer needs from the bench to put a linkage on one of its tabs
+const BENCH = { tabs: () => tabs, names: TAB_NAMES, isLocked, fromForm,
+  show(t, msg) { fromForm(); active = t; toForm(); $('rkSentText').innerHTML = msg; $('rkSent').hidden = false; setView('bike'); window.scrollTo(0, 0); } };
+
 // ---------- Saving (installed app) ----------
 // The app keeps everything in this phone's storage. Back up writes a JSON file you can keep in Files; Restore reads one back.
 const saveNote = t => { $('saveNote').textContent = t; };
@@ -1810,7 +1998,7 @@ function cloudSave() { saveNote('Saved on this phone · ' + new Date().toLocaleT
 $('exportBtn').addEventListener('click', async () => {
   fromForm();
   const name = 'xl125r-chassis-' + new Date().toISOString().slice(0, 10) + '.json';
-  const blob = new Blob([JSON.stringify({ app: 'xl125r-chassis-bench', v: 1, frame, tabs, active }, null, 2)], { type: 'application/json' });
+  const blob = new Blob([JSON.stringify({ app: 'xl125r-chassis-bench', v: 1, frame, tabs, active, rocker: RK.dump() }, null, 2)], { type: 'application/json' });
   try {
     const file = new File([blob], name, { type: 'application/json' });
     if (navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], title: 'XL125R Chassis Bench backup' }); saveNote('Backup shared'); return; }
@@ -1822,7 +2010,7 @@ $('importBtn').addEventListener('click', () => $('importFile').click());
 $('importFile').addEventListener('change', async e => {
   const f = e.target.files[0]; e.target.value = ''; if (!f) return;
   try { const s = JSON.parse(await f.text()); if (!s.frame || !s.tabs) throw new Error('not a bench backup');
-    applySaved(s); toForm(); render(); saveNote('Restored from ' + f.name);
+    applySaved(s); toForm(); render(); if (s.rocker) RK.load(s.rocker); saveNote('Restored from ' + f.name);
   } catch (err) { saveNote('That file isn\'t a Chassis Bench backup'); }
 });
 if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
@@ -1838,6 +2026,642 @@ try { toForm(); } catch (e) {} render();
   measOpen(); meas.group = 'link'; meas.step = 0; measSave(); measRender();
 })();
 
+</script>
+<script>/* earcut 2.2.4, (c) 2016 Mapbox, ISC License */
+!function(e){"object"==typeof exports&&"undefined"!=typeof module?module.exports=e():"function"==typeof define&&define.amd?define([],e):("undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:this).earcut=e()}(function(){return function r(x,i,u){function f(n,e){if(!i[n]){if(!x[n]){var t="function"==typeof require&&require;if(!e&&t)return t(n,!0);if(o)return o(n,!0);throw(e=new Error("Cannot find module '"+n+"'")).code="MODULE_NOT_FOUND",e}t=i[n]={exports:{}},x[n][0].call(t.exports,function(e){return f(x[n][1][e]||e)},t,t.exports,r,x,i,u)}return i[n].exports}for(var o="function"==typeof require&&require,e=0;e<u.length;e++)f(u[e]);return f}({1:[function(e,n,t){"use strict";function r(e,n,t){t=t||2;var r,x,i,u,f,o=n&&n.length,v=o?n[0]*t:e.length,p=s(e,0,v,t,!0),y=[];if(p&&p.next!==p.prev){if(o&&(p=function(e,n,t,r){var x,i,u,f,o=[];for(x=0,i=n.length;x<i;x++)f=n[x]*r,u=x<i-1?n[x+1]*r:e.length,(f=s(e,f,u,r,!1))===f.next&&(f.steiner=!0),o.push(function(e){var n=e,t=e;for(;(n.x<t.x||n.x===t.x&&n.y<t.y)&&(t=n),n=n.next,n!==e;);return t}(f));for(o.sort(c),x=0;x<o.length;x++)t=function(e,n){var t=function(e,n){var t,r=n,x=e.x,i=e.y,u=-1/0;do{if(i<=r.y&&i>=r.next.y&&r.next.y!==r.y){var f=r.x+(i-r.y)*(r.next.x-r.x)/(r.next.y-r.y);if(f<=x&&u<f&&(u=f,t=r.x<r.next.x?r:r.next,f===x))return t}}while(r=r.next,r!==n);if(!t)return null;var o,v=t,p=t.x,y=t.y,a=1/0;r=t;for(;x>=r.x&&r.x>=p&&x!==r.x&&D(i<y?x:u,i,p,y,i<y?u:x,i,r.x,r.y)&&(o=Math.abs(i-r.y)/(x-r.x),_(r,e)&&(o<a||o===a&&(r.x>t.x||r.x===t.x&&function(e,n){return E(e.prev,e,n.prev)<0&&E(n.next,e,e.next)<0}(t,r)))&&(t=r,a=o)),r=r.next,r!==v;);return t}(e,n);if(!t)return n;n=j(t,e);return q(n,n.next),q(t,t.next)}(o[x],t);return t}(e,n,p,t)),e.length>80*t){for(var a=r=e[0],l=x=e[1],h=t;h<v;h+=t)(i=e[h])<a&&(a=i),(u=e[h+1])<l&&(l=u),r<i&&(r=i),x<u&&(x=u);f=0!==(f=Math.max(r-a,x-l))?32767/f:0}O(p,y,t,a,l,f,0)}return y}function s(e,n,t,r,x){var i,u;if(x===0<d(e,n,t,r))for(i=n;i<t;i+=r)u=f(i,e[i],e[i+1],u);else for(i=t-r;n<=i;i-=r)u=f(i,e[i],e[i+1],u);return u&&N(u,u.next)&&(C(u),u=u.next),u}function q(e,n){if(!e)return e;n=n||e;var t,r=e;do{if(t=!1,r.steiner||!N(r,r.next)&&0!==E(r.prev,r,r.next))r=r.next;else{if(C(r),(r=n=r.prev)===r.next)break;t=!0}}while(t||r!==n);return n}function O(e,n,t,r,x,i,u){if(e){if(!u&&i){for(var f=e,o=r,v=x,p=i,y=f;0===y.z&&(y.z=k(y.x,y.y,o,v,p)),y.prevZ=y.prev,y.nextZ=y.next,(y=y.next)!==f;);y.prevZ.nextZ=null,y.prevZ=null;var a,l,h,s,c,d,Z,g,w=y,M=1;do{for(l=w,c=w=null,d=0;l;){for(d++,h=l,a=Z=0;a<M&&(Z++,h=h.nextZ);a++);for(g=M;0<Z||0<g&&h;)0!==Z&&(0===g||!h||l.z<=h.z)?(l=(s=l).nextZ,Z--):(h=(s=h).nextZ,g--),c?c.nextZ=s:w=s,s.prevZ=c,c=s;l=h}}while(c.nextZ=null,M*=2,1<d)}for(var b,m,z=e;e.prev!==e.next;)if(b=e.prev,m=e.next,i?function(e,n,t,r){var x=e.prev,i=e,u=e.next;if(0<=E(x,i,u))return;var f=x.x,o=i.x,v=u.x,p=x.y,y=i.y,a=u.y,l=f<o?f<v?f:v:o<v?o:v,h=p<y?p<a?p:a:y<a?y:a,s=o<f?v<f?f:v:v<o?o:v,c=y<p?a<p?p:a:a<y?y:a,d=k(l,h,n,t,r),Z=k(s,c,n,t,r),g=e.prevZ,w=e.nextZ;for(;g&&g.z>=d&&w&&w.z<=Z;){if(g.x>=l&&g.x<=s&&g.y>=h&&g.y<=c&&g!==x&&g!==u&&D(f,p,o,y,v,a,g.x,g.y)&&0<=E(g.prev,g,g.next))return;if(g=g.prevZ,w.x>=l&&w.x<=s&&w.y>=h&&w.y<=c&&w!==x&&w!==u&&D(f,p,o,y,v,a,w.x,w.y)&&0<=E(w.prev,w,w.next))return;w=w.nextZ}for(;g&&g.z>=d;){if(g.x>=l&&g.x<=s&&g.y>=h&&g.y<=c&&g!==x&&g!==u&&D(f,p,o,y,v,a,g.x,g.y)&&0<=E(g.prev,g,g.next))return;g=g.prevZ}for(;w&&w.z<=Z;){if(w.x>=l&&w.x<=s&&w.y>=h&&w.y<=c&&w!==x&&w!==u&&D(f,p,o,y,v,a,w.x,w.y)&&0<=E(w.prev,w,w.next))return;w=w.nextZ}return 1}(e,r,x,i):function(e){var n=e.prev,t=e,e=e.next;if(0<=E(n,t,e))return;var r=n.x,x=t.x,i=e.x,u=n.y,f=t.y,o=e.y,v=r<x?r<i?r:i:x<i?x:i,p=u<f?u<o?u:o:f<o?f:o,y=x<r?i<r?r:i:i<x?x:i,a=f<u?o<u?u:o:o<f?f:o,l=e.next;for(;l!==n;){if(l.x>=v&&l.x<=y&&l.y>=p&&l.y<=a&&D(r,u,x,f,i,o,l.x,l.y)&&0<=E(l.prev,l,l.next))return;l=l.next}return 1}(e))n.push(b.i/t|0),n.push(e.i/t|0),n.push(m.i/t|0),C(e),e=m.next,z=m.next;else if((e=m)===z){u?1===u?O(e=function(e,n,t){var r=e;do{var x=r.prev,i=r.next.next}while(!N(x,i)&&U(x,r,r.next,i)&&_(x,i)&&_(i,x)&&(n.push(x.i/t|0),n.push(r.i/t|0),n.push(i.i/t|0),C(r),C(r.next),r=e=i),r=r.next,r!==e);return q(r)}(q(e),n,t),n,t,r,x,i,2):2===u&&function(e,n,t,r,x,i){var u=e;do{for(var f,o=u.next.next;o!==u.prev;){if(u.i!==o.i&&function(e,n){return e.next.i!==n.i&&e.prev.i!==n.i&&!function(e,n){var t=e;do{if(t.i!==e.i&&t.next.i!==e.i&&t.i!==n.i&&t.next.i!==n.i&&U(t,t.next,e,n))return 1}while(t=t.next,t!==e);return}(e,n)&&(_(e,n)&&_(n,e)&&function(e,n){var t=e,r=!1,x=(e.x+n.x)/2,i=(e.y+n.y)/2;for(;t.y>i!=t.next.y>i&&t.next.y!==t.y&&x<(t.next.x-t.x)*(i-t.y)/(t.next.y-t.y)+t.x&&(r=!r),t=t.next,t!==e;);return r}(e,n)&&(E(e.prev,e,n.prev)||E(e,n.prev,n))||N(e,n)&&0<E(e.prev,e,e.next)&&0<E(n.prev,n,n.next))}(u,o))return f=j(u,o),u=q(u,u.next),f=q(f,f.next),O(u,n,t,r,x,i,0),O(f,n,t,r,x,i,0);o=o.next}}while(u=u.next,u!==e)}(e,n,t,r,x,i):O(q(e),n,t,r,x,i,1);break}}}function c(e,n){return e.x-n.x}function k(e,n,t,r,x){return(e=1431655765&((e=858993459&((e=252645135&((e=16711935&((e=(e-t)*x|0)|e<<8))|e<<4))|e<<2))|e<<1))|(n=1431655765&((n=858993459&((n=252645135&((n=16711935&((n=(n-r)*x|0)|n<<8))|n<<4))|n<<2))|n<<1))<<1}function D(e,n,t,r,x,i,u,f){return(e-u)*(i-f)<=(x-u)*(n-f)&&(t-u)*(n-f)<=(e-u)*(r-f)&&(x-u)*(r-f)<=(t-u)*(i-f)}function E(e,n,t){return(n.y-e.y)*(t.x-n.x)-(n.x-e.x)*(t.y-n.y)}function N(e,n){return e.x===n.x&&e.y===n.y}function U(e,n,t,r){var x=v(E(e,n,t)),i=v(E(e,n,r)),u=v(E(t,r,e)),f=v(E(t,r,n));return x!==i&&u!==f||(0===x&&o(e,t,n)||(0===i&&o(e,r,n)||(0===u&&o(t,e,r)||!(0!==f||!o(t,n,r)))))}function o(e,n,t){return n.x<=Math.max(e.x,t.x)&&n.x>=Math.min(e.x,t.x)&&n.y<=Math.max(e.y,t.y)&&n.y>=Math.min(e.y,t.y)}function v(e){return 0<e?1:e<0?-1:0}function _(e,n){return E(e.prev,e,e.next)<0?0<=E(e,n,e.next)&&0<=E(e,e.prev,n):E(e,n,e.prev)<0||E(e,e.next,n)<0}function j(e,n){var t=new u(e.i,e.x,e.y),r=new u(n.i,n.x,n.y),x=e.next,i=n.prev;return(e.next=n).prev=e,(t.next=x).prev=t,(r.next=t).prev=r,(i.next=r).prev=i,r}function f(e,n,t,r){e=new u(e,n,t);return r?(e.next=r.next,(e.prev=r).next.prev=e,r.next=e):(e.prev=e).next=e,e}function C(e){e.next.prev=e.prev,e.prev.next=e.next,e.prevZ&&(e.prevZ.nextZ=e.nextZ),e.nextZ&&(e.nextZ.prevZ=e.prevZ)}function u(e,n,t){this.i=e,this.x=n,this.y=t,this.prev=null,this.next=null,this.z=0,this.prevZ=null,this.nextZ=null,this.steiner=!1}function d(e,n,t,r){for(var x=0,i=n,u=t-r;i<t;i+=r)x+=(e[u]-e[i])*(e[i+1]+e[u+1]),u=i;return x}n.exports=r,(n.exports.default=r).deviation=function(e,n,t,r){var x=n&&n.length,i=x?n[0]*t:e.length,u=Math.abs(d(e,0,i,t));if(x)for(var f=0,o=n.length;f<o;f++){var v=n[f]*t,p=f<o-1?n[f+1]*t:e.length;u-=Math.abs(d(e,v,p,t))}for(var y=0,f=0;f<r.length;f+=3){var a=r[f]*t,l=r[f+1]*t,h=r[f+2]*t;y+=Math.abs((e[a]-e[h])*(e[1+l]-e[1+a])-(e[a]-e[l])*(e[1+h]-e[1+a]))}return 0===u&&0===y?0:Math.abs((y-u)/u)},r.flatten=function(e){for(var n=e[0][0].length,t={vertices:[],holes:[],dimensions:n},r=0,x=0;x<e.length;x++){for(var i=0;i<e[x].length;i++)for(var u=0;u<n;u++)t.vertices.push(e[x][i][u]);0<x&&(r+=e[x-1].length,t.holes.push(r))}return t}},{}]},{},[1])(1)});
+</script>
+<script>
+// ---------- Rocker & dogbone designer (the second view) ----------
+// Kept in its own scope so its names don't clash with the bench's. It uses the bench's linkage solver (analyse, sagAt) above.
+(() => {
+// ---------- Generator: given the mounts, the shock and its angle at full extension, search the rocker and dogbone ----------
+const fmtN = v => (Math.round(v)).toString();
+function setupCtx(p) {
+  const th0 = -p.topAng * D2R, R0w = rot(p.rocker, th0);
+  const a = p.shockAng * D2R, S0 = [p.shockTop[0] + p.eye * Math.sin(a), p.shockTop[1] - p.eye * Math.cos(a)];
+  const rS = dist(S0, R0w), angS = Math.atan2(S0[1] - R0w[1], S0[0] - R0w[0]);
+  return { p, th0, R0w, S0, rS, angS, Lext: p.eye, Lbump: p.eye - p.stroke };
+}
+const armY = (pt, th) => rot(pt, -th)[1];
+// Quick sweep from full extension to the bump stop. Returns null if the design breaks a limit.
+function quick(ctx, rD, phi, step) {
+  const p = ctx.p, F = p.dogMount, T = p.shockTop;
+  const D0 = [ctx.R0w[0] + rD * Math.cos(phi), ctx.R0w[1] + rD * Math.sin(phi)];
+  const dog = dist(D0, F);
+  if (dog < p.dogMin || dog > p.dogMax) return null;
+  if (dist(D0, ctx.S0) < p.eyeBoss + 2) return null;
+  if (dist(D0, ctx.S0) > p.maxRocker || rD > p.maxRocker) return null;
+  // Under the arm and through the arm both keep the dogbone eye down by the pivot, under the arm; through the arm points the shock eye up through it (a shark's tooth)
+  if ((p.place === 'under' || p.place === 'through') && armY(D0, ctx.th0) > p.rocker[1] + 5) return null;
+  const incl = ctx.angS - phi, minS = Math.sin(p.minTA * D2R);
+  let prevD = D0, prevL = ctx.Lext, prevW = 0, minTA = 90;
+  const ay0 = rot([p.armLen, 0], ctx.th0)[1], pts = [[0, 0]];
+  for (let th = ctx.th0 + step; th < ctx.th0 + 70 * D2R; th += step) {
+    const R = rot(p.rocker, th), sols = circles(R, rD, F, dog);
+    if (!sols) return null;
+    const D = dist(sols[0], prevD) <= dist(sols[1], prevD) ? sols[0] : sols[1];
+    const s = Math.abs(((R[0]-D[0])*(F[1]-D[1]) - (R[1]-D[1])*(F[0]-D[0])) / (rD * dog));
+    if (s < minS) return null;
+    minTA = Math.min(minTA, Math.asin(Math.min(1, s)) / D2R);
+    const ang = Math.atan2(D[1]-R[1], D[0]-R[0]) + incl, S = [R[0] + ctx.rS*Math.cos(ang), R[1] + ctx.rS*Math.sin(ang)];
+    const L = dist(T, S), w = rot([p.armLen, 0], th)[1] - ay0;
+    if (L >= prevL) return null; // shock must keep compressing
+    if (L <= ctx.Lbump) {
+      const t = (prevL - ctx.Lbump) / (prevL - L), travel = prevW + t * (w - prevW);
+      pts.push([p.stroke, travel]);
+      const at = c => { for (let i = 1; i < pts.length; i++) if (pts[i][0] >= c) { const a = pts[i-1], b = pts[i]; return a[1] + (c - a[0]) / (b[0] - a[0]) * (b[1] - a[1]); } return travel; };
+      const f = p.stroke * 0.03, rTop = at(f) / f, rBot = (travel - at(p.stroke - f)) / f;
+      return { rD, rS: ctx.rS, eyes: dist(D0, ctx.S0), phi, dog, incl: ((incl / D2R + 540) % 360) - 180, travel, rTop, rBot, prog: (rTop / rBot - 1) * 100, minTA, D0 };
+    }
+    pts.push([ctx.Lext - L, w]); prevD = D; prevL = L; prevW = w;
+  }
+  return null;
+}
+function costOf(q, p) {
+  if (!q) return Infinity;
+  const e1 = (q.travel - p.travel) / p.travel, e2 = (q.prog - p.prog) / 100;
+  const span = Math.max(q.rD, q.rS || 0, q.eyes || 0);
+  return 4*e1*e1 + e2*e2 + 2e-4 * (span / 50) ** 2 + 0.6 * Math.max(0, (55 - q.minTA) / 55) ** 2; // stay well clear of over centre
+}
+function generate(p, maxSeeds = 10) {
+  const ctx = setupCtx(p), out = { ctx, opts: [] };
+  const reach = dist(p.shockTop, ctx.R0w);
+  if (p.eye < reach - p.maxRocker || p.eye > reach + p.maxRocker) { out.error = `The shock top is ${fmtN(reach)} mm from the rocker pivot, so a ${fmtN(p.eye)} mm shock can't get its bottom eye onto a rocker no bigger than ${p.maxRocker} mm. Use a shock between ${fmtN(Math.max(0, reach - p.maxRocker))} and ${fmtN(reach + p.maxRocker)} mm, move the rocker pivot, or allow a bigger rocker.`; return out; }
+  if (ctx.rS > p.maxRocker) { out.error = `With the shock at that angle its bottom eye sits ${ctx.rS.toFixed(0)} mm from the rocker pivot, more than the biggest rocker you allowed (${p.maxRocker} mm). Change the shock angle or length, or allow a bigger rocker.`; return out; }
+  if (ctx.rS < (p.pivotBoss + p.eyeBoss) / 2 + 2) { out.error = `With the shock at that angle its bottom eye lands ${ctx.rS.toFixed(0)} mm from the rocker pivot, too close for the two bosses to fit. Change the shock angle or length.`; return out; }
+  if (p.place === 'under' && armY(ctx.S0, ctx.th0) > p.rocker[1] + 5) { out.error = `With the shock at that angle and length its bottom eye sits above the rocker pivot, so the rocker can't hang under the arm. Try a longer shock or a different angle, or use the Through the arm tab.`; return out; }
+  if (p.place === 'through' && armY(ctx.S0, ctx.th0) < p.throughClear) { out.error = `With the shock at that angle and length its bottom eye lands ${fmtN(-armY(ctx.S0, ctx.th0) + p.throughClear)} mm too low to sit above the arm's centreline. Try a shorter shock or a different angle.`; return out; }
+  const rMin = (p.pivotBoss + p.eyeBoss) / 2 + 2, cands = [];
+  for (let rD = rMin; rD <= p.maxRocker; rD += 4)
+    for (let ph = 0; ph < 360; ph += 4) { const q = quick(ctx, rD, ph * D2R, 1.5 * D2R), c = costOf(q, p); if (c < Infinity) cands.push([c, rD, ph * D2R]); }
+  if (!cands.length) { out.error = 'No rocker and dogbone within your limits gives a working linkage with these mounts. Try a bigger rocker, a wider dogbone range, or a different shock angle.'; return out; }
+  cands.sort((a, b) => a[0] - b[0]);
+  const refine = (rD, phi) => {
+    let st = 0.6 * D2R, best = [costOf(quick(ctx, rD, phi, st), p), rD, phi], sr = 2, sp = 2 * D2R;
+    while (sr > 0.05) {
+      if (sr < 0.3 && st > 0.25 * D2R) { st = 0.2 * D2R; best[0] = costOf(quick(ctx, best[1], best[2], st), p); }
+      let moved = false;
+      for (const [dr, dp] of [[sr,0],[-sr,0],[0,sp],[0,-sp],[sr,sp],[-sr,-sp],[sr,-sp],[-sr,sp]]) {
+        const c = costOf(quick(ctx, best[1] + dr, best[2] + dp, st), p);
+        if (c < best[0]) { best = [c, best[1] + dr, best[2] + dp]; moved = true; }
+      }
+      if (!moved) { sr /= 2; sp /= 2; }
+    }
+    return best;
+  };
+  const angDiff = (a, b) => Math.abs(((a - b) / D2R + 540) % 360 - 180);
+  const picks = [], seeds = [], near = (k, c) => angDiff(k[2], c[2]) < 35 && Math.abs(k[1] - c[1]) < 25;
+  for (const c of cands) {
+    if (picks.length >= 3 || seeds.length >= maxSeeds) break;
+    if (seeds.some(k => near(k, c)) || picks.some(k => near(k, c))) continue;
+    seeds.push(c);
+    const r = refine(c[1], c[2]);
+    if (r[0] < Infinity && !picks.some(k => near(k, r))) picks.push(r);
+  }
+  out.opts = picks.map(k => Object.assign(quick(ctx, k[1], k[2], 0.2*D2R), { cost: k[0], rS: ctx.rS }));
+  out.opts.sort((a, b) => a.cost - b.cost);
+  if (!out.opts.length) out.error = 'No rocker and dogbone within your limits gives a working linkage with these mounts. Try a bigger rocker, a wider dogbone range, or a different shock angle.';
+  return out;
+}
+
+// ---------- Inputs ----------
+const KEY = 'rocker-designer-v1';
+const clone = o => JSON.parse(JSON.stringify(o));
+const DEF = {
+  armLen: 630, topAng: 15, rocker: [180, -20], shockTop: [-80, 300], dogMount: [38, -66],
+  lenMode: 'fixed', eye: 450, eyeMin: 380, eyeMax: 480, stroke: 75, shockAng: 24,
+  angMode: 'fixed', angMin: 15, angMax: 40,
+  travel: 280, prog: 40, maxRocker: 120, dogMin: 60, dogMax: 260, place: 'under', throughClear: 0, minTA: 40,
+  offset: 10, pivotHole: 22, pivotBoss: 36, pivotWidth: 30, eyeHole: 12, eyeBoss: 28, eyeWidth: 22, plate: 10,
+  dogHole: 12, dogBoss: 26, dogThick: 16, locks: [],
+  spring: 1000, preload: 5, bikeKg: 115, riderKg: 80, unsprung: 15, bikeRear: 50, riderRear: 70, sagPct: 33
+};
+// Through the arm, old Pro-Link style: rocker pivot and dogbone eye under the arm, with the rocker pointing up through it like a shark's tooth so the shock's bottom eye sits above the arm's centreline.
+// Shock angle left for it to find, since the bench's angle is for the CRF style rocker under the arm.
+const DEF_THROUGH = Object.assign(clone(DEF), { eye: 400, lenMode: 'find', eyeMin: 340, eyeMax: 440, angMode: 'find', angMin: 15, angMax: 40, place: 'through' });
+const TABS = { under: { name: 'Under the arm', sub: 'CRF style rocker hung below the swingarm', def: DEF,
+    note: 'The rocker hangs under the swingarm, like the CRF450. The shock comes down in front of the arm to the rocker.' },
+  through: { name: 'Through the arm', sub: 'Shark\u2019s tooth rocker, shock eye above the centreline', def: DEF_THROUGH,
+    note: 'The rocker pivots under the swingarm with the dogbone, and points up through the arm like a shark\u2019s tooth, so the shock\u2019s bottom eye sits above the arm\u2019s centreline like an early Pro-Link. Check the shock and rocker clear the arm\u2019s cross-member.' } };
+const root = document.getElementById('rk'), $ = id => document.getElementById('rk-' + id);
+const store = { get() { try { return JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { return null; } }, set(v) { try { localStorage.setItem(KEY, JSON.stringify(v)); } catch (e) {} } };
+let saved, tabState, active, inp, design, zoom, ghosts;
+function loadSaved(sv) {
+saved = sv || {};
+// Each tab keeps its own numbers and design. Pages saved before the tabs existed become the Under the arm tab.
+tabState = {};
+Object.keys(TABS).forEach(t => {
+  const old = t === 'under' && !saved.tabs ? { inp: saved.inp, design: saved.design } : (saved.tabs && saved.tabs[t]) || {};
+  const i = Object.assign(clone(TABS[t].def), old.inp || {});
+  if (!i.v2) { if (i.minTA === 30) i.minTA = DEF.minTA; if (i.underArm === false) i.place = 'any'; delete i.underArm; i.v2 = true; } // 30° let it get too close to over centre
+  delete i.link; delete i.linkTab; if (!Array.isArray(i.locks)) i.locks = [];
+  if (t === 'through') { i.place = 'through'; if (!i.v3) { i.rocker = clone(DEF_THROUGH.rocker); ['lenMode', 'eyeMin', 'eyeMax'].forEach(k => i[k] = DEF_THROUGH[k]); i.v3 = true; } } // the first version wrongly put this rocker on top of the arm
+  tabState[t] = { inp: i, design: old.design || null };
+});
+active = saved.active in TABS ? saved.active : 'under';
+inp = tabState[active].inp; design = tabState[active].design; zoom = saved.zoom !== false; ghosts = saved.ghosts !== false;
+}
+loadSaved(store.get());
+// Which whole-bike tab the design goes onto, and whether the spring and weights go with it
+const SEND_TABS = [['crf', 'CRF style'], ['build', 'Build'], ['stock', 'Stock XL']];
+let sendTab = SEND_TABS.some(t => t[0] === saved.sendTab) ? saved.sendTab : 'crf', sendSpring = saved.sendSpring !== false;
+const save = () => { tabState[active] = { inp, design }; store.set({ tabs: tabState, active, zoom, ghosts, sendTab, sendSpring }); };
+
+// Field specs. sign: [label for +, label for −]. Values are stored signed; the box shows the size and the buttons the direction (no minus key on the iPhone pad).
+const XS = ['Behind', 'In front'], YS = ['Above', 'Below'];
+const FORMS = [
+  { title: 'Swingarm', open: true, fields: [
+    { k: 'armLen', label: 'Pivot to axle', unit: 'mm', hint: 'Centre of the pivot bolt to centre of the axle.' },
+    { k: 'topAng', label: 'Arm angle with the shock fully extended', unit: '°', sign: ['Below level', 'Above level'], hint: 'Wheel hanging, shock at full length. How far the pivot-to-axle line drops below level.' },
+    { k: 'rocker', pair: ['Along', 'Off'], label: 'Rocker pivot on the arm', unit: 'mm', sign: [null, ['Above', 'Below']], hint: 'Measured on the arm itself: along the pivot-to-axle line, then square off it. Under the arm is Below.' } ] },
+  { title: 'Frame mounts', open: true, fields: [
+    { k: 'shockTop', pair: ['X', 'Y'], label: 'Shock top mount', unit: 'mm', sign: [XS, YS], hint: 'From the swingarm pivot centre.' },
+    { k: 'dogMount', pair: ['X', 'Y'], label: 'Dogbone mount, bottom of frame', unit: 'mm', sign: [XS, YS] } ] },
+  { title: 'Shock', open: true, fields: [
+    { k: 'lenMode', label: 'Shock length', choice: [['fixed', 'I know it'], ['find', 'Find it for me']] },
+    { k: 'eye', label: 'Eye to eye, fully extended', unit: 'mm', when: () => inp.lenMode === 'fixed' },
+    { k: 'eyeMin', label: 'Shortest shock to try', unit: 'mm', when: () => inp.lenMode === 'find' },
+    { k: 'eyeMax', label: 'Longest shock to try', unit: 'mm', when: () => inp.lenMode === 'find' },
+    { k: 'stroke', label: 'Stroke', unit: 'mm' },
+    { k: 'angMode', label: 'Shock angle', choice: [['fixed', 'I know it'], ['find', 'Find it for me']], hint: 'Lean of the shock from vertical with it fully extended, seen from the side. With the length, this sets where the shock’s bottom eye, and so the rocker, has to be. If you change the length, let it find the angle too, or the rocker may not fit.' },
+    { k: 'shockAng', label: 'Shock angle, fully extended', unit: '°', sign: ['Bottom eye behind top', 'Bottom eye in front'], when: () => inp.angMode === 'fixed' },
+    { k: 'angMin', label: 'Least lean to try (bottom eye behind top)', unit: '°', when: () => inp.angMode === 'find' },
+    { k: 'angMax', label: 'Most lean to try', unit: '°', when: () => inp.angMode === 'find' } ] },
+  { title: 'What you want', open: true, fields: [
+    { k: 'travel', label: 'Rear wheel travel', unit: 'mm' },
+    { k: 'prog', label: 'Rising rate', unit: '%', hint: 'How much stiffer the end of the travel is than the start. 0 is linear; modern motocross bikes are roughly 30 to 50.' } ] },
+  { title: 'Spring and weight', open: true, fields: [
+    { k: 'spring', label: 'Shock spring rate', unit: 'lb/in', hint: 'The number on the spring. 1000 lb/in is 175 N/mm or 17.9 kg/mm.' },
+    { k: 'preload', label: 'Spring preload', unit: 'mm', hint: 'How far the collar squashes the spring with the shock fully extended.' },
+    { k: 'riderKg', label: 'You, in your kit', unit: 'kg' },
+    { k: 'bikeKg', label: 'Bike, ready to ride', unit: 'kg', hint: 'With fuel and luggage. A stock XL125R is about 110 kg wet.' },
+    { k: 'sagPct', label: 'Rider sag you want', unit: '% of travel', hint: 'About 33% is usual off road. A rally bike with luggage often runs a little less.' },
+    { k: 'bikeRear', label: 'Bike weight on the back wheel', unit: '%' },
+    { k: 'riderRear', label: 'Your weight on the back wheel', unit: '%', hint: 'Sat down. Around 70% is a fair guess.' },
+    { k: 'unsprung', label: 'Unsprung weight at the back', unit: 'kg', hint: 'Wheel, tyre, brake and about half the swingarm. It does not squash the spring.' } ] },
+  { title: 'Limits', open: false, fields: [
+    { k: 'maxRocker', label: 'Biggest rocker, any eye to any eye', unit: 'mm' },
+    { k: 'dogMin', label: 'Shortest dogbone', unit: 'mm' },
+    { k: 'dogMax', label: 'Longest dogbone', unit: 'mm' },
+    { k: 'minTA', label: 'Smallest angle between dogbone and rocker', unit: '°', hint: 'Keeps it away from going over centre. 40° is the least it allows by default, and it aims for 55° or more.' },
+    { k: 'place', label: 'Rocker hangs under the arm', choice: [['under', 'Yes, keep the eyes below its pivot'], ['any', 'Anywhere']], when: () => inp.place !== 'through' },
+    { k: 'throughClear', label: 'Shock eye above the arm centreline by at least', unit: 'mm', when: () => inp.place === 'through' } ] }
+];
+const PRINT = [
+  { k: 'offset', label: 'Shock and dogbone line, sideways from the pivot boss', unit: 'mm', sign: ['Left', 'Right'], hint: 'Your shock top and lower dogbone mount are about 10 mm left of centre.' },
+  { k: 'pivotHole', label: 'Rocker pivot bore', unit: 'mm' }, { k: 'pivotBoss', label: 'Rocker pivot boss, outside', unit: 'mm' }, { k: 'pivotWidth', label: 'Rocker pivot boss width', unit: 'mm' },
+  { k: 'eyeHole', label: 'Shock and dogbone eye bores', unit: 'mm' }, { k: 'eyeBoss', label: 'Eye bosses, outside', unit: 'mm' }, { k: 'eyeWidth', label: 'Eye boss width', unit: 'mm' },
+  { k: 'plate', label: 'Rocker plate thickness', unit: 'mm' },
+  { k: 'dogHole', label: 'Dogbone eye bores', unit: 'mm' }, { k: 'dogBoss', label: 'Dogbone ends, outside', unit: 'mm' }, { k: 'dogThick', label: 'Dogbone thickness', unit: 'mm' }
+];
+const TUNE = [
+  { k: 'rD', label: 'Rocker pivot to dogbone eye', unit: 'mm' },
+  { k: 'rS', label: 'Rocker pivot to shock eye', unit: 'mm' },
+  { k: 'incl', label: 'Angle from dogbone eye round to shock eye', unit: '°', sign: ['+ anticlockwise', '− clockwise'], hint: 'Measured at the rocker pivot, seen from the right. The same number and sign as the bench’s rocker angle.' },
+  { k: 'dog', label: 'Dogbone, eye to eye', unit: 'mm' },
+  { k: 'branch', label: 'Which way the rocker sits', choice: [[false, 'As designed'], [true, 'Flipped']], hint: 'The same rocker and dogbone can join up two ways. Flipped is the other one.' }
+];
+
+const fmt = (v, d = 1) => (Math.round(v * 10 ** d) / 10 ** d).toString();
+function fieldHTML(f, obj, scope) {
+  const get = i => f.pair ? obj[f.k][i] : obj[f.k];
+  if (f.choice) return `<div class="field"><span class="lab">${f.label}${f.hint ? `<small>${f.hint}</small>` : ''}</span><div class="seg wide">${f.choice.map(([v, t]) => `<button type="button" data-s="${scope}" data-k="${f.k}" data-c='${JSON.stringify(v)}' aria-pressed="${get() === v}">${t}</button>`).join('')}</div></div>`;
+  const row = (i, ax, sg) => {
+    const v = get(i), signs = sg;
+    return `<div class="inrow">${ax ? `<span class="ax">${ax}</span>` : ''}<input type="number" inputmode="decimal" step="any" data-s="${scope}" data-k="${f.k}" data-i="${i}" value="${signs ? fmt(Math.abs(v), 2) : fmt(v, 2)}" aria-label="${f.label}${ax ? ' ' + ax : ''}"><span class="unit">${f.unit}</span>${signs ? `<div class="seg">${signs.map((t, j) => `<button type="button" data-s="${scope}" data-k="${f.k}" data-i="${i}" data-sign="${j ? -1 : 1}" aria-pressed="${(v < 0) === !!j}">${t}</button>`).join('')}</div>` : ''}</div>`;
+  };
+  const lockable = scope === 'inp', on = lockable && (obj.locks || []).includes(f.k);
+  let rows = f.pair ? f.pair.map((ax, i) => row(i, ax, f.sign && f.sign[i])).join('') : row(-1, null, f.sign);
+  if (on) rows = rows.replace(/<input /g, '<input readonly ').replace(/<button /g, '<button disabled ');
+  const lock = lockable ? `<button type="button" class="lockBtn" data-lock="${f.k}" aria-pressed="${on}" aria-label="${on ? 'Unlock' : 'Lock'} ${f.label}">${on ? '\u{1F512}' : '\u{1F513}'}</button>` : '';
+  return `<div class="field${on ? ' locked' : ''}"><span class="lab lockrow"><span>${f.label}${f.hint ? `<small>${f.hint}</small>` : ''}</span>${lock}</span>${rows}</div>`;
+}
+function renderForms() {
+  $('forms').innerHTML = FORMS.map(s => `<details class="card"${s.open ? ' open' : ''}><summary>${s.title}</summary><div class="in">${s.fields.filter(f => !f.when || f.when()).map(f => fieldHTML(f, inp, 'inp')).join('')}<div id="rk-note-${s.title.replace(/\W/g, '')}"></div></div></details>`).join('');
+  $('printForm').innerHTML = PRINT.map(f => fieldHTML(f, inp, 'inp')).join('');
+}
+function renderTune() { $('tune').innerHTML = design ? TUNE.map(f => fieldHTML(f, design, 'des')).join('') : '<p class="small">Design the linkage first.</p>'; }
+const scopeObj = s => s === 'inp' ? inp : design;
+const PRINT_KEYS = PRINT.map(f => f.k), SPRING_KEYS = FORMS.find(s => s.title === 'Spring and weight').fields.map(f => f.k);
+function setVal(s, k, i, v) { const o = scopeObj(s); if (i >= 0) o[k][i] = v; else o[k] = v; }
+function getVal(s, k, i) { const o = scopeObj(s); return i >= 0 ? o[k][i] : o[k]; }
+function changed(s, k) {
+  save();
+  if (s === 'des') { design.hand = true; save(); analyseDesign(); draw(); return; }
+  if (PRINT_KEYS.includes(k)) { drawRockerSketch(); return; }
+  if (SPRING_KEYS.includes(k)) { drawSag(); return; }
+  if (k === 'lenMode' || k === 'angMode') renderForms();
+  scheduleGen();
+}
+root.addEventListener('input', e => {
+  const t = e.target; if (!t.dataset || !t.dataset.k || t.type !== 'number') return;
+  const s = t.dataset.s, k = t.dataset.k, i = +t.dataset.i, raw = parseFloat(t.value);
+  if (!isFinite(raw)) return;
+  const segs = t.parentNode.querySelector('.seg'), neg = segs && segs.querySelector('[data-sign="-1"]').getAttribute('aria-pressed') === 'true';
+  setVal(s, k, i, neg ? -Math.abs(raw) : (segs ? Math.abs(raw) : raw));
+  changed(s, k);
+});
+root.addEventListener('click', e => {
+  const b = e.target.closest('button[data-k]'); if (!b) return;
+  const s = b.dataset.s, k = b.dataset.k, i = b.dataset.i === undefined ? -1 : +b.dataset.i;
+  if (b.dataset.c !== undefined) { setVal(s, k, i, JSON.parse(b.dataset.c)); b.parentNode.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b)); changed(s, k); return; }
+  const sign = +b.dataset.sign, v = Math.abs(getVal(s, k, i)) * sign;
+  setVal(s, k, i, v); b.parentNode.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b)); changed(s, k);
+});
+
+// ---------- Design ----------
+let gen = null, an = null, timer = null;
+function scheduleGen() { clearTimeout(timer); timer = setTimeout(runGen, 450); }
+function benchG(d) {
+  // Start the bench solver a hair above full extension, so it finds the top-out crossing whichever way rounding falls
+  return { layout: 'arm', armLen: inp.armLen, armAngle: inp.topAng - 0.01, rockerArm: inp.rocker, frameLink: inp.dogMount, rD: d.rD, rS: d.rS, incl: d.incl, dog: d.dog,
+    branch: !!d.branch, topOn: 'frame', botOn: 'rocker', shockTop: inp.shockTop, shockLow: [0, 0], shockArm: [0, 0], lug: [0, 0], rocker: [0, 0], eye: d.eye, stroke: inp.stroke, k: 1 };
+}
+function toDesign(q, ctx) {
+  const R0w = ctx.R0w, sols = circles(R0w, q.rD, inp.dogMount, q.dog);
+  const branch = !!sols && dist(sols[1], q.D0) < dist(sols[0], q.D0);
+  return { rD: q.rD, rS: q.rS, incl: q.incl, dog: q.dog, eye: ctx.p.eye, shockAng: ctx.p.shockAng, branch, travel: q.travel, prog: q.prog };
+}
+function range(lo, hi, n, minStep) { lo = Math.min(lo, hi); hi = Math.max(lo, hi); const st = Math.max(minStep, (hi - lo) / n), out = []; for (let v = lo; v <= hi + 1e-9; v += st) out.push(v); return out; }
+function runGen() {
+  const p = Object.assign({}, inp);
+  const both = inp.lenMode === 'find' && inp.angMode === 'find';
+  const Ls = inp.lenMode === 'find' ? range(inp.eyeMin, inp.eyeMax, both ? 12 : 40, 2.5) : [inp.eye];
+  const As = inp.angMode === 'find' ? range(inp.angMin, inp.angMax, both ? 12 : 30, 1) : [inp.shockAng];
+  const all = [], combos = Ls.length * As.length;
+  let firstErr = null;
+  for (const L of Ls) for (const A of As) {
+    const o = generate(Object.assign({}, p, { eye: L, shockAng: A }), combos > 1 ? 2 : 10);
+    if (o.error) { if (!firstErr || /shock top is/.test(o.error)) firstErr = o.error; continue; }
+    o.opts.forEach(q => all.push({ q, ctx: o.ctx }));
+  }
+  all.sort((a, b) => a.q.cost - b.q.cost);
+  const picks = [];
+  const same = (k, c) => Math.abs(k.ctx.p.eye - c.ctx.p.eye) < 15 && Math.abs(k.ctx.p.shockAng - c.ctx.p.shockAng) < 4 && (combos > 1 || Math.abs(k.q.rD - c.q.rD) < 25);
+  for (const c of all) { if (picks.length >= 3) break; if (picks.some(k => same(k, c))) continue; picks.push(c); }
+  let err = null;
+  if (!picks.length) err = combos > 1 ? 'None of the shock ' + (inp.lenMode === 'find' && inp.angMode === 'find' ? 'lengths and angles' : inp.lenMode === 'find' ? 'lengths' : 'angles') + ` tried gives a working linkage within your limits. The first problem it hit: ${firstErr || 'the linkage would not assemble.'}` : firstErr;
+  if (err && inp.angMode === 'fixed') err += ' Setting the shock angle to Find it for me usually sorts this.';
+  gen = { opts: picks, error: err };
+  if (picks.length) { design = toDesign(picks[0].q, picks[0].ctx); design.pick = 0; }
+  else design = null;
+  save(); renderTune(); analyseDesign(); draw();
+}
+function analyseDesign() { an = design ? analyse(benchG(design)) : null; }
+
+// ---------- Drawing ----------
+const W = 400, H = 330;
+let posK = 0;
+function poseAt(k) { if (!an || !an.res) return null; const r = an.res; return r[Math.round(k * (r.length - 1))]; }
+function draw() {
+  drawMsg(); drawView(); drawChart(); drawSag(); drawStats(); drawOpts(); drawBench(); drawRockerSketch(); drawNotes(); drawSend();
+  $('zoomBtn').setAttribute('aria-pressed', zoom); $('zoomBtn').textContent = zoom ? 'Linkage close-up' : 'Whole swingarm';
+  $('ghostBtn').setAttribute('aria-pressed', ghosts);
+}
+function drawMsg() {
+  const m = [];
+  if (gen && gen.error) m.push(gen.error);
+  if (design && an && an.error) m.push(an.error);
+  if (an && an.warn) m.push(...an.warn.map(t => t.replace(/\d+\.\d{2,}/g, v => (+v).toFixed(1))));
+  if (design && an && an.res) {
+    // Check the linkage it actually drew, whatever made it: the generator, a hand tweak or a flip
+    const r = an.res, top = r[0].lr, bot = r[r.length - 1].lr, mean = an.travel / an.stroke, peak = Math.max(...r.map(p => p.lr));
+    const prog = (top / bot - 1) * 100, bad = Math.abs(an.travel - inp.travel) > 30 || Math.abs(prog - inp.prog) > 30;
+    if (peak > 1.6 * mean) m.push(`<b>The ratio shoots up to ${peak.toFixed(1)} near the top of the travel.</b> The shock is nearly in line with the rocker there, so the back would be very soft at first and then very hard. Don't trust the spring and sag numbers for this one.`);
+    if (design.hand && bad) m.push(`<b>This has been changed by hand</b> in Fine-tune the rocker, and it now gives ${fmt(an.travel, 0)} mm travel and a ${fmt(prog, 0)}% rising rate instead of the ${inp.travel} mm and ${inp.prog}% you asked for. Tap Design the linkage to start again from your numbers.`);
+  }
+  if (design && !design.hand && an && an.res && gen && gen.opts.length) {
+    const q = gen.opts[design.pick ?? 0]?.q;
+    const off = [];
+    if (q && Math.abs(q.travel - inp.travel) > 5) off.push(`${fmt(q.travel, 0)} mm travel instead of ${inp.travel}`);
+    if (q && Math.abs(q.prog - inp.prog) > 5) off.push(`a ${fmt(q.prog, 0)}% rising rate instead of ${inp.prog}%`);
+    const tip = q.travel > inp.travel + 5 ? 'The rocker is giving too much leverage. A shorter stroke, or the rocker pivot further back along the arm, would bring the travel down.'
+      : q.travel < inp.travel - 5 ? 'A longer stroke, a bigger rocker, or the rocker pivot further forward would give more travel.' : 'A different shock length or angle may get closer.';
+    if (off.length) m.push(`<b>This isn't what you asked for.</b> The closest it can get with these mounts and this shock is ${off.join(' and ')}. ${tip}${inp.angMode === 'fixed' ? ' Setting the shock angle to Find it for me may also help.' : ''}`);
+  }
+  $('msg').innerHTML = m.map(t => `<div class="tip">${t}</div>`).join('');
+}
+function bounds(pts) { const xs = pts.map(p => p[0]), ys = pts.map(p => p[1]); return [Math.min(...xs), Math.max(...xs), Math.min(...ys), Math.max(...ys)]; }
+function drawView() {
+  const res = an && an.res, p = poseAt(posK), sh = (a, b) => `M${a[0]},${-a[1]} L${b[0]},${-b[1]}`;
+  const axle0 = rot([inp.armLen, 0], -inp.topAng * D2R);
+  const pts = [[0, 0], inp.dogMount];
+  if (res) [res[0], res[res.length - 1]].forEach(q => pts.push(q.R, q.D, q.S));
+  else pts.push(rot(inp.rocker, -inp.topAng * D2R));
+  if (!zoom) pts.push(inp.shockTop, axle0, [inp.armLen, 80], [inp.armLen, -330]);
+  let [x0, x1, y0, y1] = bounds(pts);
+  const pad = zoom ? 60 : 70; x0 -= pad; x1 += pad; y0 -= pad; y1 += pad;
+  // keep the view's shape steady
+  const asp = W / H; let w = x1 - x0, h = y1 - y0;
+  if (w / h < asp) { const d = h * asp - w; x0 -= d / 2; w = h * asp; } else { const d = w / asp - h; y0 -= d / 2; h = w / asp; }
+  const sc = w / W, fs = 14 * sc;
+  let s = `<svg viewBox="${x0} ${-(y0 + h)} ${w} ${h}" role="img" aria-label="Side view of the swingarm, rocker, dogbone and shock">`;
+  const th = p ? p.th : -inp.topAng * D2R, axle = rot([inp.armLen, 0], th);
+  const sw = v => `stroke-width:${v}`; // part widths are real mm
+  s += `<path class="frame" style="${sw(22)}" d="${sh([0, 0], inp.shockTop)} ${sh([0, 0], inp.dogMount)}"/>`;
+  s += `<circle class="tyre" style="${sw(2 * sc)}" cx="${axle[0]}" cy="${-axle[1]}" r="323"/>`;
+  if (ghosts && res) [res[0], res[res.length - 1]].forEach(q => {
+    s += `<path class="ghost" style="${sw(1.6 * sc)};stroke-dasharray:${5 * sc} ${4 * sc}" d="${sh([0, 0], q.axle)} M${q.R[0]},${-q.R[1]} L${q.D[0]},${-q.D[1]} L${q.S[0]},${-q.S[1]} Z ${sh(inp.dogMount, q.D)} ${sh(inp.shockTop, q.S)}"/>`;
+  });
+  const lugBase = rot([inp.rocker[0], 0], th), R = p ? p.R : rot(inp.rocker, th);
+  s += `<path class="arm" style="${sw(45)}" d="${sh([0, 0], axle)}"/><path class="lug" style="${sw(24)}" d="${sh(lugBase, R)}"/>`;
+  if (p) {
+    const u = [p.S[0] - inp.shockTop[0], p.S[1] - inp.shockTop[1]], L = Math.hypot(u[0], u[1]), body = Math.min(L - 40, design.eye * 0.6);
+    const bEnd = [inp.shockTop[0] + u[0] / L * body, inp.shockTop[1] + u[1] / L * body];
+    s += `<path class="shaft" style="${sw(16)}" d="${sh(inp.shockTop, p.S)}"/><path class="shock" style="${sw(50)}" d="${sh(inp.shockTop, bEnd)}"/>`;
+    s += `<path class="dog" style="${sw(20)}" d="${sh(inp.dogMount, p.D)}"/>`;
+    // the rocker plate itself, turned to where it sits at this point in the travel
+    const rp = rockerParts(), q0 = an.res[0];
+    if (rp) {
+      const turn = q0.th + Math.atan2(p.D[1] - p.R[1], p.D[0] - p.R[0]) - Math.atan2(q0.D[1] - q0.R[1], q0.D[0] - q0.R[0]);
+      const wpath = l => 'M' + l.map(v => { const r = rot(v, turn); return `${(p.R[0] + r[0]).toFixed(1)},${(-(p.R[1] + r[1])).toFixed(1)}`; }).join(' L') + ' Z';
+      s += `<path class="rocker" style="${sw(1.5 * sc)};fill-rule:evenodd" d="${[rp.outline, ...rp.holes].map(wpath).join(' ')}"/>`;
+    }
+    [p.R, p.D, p.S].forEach(q => s += `<circle class="fix" cx="${q[0]}" cy="${-q[1]}" r="${2.5 * sc}"/>`);
+  } else {
+    const a = inp.shockAng * D2R, Ls = inp.lenMode === 'find' ? inp.eyeMax : inp.eye, S0 = [inp.shockTop[0] + Ls * Math.sin(a), inp.shockTop[1] - Ls * Math.cos(a)];
+    s += `<path class="ghost" style="${sw(2 * sc)}" d="${sh(inp.shockTop, S0)}"/>`;
+  }
+  [[0, 0], inp.shockTop, inp.dogMount].forEach(q => s += `<circle class="eye" style="${sw(2 * sc)}" cx="${q[0]}" cy="${-q[1]}" r="${5 * sc}"/>`);
+  const lab = (q, t, dx, dy, anchor = 'start') => `<text x="${q[0] + dx * sc}" y="${-q[1] + dy * sc}" font-size="${fs}" text-anchor="${anchor}">${t}</text>`;
+  s += lab([0, 0], 'pivot', -10, -12, 'end') + lab(inp.dogMount, 'dogbone mount', 0, 26, 'middle');
+  if (!zoom) s += lab(inp.shockTop, 'shock top', 12, -8) + lab(axle, 'axle', 0, -30, 'middle');
+  else if (p) s += lab(p.S, 'shock', -14, -6, 'end');
+  s += '</svg>';
+  $('view').innerHTML = s;
+  $('posOut').textContent = p ? `${fmt(p.wheel, 0)} mm up` : '';
+}
+function drawChart() {
+  const res = an && an.res;
+  if (!res) { $('chart').innerHTML = '<p class="small">Nothing to show yet.</p>'; return; }
+  const cw = 420, ch = 240, ml = 40, mb = 34, mt = 10, mr = 12;
+  const tmax = Math.ceil(an.travel / 50) * 50, lrs = res.map(p => p.lr).filter(isFinite);
+  let lo = Math.floor(Math.min(...lrs) * 2) / 2 - 0.5, hi = Math.ceil(Math.max(...lrs) * 2) / 2 + 0.5; lo = Math.max(0, lo);
+  const X = v => ml + v / tmax * (cw - ml - mr), Y = v => mt + (hi - v) / (hi - lo) * (ch - mt - mb);
+  let s = `<svg viewBox="0 0 ${cw} ${ch}" role="img" aria-label="Leverage ratio against wheel travel">`;
+  for (let v = 0; v <= tmax; v += 50) s += `<line class="gridl" x1="${X(v)}" x2="${X(v)}" y1="${mt}" y2="${ch - mb}"/><text class="m" x="${X(v)}" y="${ch - mb + 18}" font-size="12" text-anchor="middle">${v}</text>`;
+  for (let v = Math.ceil(lo * 2) / 2; v <= hi + 1e-9; v += 0.5) s += `<line class="gridl" x1="${ml}" x2="${cw - mr}" y1="${Y(v)}" y2="${Y(v)}"/><text class="m" x="${ml - 6}" y="${Y(v) + 4}" font-size="12" text-anchor="end">${v.toFixed(1)}</text>`;
+  s += `<text class="m" x="${cw - mr}" y="${ch - 4}" font-size="12" text-anchor="end">wheel travel, mm</text>`;
+  s += `<path class="curve" d="${res.map((p, i) => `${i ? 'L' : 'M'}${X(p.wheel).toFixed(1)},${Y(p.lr).toFixed(1)}`).join(' ')}"/>`;
+  const p = poseAt(posK); if (p) s += `<circle class="mark" cx="${X(p.wheel)}" cy="${Y(p.lr)}" r="5"/><text x="${X(p.wheel) + 8}" y="${Y(p.lr) - 8}" font-size="13">${p.lr.toFixed(2)}</text>`;
+  $('chart').innerHTML = s + '</svg>';
+}
+// ---------- Spring and sag ----------
+const LBIN = 0.175127; // lb/in to N/mm
+function sagLoads() {
+  const bike = Math.max(0, inp.bikeKg * inp.bikeRear / 100 - inp.unsprung);
+  return { bike, rider: bike + inp.riderKg * inp.riderRear / 100 };
+}
+// Where the wheel settles under a load (kg at the axle) for a spring of k N/mm
+const sagFor = (k, kg) => sagAt(an, { k, preload: inp.preload }, kg);
+// The spring that gives the rider sag asked for. More spring, less sag, so halve the gap until it lands.
+function springFor(kg, want) {
+  let lo = 1, hi = 2000;
+  for (let i = 0; i < 60; i++) { const m = (lo + hi) / 2, s = sagFor(m, kg); if (s && s.wheel > want) lo = m; else hi = m; }
+  return (lo + hi) / 2;
+}
+function drawSag() {
+  const res = an && an.res;
+  if (!res || !design) { $('sagStats').innerHTML = ''; $('sagChart').innerHTML = '<p class="small">Nothing to show yet.</p>'; return; }
+  const k = inp.spring * LBIN, L = sagLoads(), want = an.travel * inp.sagPct / 100;
+  const st = sagFor(k, L.bike), rs = sagFor(k, L.rider), kWant = springFor(L.rider, want);
+  const sg = s => !s ? '–' : s.topped ? 'none, preload holds it' : s.bottomed ? 'bottoms out' : `${fmt(s.wheel, 0)} mm`;
+  const wr = p => k / (p.lr * p.lr);
+  $('sagStats').innerHTML = [
+    [sg(rs), `rider sag (${fmt(rs && !rs.topped && !rs.bottomed ? rs.wheel / an.travel * 100 : 0, 0)}% of travel, you want ${fmt(want, 0)})`],
+    [sg(st), 'static sag, bike on its own'],
+    [`${Math.round(kWant / LBIN / 10) * 10} lb/in`, `spring for ${inp.sagPct}% rider sag (${fmt(kWant, 0)} N/mm)`],
+    [`${fmt(wr(res[0]), 1)} → ${fmt(wr(res[res.length - 1]), 1)}`, 'stiffness at the wheel, top to bottom, N/mm'],
+  ].map(([v, t]) => `<div class="stat"><b>${v}</b><span>${t}</span></div>`).join('');
+  const cw = 420, ch = 250, ml = 40, mb = 34, mt = 12, mr = 12, f = kWant / k;
+  const tmax = Math.ceil(an.travel / 50) * 50, vals = res.map(wr).concat(res.map(p => wr(p) * f)).filter(isFinite);
+  const yStep = Math.max(...vals) > 40 ? 10 : Math.max(...vals) > 16 ? 5 : 2, hi = Math.ceil(Math.max(...vals) * 1.08 / yStep) * yStep;
+  const X = v => ml + v / tmax * (cw - ml - mr), Y = v => mt + (hi - v) / hi * (ch - mt - mb);
+  let s = `<svg viewBox="0 0 ${cw} ${ch}" role="img" aria-label="Stiffness at the back wheel against wheel travel">`;
+  for (let v = 0; v <= tmax; v += 50) s += `<line class="gridl" x1="${X(v)}" x2="${X(v)}" y1="${mt}" y2="${ch - mb}"/><text class="m" x="${X(v)}" y="${ch - mb + 18}" font-size="12" text-anchor="middle">${v}</text>`;
+  for (let v = 0; v <= hi + 1e-9; v += yStep) s += `<line class="gridl" x1="${ml}" x2="${cw - mr}" y1="${Y(v)}" y2="${Y(v)}"/><text class="m" x="${ml - 6}" y="${Y(v) + 4}" font-size="12" text-anchor="end">${v}</text>`;
+  s += `<text class="m" x="${ml + 4}" y="${mt + 12}" font-size="12">N/mm at the wheel</text><text class="m" x="${cw - mr}" y="${ch - 4}" font-size="12" text-anchor="end">wheel travel, mm</text>`;
+  const line = g => res.map((p, i) => `${i ? 'L' : 'M'}${X(p.wheel).toFixed(1)},${Y(g(p)).toFixed(1)}`).join(' ');
+  if (Math.abs(f - 1) > 0.02) s += `<path class="curve" style="stroke:var(--cmp);stroke-dasharray:6 5;stroke-width:2" d="${line(p => wr(p) * f)}"/>`;
+  s += `<path class="curve" d="${line(wr)}"/>`;
+  const vmark = (q, t, dy) => { if (!q || q.topped || q.bottomed) return; const x = X(q.wheel); s += `<line class="dim" x1="${x}" x2="${x}" y1="${mt}" y2="${ch - mb}"/><text x="${x + 4}" y="${ch - mb - dy}" font-size="12">${t}</text>`; };
+  vmark(st, 'bike', 8); vmark(rs, 'with you', 24);
+  const p = poseAt(posK); if (p) s += `<circle class="mark" cx="${X(p.wheel)}" cy="${Y(wr(p))}" r="5"/><text x="${X(p.wheel) + 8}" y="${Y(wr(p)) - 8}" font-size="13">${wr(p).toFixed(1)}</text>`;
+  $('sagChart').innerHTML = s + '</svg>';
+}
+const shockAngle = q => Math.atan2(q.S[0] - inp.shockTop[0], inp.shockTop[1] - q.S[1]) / D2R;
+const minTrans = res => Math.min(...res.map(q => { const R = q.R, D = q.D, F = inp.dogMount; const s = Math.abs(((R[0]-D[0])*(F[1]-D[1]) - (R[1]-D[1])*(F[0]-D[0])) / (dist(R, D) * dist(F, D))); return Math.asin(Math.min(1, s)) / D2R; }));
+function drawStats() {
+  const res = an && an.res;
+  if (!res || !design) { $('stats').innerHTML = ''; return; }
+  const a = res[0], b = res[res.length - 1], st = [
+    [`${fmt(an.travel, 0)} mm`, 'wheel travel'], [`${a.lr.toFixed(2)} → ${b.lr.toFixed(2)}`, 'ratio, top to bottom'],
+    [`${fmt((a.lr / b.lr - 1) * 100, 0)}%`, 'rising rate'], [`${fmt(design.dog, 1)} mm`, 'dogbone'],
+    [`${fmt(design.rD, 1)} / ${fmt(design.rS, 1)}`, 'rocker: pivot to dogbone / shock eye'], [`${fmt(dist(a.D, a.S), 1)} mm`, 'rocker: eye to eye'],
+    [`${fmt(shockAngle(a), 0)}° → ${fmt(shockAngle(b), 0)}°`, 'shock angle, top to bottom'], [`${fmt(minTrans(res), 0)}°`, 'tightest dogbone to rocker angle']];
+  $('stats').innerHTML = st.map(([v, t]) => `<div class="stat"><b>${v}</b><span>${t}</span></div>`).join('');
+}
+function drawOpts() {
+  if (!gen || gen.opts.length < 2) { $('opts').innerHTML = ''; return; }
+  $('opts').innerHTML = '<p class="small" style="margin:4px 0 0">Other ways it found to do it. Tap one to look at it.</p>' + gen.opts.map((o, i) => `<button type="button" data-opt="${i}" aria-pressed="${design && design.pick === i}"><b>Option ${i + 1}${i ? '' : ', closest'}</b>${fmt(o.q.travel, 0)} mm travel, ${fmt(o.q.prog, 0)}% rising rate. Rocker ${fmt(o.q.rD, 0)} / ${fmt(o.q.rS, 0)} mm, dogbone ${fmt(o.q.dog, 0)} mm${inp.lenMode === 'find' ? `, shock ${fmt(o.ctx.p.eye, 1)} mm` : ''}${inp.angMode === 'find' ? ` at ${fmt(o.ctx.p.shockAng, 1)}°` : ''}.</button>`).join('');
+}
+root.addEventListener('click', e => { const b = e.target.closest('[data-opt]'); if (!b) return; const i = +b.dataset.opt, o = gen.opts[i]; design = toDesign(o.q, o.ctx); design.pick = i; save(); renderTune(); analyseDesign(); draw(); });
+function drawBench() {
+  if (!design) { $('bench').innerHTML = ''; return; }
+  const xy = (v, s) => `${fmt(Math.abs(v[0]), 1)} ${v[0] < 0 ? s[1] : s[0]}, ${fmt(Math.abs(v[1]), 1)} ${v[1] < 0 ? 'below' : 'above'}`;
+  const rows = [['h', 'Rear linkage'], ['Swingarm, pivot to axle', `${inp.armLen} mm`], ['Arm angle', `${fmt(inp.topAng, 1)}°`],
+    ['Rocker pivot on the arm', `${fmt(inp.rocker[0], 1)} along, ${fmt(Math.abs(inp.rocker[1]), 1)} ${inp.rocker[1] < 0 ? 'below' : 'above'}`],
+    ['Dogbone mount', xy(inp.dogMount, ['behind', 'in front'])], ['Shock top mount', xy(inp.shockTop, ['behind', 'in front'])],
+    ['Rocker pivot to dogbone eye', `${fmt(design.rD, 1)} mm`], ['Rocker pivot to shock eye', `${fmt(design.rS, 1)} mm`], ['Rocker angle', `${fmt(design.incl, 1)}°`],
+    ['Dogbone', `${fmt(design.dog, 1)} mm`], ['Shock eye to eye', `${fmt(design.eye, 1)} mm`], ['Shock stroke', `${inp.stroke} mm`], ['Flip the rocker assembly', design.branch ? 'ticked' : 'not ticked']];
+  $('bench').innerHTML = rows.map(r => r[0] === 'h' ? `<tr class="h"><td colspan="2">${r[1]}</td></tr>` : `<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join('');
+}
+function drawNotes() {
+  const el = $('note-Shock'); if (!el) return;
+  if (inp.lenMode === 'find' || inp.angMode === 'find') { el.innerHTML = design ? `<p class="small">It picked a ${fmt(design.eye, 1)} mm shock at ${fmt(design.shockAng ?? inp.shockAng, 1)}° from vertical.</p>` : ''; return; }
+  const c = setupCtx(Object.assign({}, inp));
+  el.innerHTML = `<p class="small">At that angle and length the shock's bottom eye lands ${fmt(c.rS, 0)} mm from the rocker pivot, so that is one arm of the rocker.</p>`;
+}
+
+// ---------- Mock-up parts: outlines, STL and SVG ----------
+function circ(c, r, n = 64, cw = false) { const o = []; for (let i = 0; i < n; i++) { const a = (cw ? -1 : 1) * i / n * 2 * Math.PI; o.push([c[0] + r * Math.cos(a), c[1] + r * Math.sin(a)]); } return o; }
+function hull(pts) {
+  const p = pts.slice().sort((a, b) => a[0] - b[0] || a[1] - b[1]), cr = (o, a, b) => (a[0]-o[0])*(b[1]-o[1]) - (a[1]-o[1])*(b[0]-o[0]);
+  const lo = [], up = [];
+  for (const q of p) { while (lo.length >= 2 && cr(lo[lo.length-2], lo[lo.length-1], q) <= 0) lo.pop(); lo.push(q); }
+  for (let i = p.length - 1; i >= 0; i--) { const q = p[i]; while (up.length >= 2 && cr(up[up.length-2], up[up.length-1], q) <= 0) up.pop(); up.push(q); }
+  return lo.slice(0, -1).concat(up.slice(0, -1)); // anticlockwise
+}
+// The rocker laid flat: pivot at the origin, arm line along +x, seen from the right (x rearwards, y up)
+function rockerFlat() {
+  if (!an || !an.res) return null;
+  const q = an.res[0], th = q.th, tr = v => rot([v[0] - q.R[0], v[1] - q.R[1]], -th);
+  return { P: [0, 0], D: tr(q.D), S: tr(q.S) };
+}
+function rockerParts() {
+  const f = rockerFlat(); if (!f) return null;
+  const r1 = inp.pivotBoss / 2, r2 = inp.eyeBoss / 2;
+  const outline = hull([...circ(f.P, r1), ...circ(f.D, r2), ...circ(f.S, r2)]);
+  const holes = [circ(f.P, inp.pivotHole / 2, 48, true), circ(f.D, inp.eyeHole / 2, 48, true), circ(f.S, inp.eyeHole / 2, 48, true)];
+  return { f, outline, holes };
+}
+function prism(tris, outline, holes, z0, z1) {
+  const flat = [], hi = [], loops = [outline, ...holes];
+  loops.forEach((l, i) => { if (i) hi.push(flat.length / 2); l.forEach(v => flat.push(v[0], v[1])); });
+  const all = loops.flat(), idx = earcut(flat, hi);
+  for (let i = 0; i < idx.length; i += 3) {
+    let a = all[idx[i]], b = all[idx[i+1]], c = all[idx[i+2]];
+    if ((b[0]-a[0])*(c[1]-a[1]) - (b[1]-a[1])*(c[0]-a[0]) < 0) [b, c] = [c, b];
+    tris.push([[a[0], a[1], z1], [b[0], b[1], z1], [c[0], c[1], z1]], [[a[0], a[1], z0], [c[0], c[1], z0], [b[0], b[1], z0]]);
+  }
+  loops.forEach(l => l.forEach((a, i) => { const b = l[(i + 1) % l.length];
+    tris.push([[a[0], a[1], z0], [b[0], b[1], z0], [b[0], b[1], z1]], [[a[0], a[1], z0], [b[0], b[1], z1], [a[0], a[1], z1]]); }));
+}
+// z is sideways: + is the bike's left. Pivot boss centred on z = 0, eye bosses centred on the offset, plate between them.
+function rockerMesh() {
+  const rp = rockerParts(); if (!rp) return null;
+  const { f } = rp, t = [], zo = inp.offset, zp = zo / 2;
+  prism(t, rp.outline, rp.holes, zp - inp.plate / 2, zp + inp.plate / 2);
+  prism(t, circ(f.P, inp.pivotBoss / 2), [circ(f.P, inp.pivotHole / 2, 64, true)], -inp.pivotWidth / 2, inp.pivotWidth / 2);
+  [f.D, f.S].forEach(c => prism(t, circ(c, inp.eyeBoss / 2), [circ(c, inp.eyeHole / 2, 64, true)], zo - inp.eyeWidth / 2, zo + inp.eyeWidth / 2));
+  return t;
+}
+function dogMesh() {
+  if (!design) return null;
+  const a = [0, 0], b = [design.dog, 0], r = inp.dogBoss / 2, t = [];
+  prism(t, hull([...circ(a, r), ...circ(b, r)]), [circ(a, inp.dogHole / 2, 48, true), circ(b, inp.dogHole / 2, 48, true)], 0, inp.dogThick);
+  return t;
+}
+function stl(tris, name) {
+  const buf = new ArrayBuffer(84 + tris.length * 50), dv = new DataView(buf);
+  for (let i = 0; i < 80; i++) dv.setUint8(i, i < name.length ? name.charCodeAt(i) & 127 : 32);
+  dv.setUint32(80, tris.length, true);
+  tris.forEach((tr, k) => {
+    const o = 84 + k * 50, [a, b, c] = tr, u = [b[0]-a[0], b[1]-a[1], b[2]-a[2]], v = [c[0]-a[0], c[1]-a[1], c[2]-a[2]];
+    let n = [u[1]*v[2]-u[2]*v[1], u[2]*v[0]-u[0]*v[2], u[0]*v[1]-u[1]*v[0]]; const l = Math.hypot(...n) || 1; n = n.map(x => x / l);
+    [n, a, b, c].forEach((p, j) => p.forEach((x, m) => dv.setFloat32(o + j * 12 + m * 4, x, true)));
+  });
+  return new Blob([buf], { type: 'model/stl' });
+}
+function download(blob, name) {
+  const url = URL.createObjectURL(blob), a = document.createElement('a');
+  a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
+}
+const stamp = () => design ? `${fmt(design.rD, 0)}-${fmt(design.rS, 0)}` : '';
+function printCheck() {
+  const m = [], zo = Math.abs(inp.offset), lo = zo / 2 - inp.plate / 2, hi = zo / 2 + inp.plate / 2;
+  if (lo < -inp.pivotWidth / 2 || hi > inp.pivotWidth / 2 || lo < zo - inp.eyeWidth / 2 || hi > zo + inp.eyeWidth / 2) m.push('The plate sticks out past the side of a boss with these widths and this offset. Make the bosses wider or the plate thinner.');
+  if (inp.pivotHole >= inp.pivotBoss || inp.eyeHole >= inp.eyeBoss || inp.dogHole >= inp.dogBoss) m.push('A bore is as big as its boss. Make the boss bigger than the hole.');
+  const f = rockerFlat();
+  if (f && (dist(f.D, f.S) < inp.eyeBoss || dist(f.P, f.D) < (inp.pivotBoss + inp.eyeBoss) / 2 || dist(f.P, f.S) < (inp.pivotBoss + inp.eyeBoss) / 2)) m.push('Two of the bosses overlap at this size. It will still print, but check the bolts fit.');
+  return m;
+}
+function drawRockerSketch() {
+  const rp = rockerParts();
+  $('printMsg').innerHTML = printCheck().map(t => `<div class="tip">${t}</div>`).join('');
+  if (!rp) { $('rockerSketch').innerHTML = ''; return; }
+  const [x0, x1, y0, y1] = bounds(rp.outline), pad = 18, w = x1 - x0 + 2 * pad, h = y1 - y0 + 2 * pad, f = rp.f;
+  const path = l => 'M' + l.map(v => `${v[0].toFixed(2)},${(-v[1]).toFixed(2)}`).join(' L') + ' Z';
+  const dimL = (a, b, t) => { const m = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2]; return `<path class="dim" d="M${a[0]},${-a[1]} L${b[0]},${-b[1]}"/><text x="${m[0]}" y="${-m[1] - 3}" font-size="${Math.max(6, w / 40)}" text-anchor="middle">${t}</text>`; };
+  $('rockerSketch').innerHTML = `<p class="small" style="margin-top:10px">The rocker seen from the right, with the arm level and the shock fully extended. Pivot on the left of the drawing is at the swingarm's lug.</p>
+  <svg viewBox="${x0 - pad} ${-(y1 + pad)} ${w} ${h}" style="max-height:260px;display:block;margin:0 auto;width:100%"><path class="plate" d="${[rp.outline, ...rp.holes].map(path).join(' ')}"/>
+  ${dimL(f.P, f.D, `${fmt(design.rD, 1)}`)}${dimL(f.P, f.S, `${fmt(design.rS, 1)}`)}${dimL(f.D, f.S, `${fmt(dist(f.D, f.S), 1)}`)}
+  <text x="${f.D[0]}" y="${-f.D[1] + inp.eyeBoss / 2 + 10}" font-size="${Math.max(6, w / 40)}" text-anchor="middle">dogbone</text><text x="${f.S[0]}" y="${-f.S[1] + inp.eyeBoss / 2 + 10}" font-size="${Math.max(6, w / 40)}" text-anchor="middle">shock</text></svg>`;
+}
+$('stlRocker').onclick = () => { const m = rockerMesh(); if (m) download(stl(m, 'rocker'), `rocker-${stamp()}.stl`); };
+$('stlDog').onclick = () => { const m = dogMesh(); if (m) download(stl(m, 'dogbone'), `dogbone-${fmt(design.dog, 0)}.stl`); };
+$('svgRocker').onclick = () => {
+  const rp = rockerParts(); if (!rp) return;
+  const [x0, x1, y0, y1] = bounds(rp.outline), pad = 10, w = x1 - x0 + 2 * pad, h = y1 - y0 + 2 * pad;
+  const path = l => 'M' + l.map(v => `${(v[0] - x0 + pad).toFixed(3)},${(y1 + pad - v[1]).toFixed(3)}`).join(' L') + ' Z';
+  const txt = `Rocker: pivot to dogbone eye ${fmt(design.rD, 1)}, pivot to shock eye ${fmt(design.rS, 1)}, eye to eye ${fmt(dist(rp.f.D, rp.f.S), 1)} mm. Bores ${inp.pivotHole} / ${inp.eyeHole} mm. Full size.`;
+  const s = `<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="http://www.w3.org/2000/svg" width="${w.toFixed(2)}mm" height="${(h + 12).toFixed(2)}mm" viewBox="0 0 ${w.toFixed(3)} ${(h + 12).toFixed(3)}">\n<path d="${[rp.outline, ...rp.holes].map(path).join(' ')}" fill="none" stroke="#000" stroke-width="0.2" fill-rule="evenodd"/>\n<text x="2" y="${(h + 8).toFixed(1)}" font-size="3" font-family="sans-serif">${txt}</text>\n</svg>\n`;
+  download(new Blob([s], { type: 'image/svg+xml' }), `rocker-${stamp()}.svg`);
+};
+
+// ---------- Padlocks: a locked number can't be changed by accident ----------
+const isLocked = k => (inp.locks || []).includes(k);
+root.addEventListener('click', e => {
+  const b = e.target.closest('[data-lock]'); if (!b) return;
+  const k = b.dataset.lock, on = isLocked(k);
+  inp.locks = (inp.locks || []).filter(x => x !== k); if (!on) inp.locks.push(k);
+  save(); renderForms();
+});
+
+// ---------- Wiring ----------
+$('pos').oninput = e => { posK = e.target.value / 1000; drawView(); drawChart(); drawSag(); };
+$('zoomBtn').onclick = () => { zoom = !zoom; save(); draw(); };
+$('ghostBtn').onclick = () => { ghosts = !ghosts; save(); draw(); };
+$('genBtn').onclick = () => { clearTimeout(timer); runGen(); };
+const resetTab = () => { if (!confirm(`Put every number on the ${TABS[active].name} tab back to its default? Padlocked numbers on this tab get reset too. The other tab isn't touched.`)) return; inp = clone(TABS[active].def); design = null; renderForms(); runGen(); };
+function drawTabs() {
+  $('tabs').innerHTML = Object.entries(TABS).map(([k, t]) => `<button type="button" role="tab" data-rtab="${k}" aria-pressed="${k === active}" aria-selected="${k === active}"><b>${t.name}</b><span>${t.sub}</span></button>`).join('');
+  $('tabNote').textContent = TABS[active].note;
+}
+root.addEventListener('click', e => {
+  const b = e.target.closest('[data-rtab]'); if (!b || b.dataset.rtab === active) return;
+  save(); active = b.dataset.rtab; inp = tabState[active].inp; design = tabState[active].design; gen = null; posK = 0; $('pos').value = 0;
+  save(); drawTabs(); renderForms(); renderTune();
+  if (design) { analyseDesign(); draw(); if (!an || !an.res) runGen(); } else runGen();
+});
+
+// ---------- Putting the design on the whole bike (a tab of the bench view) ----------
+function drawSend() {
+  $('sendTab').innerHTML = SEND_TABS.map(([v, t]) => `<button type="button" data-st="${v}" aria-pressed="${v === sendTab}">${t}</button>`).join('');
+  $('sendSpring').checked = sendSpring;
+  $('sendBtn').disabled = !(design && an && an.res);
+}
+root.addEventListener('click', e => { const b = e.target.closest('[data-st]'); if (!b) return; sendTab = b.dataset.st; save(); drawSend(); $('sendMsg').innerHTML = ''; });
+$('sendSpring').onchange = e => { sendSpring = e.target.checked; save(); };
+const r1 = v => Math.round(v * 10) / 10;
+function sendToBench() {
+  if (!(design && an && an.res)) return;
+  BENCH.fromForm();
+  const c = BENCH.tabs()[sendTab], name = BENCH.names[sendTab], held = [];
+  const put = (k, v, label) => { if (!BENCH.isLocked(c, k)) c[k] = v; else if (JSON.stringify(c[k]) !== JSON.stringify(v)) held.push(label); };
+  put('armLen', inp.armLen, 'pivot to axle');
+  put('rockerArm', inp.rocker.map(r1), 'rocker pivot'); put('frameLink', inp.dogMount.map(r1), 'dogbone mount'); put('shockTop', inp.shockTop.map(r1), 'shock top mount');
+  put('rD', r1(design.rD), 'rocker pivot to dogbone eye'); put('rS', r1(design.rS), 'rocker pivot to shock eye'); put('incl', r1(design.incl), 'rocker angle');
+  put('dog', r1(design.dog), 'dogbone'); put('eye', r1(design.eye), 'shock eye to eye'); put('stroke', inp.stroke, 'shock stroke');
+  if (sendSpring) { const L = sagLoads();
+    put('k', r1(inp.spring * LBIN), 'shock spring'); put('preload', inp.preload, 'shock preload');
+    put('wUnladen', Math.round(L.bike), 'sprung load unladen'); put('wLaden', Math.round(L.rider), 'sprung load with rider'); }
+  c.shape = 'tri';
+  const notes = [];
+  if (c.armTarget && !BENCH.isLocked(c, 'eye')) { c.armTarget = false; notes.push('Build around the swingarm angle I want was on for that tab, so it’s been switched off. Otherwise it would change the shock length straight back.'); }
+  // The bench starts its sweep from its arm angle and picks the rocker's way up there, so find the start that gives this design's travel
+  const want = an.travel, b0 = !!design.branch, angs = BENCH.isLocked(c, 'armAngle') ? [c.armAngle] : [r1(inp.topAng - 0.1), r1(inp.topAng - 1), r1(inp.topAng - 3), r1(inp.topAng + 1)];
+  let ok = false;
+  for (const br of [b0, !b0]) { for (const a of angs) {
+    const r = analyse(linkCfg(Object.assign({}, c, { branch: br, armAngle: a })));
+    if (r && r.res && Math.abs(r.travel - want) < 3) { c.branch = br; c.armAngle = a; ok = true; break; } } if (ok) break; }
+  if (!ok) { c.branch = b0; if (!BENCH.isLocked(c, 'armAngle')) c.armAngle = r1(inp.topAng - 0.1); }
+  if (held.length) notes.push(`Padlocked on that tab, so not changed: ${held.join(', ')}.`);
+  if (!ok) notes.push(`The bench doesn't get the same ${fmt(want, 0)} mm of travel from it${held.length ? ', probably because of the padlocked numbers' : ''}. Check the Rear linkage numbers on that tab.`);
+  const msg = `<b>The ${TABS[active].name} design from the rocker &amp; dogbone designer is on the ${name} tab.</b> ${fmt(design.rD, 1)} / ${fmt(design.rS, 1)} mm rocker, ${fmt(design.dog, 1)} mm dogbone, ${fmt(design.eye, 1)} mm shock. ${notes.join(' ')}`;
+  $('sendMsg').innerHTML = `<div class="tip">Sent to the ${name} tab. ${notes.join(' ')}</div>`;
+  BENCH.show(sendTab, msg);
+}
+$('sendBtn').onclick = sendToBench;
+
+// ---------- Start-up: the bench opens this view; nothing runs until it's first shown ----------
+let started = false;
+function start() {
+  if (started) return; started = true;
+  drawTabs(); renderForms();
+  if (design) { renderTune(); analyseDesign(); draw(); if (!an || !an.res) runGen(); } else runGen();
+}
+function refresh() { gen = null; posK = 0; $('pos').value = 0; drawTabs(); renderForms(); renderTune(); if (design) { analyseDesign(); draw(); if (!an || !an.res) runGen(); } else runGen(); }
+window.RK = {
+  start, reset() { start(); resetTab(); },
+  dump: () => store.get(),
+  // A backup restored on the bench brings this view's numbers back too
+  load(v) { if (!v || typeof v !== 'object') return; loadSaved(v); save(); if (started) refresh(); }
+};
+})();
+// Open on the view used last, or the designer when the link asks for it (#rocker, which the old rocker.html page sends you to)
+{ const want = /^#rocker/.test(location.hash) ? 'rocker' : store.get('xl-view'); if (/^#rocker/.test(location.hash)) history.replaceState(null, '', location.pathname + location.search); setView(want || 'bike', false); }
 </script>
 </body>
 </html>
