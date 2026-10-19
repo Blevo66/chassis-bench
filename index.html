@@ -891,7 +891,7 @@ body { padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-are
     </div>
     <div class="hdr-tools">
       <button type="button" class="primary" id="measureBtn">Measuring mode</button>
-      <span class="note">Version 19 Oct 16:20</span>
+      <span class="note">Version 19 Oct 16:40</span>
       <span class="note" id="saveNote" aria-live="polite"></span>
       <button type="button" id="exportBtn">Back up</button>
       <button type="button" id="importBtn">Restore</button>
@@ -1157,8 +1157,9 @@ const DEF_TABS = {
 };
 const clone = o => JSON.parse(JSON.stringify(o));
 // CRF style: Joel's '02-03 CRF450R rocker (eyes 48.5 / 77 / 70 mm) hung under the arm, CR forks as Build.
-// Rocker spot on the arm, the dogbone lug and the dogbone are fitted guesses (266 mm travel, ratio 4.2 to 2.6) until measured.
-DEF_TABS.crf = Object.assign(clone(DEF_TABS.build), { rockerArm: [120, -30], frameLink: [10, -88], dog: 96, rD: 48.5, rS: 77, incl: -63, eye: 406, stroke: 75, shape: 'tri' });
+// Plan (19 Oct): CRF arm and rocker, with a custom dogbone forward to the XL's own lower mount, so the dogbone mount is the frame's (same as Build).
+// Rocker spot on the arm, the dogbone and the shock are fitted guesses (277 mm travel, ratio 4.4 to 3.1, arm 4.5° at rider sag) until measured.
+DEF_TABS.crf = Object.assign(clone(DEF_TABS.build), { rockerArm: [180, -20], dog: 145, rD: 48.5, rS: 77, incl: -63, eye: 450, stroke: 75, shape: 'tri' });
 const TAB_NAMES = { build: 'Build', stock: 'Stock XL', crf: 'CRF style' };
 const $ = id => document.getElementById(id);
 const store = { get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} } };
@@ -1230,6 +1231,12 @@ function migrateLink() {
     if (!c.rockerArm || c.rockerArm[0] !== 203 || c.rockerArm[1] !== 68 || c.rD !== 127 || c.rS !== 88) return;
     Object.keys(OLD_LINK).forEach(k => { if (JSON.stringify(c[k]) === JSON.stringify(OLD_LINK[k]) && !isLocked(c, k)) c[k] = clone(DEF_TABS[t][k]); });
     c.shape = 'c'; });
+  // CRF style saved before 19 Oct still has its own made-up dogbone lug; move it onto the XL lower mount with the refitted guesses, unless locked
+  const c = tabs.crf, OLD_CRF = { rockerArm: [120, -30], frameLink: [10, -88], dog: 96, eye: 406 };
+  if (c && JSON.stringify(c.frameLink) === JSON.stringify(OLD_CRF.frameLink) && !isLocked(c, 'frameLink')) {
+    c.frameLink = clone(tabs.build.frameLink);
+    Object.keys(OLD_CRF).forEach(k => { if (k !== 'frameLink' && JSON.stringify(c[k]) === JSON.stringify(OLD_CRF[k]) && !isLocked(c, k)) c[k] = clone(DEF_TABS.crf[k]); });
+  }
 }
 // A blank or broken number saved on the phone (null, NaN) would draw nothing at all; put the default back for just that number
 function sanitise() {
@@ -1751,7 +1758,7 @@ function measRender() {
       .forEach(([t, k, u]) => { const v = r[k]; if (v !== null && v !== undefined) rows.push(`<tr><td>${t}</td><td>${f1(v)} ${u}</td></tr>`); });
     html = rows.length ? `<table class="mreview">${rows.join('')}</table>
       <label class="check"><input type="checkbox" id="mBoth" ${meas.v.both === false ? '' : 'checked'}> Use the measured frame mounts, rocker, dogbone and shock on both tabs</label>
-      <p class="note">Frame points always go on both tabs. The swingarm length goes on the Stock tab only, because the build gets a longer arm. The forks go on the tab you picked.</p>`
+      <p class="note">Frame points always go on every tab, CRF style included. The swingarm length goes on the Stock tab only, because the build gets a longer arm. The forks go on the tab you picked.</p>`
       : '<p class="note">Nothing entered yet. Go back and fill in what you have.</p>';
   }
   $('mBody').innerHTML = html;
@@ -1769,8 +1776,8 @@ function measApply() {
   ['pivotHead', 'rho', 'engLow', 'peg'].forEach(k => put(frame, k, r[k]));
   (both ? ['build', 'stock'] : ['stock']).forEach(t => ['armAngle', 'shockTop', 'frameLink', 'rockerArm', 'rD', 'rS', 'incl', 'dog', 'eye', 'stroke'].forEach(k => put(tabs[t], k, r[k])));
   ['shockTop', 'frameLink'].forEach(k => ['build', 'stock'].forEach(t => put(tabs[t], k, r[k])));
-  // CRF style keeps its own rocker and dogbone lug; it shares the frame's shock top, the arm angle and (with the CR forks) the fork numbers
-  put(tabs.crf, 'shockTop', r.shockTop); put(tabs.crf, 'armAngle', r.armAngle);
+  // CRF style keeps its own rocker, dogbone and shock; it shares the frame's shock top and dogbone mount, the arm angle and (with the CR forks) the fork numbers
+  put(tabs.crf, 'shockTop', r.shockTop); put(tabs.crf, 'frameLink', r.frameLink); put(tabs.crf, 'armAngle', r.armAngle);
   put(tabs.stock, 'armLen', r.armLen);
   // Tubes showing above the top yoke is what the bench calls slide-up, once the top yoke's own height is counted in the stack
   const ftabs = (meas.v.forkTab || 'build') === 'build' ? [tabs.build, tabs.crf] : [tabs.stock];
