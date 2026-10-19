@@ -891,13 +891,12 @@ body { padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-are
     </div>
     <div class="hdr-tools">
       <button type="button" class="primary" id="measureBtn">Measuring mode</button>
-      <span class="note">Version 19 Oct 16:10</span>
+      <span class="note">Version 19 Oct 16:20</span>
       <span class="note" id="saveNote" aria-live="polite"></span>
       <button type="button" id="exportBtn">Back up</button>
       <button type="button" id="importBtn">Restore</button>
       <input type="file" id="importFile" accept=".json,application/json" hidden>
-      <button type="button" id="resetTab">Reset this tab</button>
-      <button type="button" id="resetAll">Put everything back to default</button>
+      <button type="button" id="resetTab">Put this tab back to default</button>
     </div>
   </header>
 
@@ -1262,7 +1261,7 @@ function fromForm() {
 }
 
 // ---------- Locks: a padlock on each row keeps a measured number from being changed by accident ----------
-// Frame rows lock for every tab; the rest lock on the tab you're on. Locked numbers survive Reset this tab and measuring mode.
+// Frame rows lock for every tab; the rest lock on the tab you're on. Locked numbers survive measuring mode.
 const lockScope = k => FRAME_SINGLE.includes(k) || FRAME_PAIRS.includes(k) ? frame : tabs[active];
 const isLocked = (o, k) => !!(o.locks && o.locks.includes(k));
 function showLocks() {
@@ -1574,12 +1573,10 @@ document.querySelectorAll('#sheet fieldset > legend, .board .card:not(.view-card
 { const setPin = on => { document.body.classList.toggle('pinned', on); $('pin').checked = on; };
   setPin(store.get('xl-chassis-pin') !== '0');
   $('pin').addEventListener('change', e => { setPin(e.target.checked); store.set('xl-chassis-pin', e.target.checked ? '1' : '0'); }); }
-// Everything back to the starting numbers: frame and all three tabs, padlocks off. Measuring mode keeps what's been typed into it.
-$('resetAll').addEventListener('click', () => {
-  if (!confirm('Put every number on every tab back to the defaults? Padlocked numbers get reset too. Tap Back up first if you want to keep what you have.')) return;
-  frame = clone(DEF_FRAME); tabs = clone(DEF_TABS);
-  store.set('xl-chassis-v2', JSON.stringify({ frame, tabs, active })); toForm(); render(); });
-$('resetTab').addEventListener('click', () => { fromForm(); tabs[active] = keepLocked(tabs[active], DEF_TABS[active]); frame = keepLocked(frame, DEF_FRAME); toForm(); render(); });
+// Only the tab you're on goes back to its starting numbers, padlocks included; the other tabs and the shared frame numbers stay as they are
+$('resetTab').addEventListener('click', () => {
+  if (!confirm(`Put every number on the ${TAB_NAMES[active]} tab back to its default? Padlocked numbers on this tab get reset too. The other tabs aren't touched.`)) return;
+  tabs[active] = clone(DEF_TABS[active]); toForm(); render(); });
 window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', render);
 new MutationObserver(render).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 // ---------- Measuring mode ----------
