@@ -891,7 +891,7 @@ body { padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-are
     </div>
     <div class="hdr-tools">
       <button type="button" class="primary" id="measureBtn">Measuring mode</button>
-      <span class="note">Version 13 Oct 21:24</span>
+      <span class="note">Version 19 Oct 16:00</span>
       <span class="note" id="saveNote" aria-live="polite"></span>
       <button type="button" id="exportBtn">Back up</button>
       <button type="button" id="importBtn">Restore</button>
@@ -1231,8 +1231,15 @@ function migrateLink() {
     Object.keys(OLD_LINK).forEach(k => { if (JSON.stringify(c[k]) === JSON.stringify(OLD_LINK[k]) && !isLocked(c, k)) c[k] = clone(DEF_TABS[t][k]); });
     c.shape = 'c'; });
 }
+// A blank or broken number saved on the phone (null, NaN) would draw nothing at all; put the default back for just that number
+function sanitise() {
+  const fix = (o, d) => Object.keys(d).forEach(k => { const v = o[k], dv = d[k];
+    if (typeof dv === 'number' && !Number.isFinite(v)) o[k] = dv;
+    else if (Array.isArray(dv) && !(Array.isArray(v) && v.length === 2 && v.every(Number.isFinite))) o[k] = clone(dv); });
+  fix(frame, DEF_FRAME); Object.keys(DEF_TABS).forEach(t => fix(tabs[t], DEF_TABS[t]));
+}
 function toForm() {
-  migrateLink();
+  sanitise(); migrateLink();
   FRAME_SINGLE.forEach(k => $(k).value = frame[k]); FRAME_PAIRS.forEach(k => { $(k+'0').value = frame[k][0]; $(k+'1').value = frame[k][1]; });
   const c = tabs[active];
   TAB_SINGLE.forEach(k => $(k).value = c[k]); TAB_PAIRS.forEach(k => { $(k+'0').value = c[k][0]; $(k+'1').value = c[k][1]; });
@@ -1320,7 +1327,13 @@ function posFor(P, state, f, r) {
   if (state && P.sag[state]) return P.sag[state];
   return [Math.min(f, P.fT), Math.min(r, P.rT)];
 }
+// If drawing ever trips over something, say what rather than leaving the side view blank
 function render() {
+  try { renderBench(); } catch (e) {
+    const p = document.createElement('p'); p.className = 'banner'; p.textContent = `The side view hit a snag on the ${TAB_NAMES[active]} tab: ${e && e.message}. Send Claude a screenshot of this.`;
+    $('warnings').appendChild(p); }
+}
+function renderBench() {
   fromForm();
   store.set('xl-chassis-v2', JSON.stringify({ frame, tabs, active })); cloudSave();
   F = frameGeom(frame);
@@ -1328,7 +1341,13 @@ function render() {
   PA = prepare(tabs[active]); PO = prepare(tabs[other()]);
   const Wn = $('warnings'); Wn.innerHTML = '';
   const warn = t => { const p = document.createElement('p'); p.className = 'banner'; p.textContent = t; Wn.appendChild(p); };
-  if (PA.error) { warn('Rear linkage: ' + PA.error); $('drawing').innerHTML = ''; $('tiles').innerHTML = ''; $('table').innerHTML = ''; return; }
+  if (PA.error) { warn('Rear linkage: ' + PA.error); $('drawing').innerHTML = ''; $('tiles').innerHTML = ''; $('table').innerHTML = '';
+    // without a working linkage there's no bike to draw, so offer a one-tap way back to this tab's starting linkage (locked numbers stay)
+    const b = document.createElement('button'); b.type = 'button'; b.textContent = `Put back the ${TAB_NAMES[active]} linkage guesses`;
+    b.addEventListener('click', () => { const c = tabs[active], d = DEF_TABS[active];
+      ['armAngle', 'rockerArm', 'frameLink', 'shockTop', 'dog', 'rD', 'rS', 'incl', 'eye', 'stroke', 'branch', 'shape'].forEach(k => { if (!isLocked(c, k)) c[k] = clone(d[k]); }); c.armTarget = false;
+      toForm(); render(); });
+    Wn.lastChild.appendChild(document.createElement('br')); Wn.lastChild.appendChild(b); return; }
   PA.warn.forEach(t => warn('Rear linkage: ' + t));
   if (forkL(PA.c) - PA.fT - PA.c.rf < 0) warn(`At full compression the front tyre would hit the bottom yoke by ${fmt(-(forkL(PA.c) - PA.fT - PA.c.rf))} mm. Slide the tubes back down or fit more spacer.`);
   const full = solve(PA, F, PA.sag.full[0], PA.sag.full[1]);
