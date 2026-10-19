@@ -891,12 +891,13 @@ body { padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-are
     </div>
     <div class="hdr-tools">
       <button type="button" class="primary" id="measureBtn">Measuring mode</button>
-      <span class="note">Version 19 Oct 16:00</span>
+      <span class="note">Version 19 Oct 16:10</span>
       <span class="note" id="saveNote" aria-live="polite"></span>
       <button type="button" id="exportBtn">Back up</button>
       <button type="button" id="importBtn">Restore</button>
       <input type="file" id="importFile" accept=".json,application/json" hidden>
       <button type="button" id="resetTab">Reset this tab</button>
+      <button type="button" id="resetAll">Put everything back to default</button>
     </div>
   </header>
 
@@ -1573,6 +1574,11 @@ document.querySelectorAll('#sheet fieldset > legend, .board .card:not(.view-card
 { const setPin = on => { document.body.classList.toggle('pinned', on); $('pin').checked = on; };
   setPin(store.get('xl-chassis-pin') !== '0');
   $('pin').addEventListener('change', e => { setPin(e.target.checked); store.set('xl-chassis-pin', e.target.checked ? '1' : '0'); }); }
+// Everything back to the starting numbers: frame and all three tabs, padlocks off. Measuring mode keeps what's been typed into it.
+$('resetAll').addEventListener('click', () => {
+  if (!confirm('Put every number on every tab back to the defaults? Padlocked numbers get reset too. Tap Back up first if you want to keep what you have.')) return;
+  frame = clone(DEF_FRAME); tabs = clone(DEF_TABS);
+  store.set('xl-chassis-v2', JSON.stringify({ frame, tabs, active })); toForm(); render(); });
 $('resetTab').addEventListener('click', () => { fromForm(); tabs[active] = keepLocked(tabs[active], DEF_TABS[active]); frame = keepLocked(frame, DEF_FRAME); toForm(); render(); });
 window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', render);
 new MutationObserver(render).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
@@ -1816,7 +1822,7 @@ $('importFile').addEventListener('change', async e => {
 });
 if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(() => {});
-toForm(); render();
+try { toForm(); } catch (e) {} render();
 // A results link from the swingarm measuring page (arm.html) carries its numbers after #m=: load them into measuring mode and open the review to check and apply
 (function () {
   const m = /[#&]m=([^&]*)/.exec(location.hash); if (!m) return;
