@@ -990,7 +990,7 @@ body { padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-are
     </div>
     <div class="hdr-tools">
       <button type="button" class="primary" id="measureBtn">Measuring mode</button>
-      <span class="note">Version 19 Oct 23:45</span>
+      <span class="note">Version 19 Oct 23:55</span>
       <span class="note" id="saveNote" aria-live="polite"></span>
       <button type="button" id="exportBtn">Back up</button>
       <button type="button" id="importBtn">Restore</button>
@@ -1007,17 +1007,12 @@ body { padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-are
   <div id="bikeView">
   <div class="banner sent" id="rkSent" hidden><span id="rkSentText"></span><button type="button" id="rkBack">Back to the designer</button></div>
 
-  <div class="tabs" role="tablist" aria-label="Set-ups">
-    <button type="button" role="tab" data-tab="build" aria-selected="true"><b>Build: CR forks</b><span>'86-87 CR250R forks, long arm</span></button>
-    <button type="button" role="tab" data-tab="stock" aria-selected="false"><b>Stock XL125R</b><span>Reference, for comparison</span></button>
-    <button type="button" role="tab" data-tab="crf" aria-selected="false"><b>CRF style</b><span>CRF450 rocker under the arm</span></button>
-  </div>
 
 
   <div class="main">
     <form class="sheet" id="sheet" autocomplete="off">
       <fieldset>
-        <legend>Frame <span class="note">(both tabs)</span></legend>
+        <legend>Frame</legend>
         <div class="row one"><label for="pivotHead">Pivot centre to bottom of head tube <span class="u">mm</span></label><input type="number" id="pivotHead" step="1"></div>
         <div class="row one"><label for="rho">Steering axis to frame vertical <span class="u">°</span></label><input type="number" id="rho" step="0.25"></div>
         <div class="axes"><span>.</span><span>X / back</span><span>Y / up</span></div>
@@ -1051,12 +1046,6 @@ body { padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-are
         <div class="row one"><label for="preload">Shock preload <span class="u">mm</span></label><input type="number" id="preload" step="0.5"></div>
         <div class="row one"><label for="wUnladen">Sprung load on rear, unladen <span class="u">kg</span></label><input type="number" id="wUnladen" step="1"></div>
         <div class="row one"><label for="wLaden">Sprung load on rear, with rider <span class="u">kg</span></label><input type="number" id="wLaden" step="1"></div>
-        <div class="target">
-          <label class="check"><input type="checkbox" id="armTarget"> Build around the swingarm angle I want</label>
-          <div class="row one"><label for="armWant">Swingarm angle to the ground <span class="u">° axle below pivot</span></label><input type="number" id="armWant" step="0.5"></div>
-          <div class="row one"><label for="armAt">With the bike</label><select id="armAt"><option value="unladen">Unladen</option><option value="rider">With rider</option><option value="top">Topped out</option></select></div>
-          <p class="hint" id="armNote">The bench sets the shock length to give this angle, and the head angle, trail and the rest follow from it.</p>
-        </div>
       </fieldset>
 
       <fieldset>
@@ -1094,12 +1083,12 @@ body { padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-are
         <div class="sliders">
           <label for="fPos">Front</label><input type="range" id="fPos" min="0" max="1000" value="0"><output id="fOut"></output>
           <label for="rPos">Rear</label><input type="range" id="rPos" min="0" max="1000" value="0"><output id="rOut"></output>
+          <label for="dogPos">Dogbone</label><input type="range" id="dogPos" min="60" max="260" step="0.1" value="145"><output id="dogOut"></output>
         </div>
         <details class="view-opts">
           <summary>View options</summary>
         <div class="slider-tools">
           <label class="check"><input type="checkbox" id="linkEnds" checked> Move both ends together</label>
-          <label class="check"><input type="checkbox" id="ghost" checked> Show the other tab as an outline</label>
           <label class="check"><input type="checkbox" id="zoom"> Zoom in to the rear linkage</label>
           <label class="check"><input type="checkbox" id="pin" checked> Keep the side view pinned while scrolling</label>
         </div>
@@ -1111,7 +1100,7 @@ body { padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-are
       <div class="card">
         <h2>At each load</h2>
         <div class="tbl-wrap"><table id="table"></table></div>
-        <p class="note" style="margin:8px 0 0">Small grey figures are the other tab. Ground clearance is the lowest of the engine, footpeg, dogbone mount and rocker. Tyre gaps are to the underside of the bottom yoke at the front and to the frame tubes at the rear, so mudguards and the airbox come off that.</p>
+        <p class="note" style="margin:8px 0 0">Ground clearance is the lowest of the engine, footpeg, dogbone mount and rocker. Tyre gaps are to the underside of the bottom yoke at the front and to the frame tubes at the rear, so mudguards and the airbox come off that.</p>
       </div>
 
       <div class="card">
@@ -1174,8 +1163,7 @@ body { padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-are
       <details class="card" open>
         <summary>Put it on the whole bike</summary>
         <div class="in">
-          <p class="small">Sends this rocker, dogbone, shock and the mounts to a tab of the whole-bike view, so you can see head angle, trail, wheelbase, sag and ground clearance with it. Padlocked numbers on that tab are left as they are.</p>
-          <div class="field"><span class="lab">Whole-bike tab to put it on</span><div class="seg wide" id="rk-sendTab"></div></div>
+          <p class="small">Sends this rocker, dogbone, shock and the mounts to the whole-bike view, so you can see head angle, trail, wheelbase, sag and ground clearance with it. Padlocked numbers there are left as they are.</p>
           <label class="check"><input type="checkbox" id="rk-sendSpring"> Send the spring, preload and weights too</label>
           <div class="btns"><button type="button" class="primary" id="rk-sendBtn">Put it on the bike and show me</button></div>
           <div id="rk-sendMsg"></div>
@@ -1322,22 +1310,26 @@ const LINK = { armAngle: 15, rockerArm: [170, 10], frameLink: [38, -66], shockTo
 const DEF_TABS = {
   build: Object.assign({ forkLen: 935, stack: 260, slide: 50, spacer: 100, travel: 300, offset: 47, rf: 346, fk: 4.4, fpre: 10, fUn: 35, fLad: 75,
     armLen: 630, rr: 323, eye: 378, stroke: 60, k: 110, preload: 5, wUnladen: 40, wLaden: 100 }, LINK),
-  stock: Object.assign({ forkLen: 680, stack: 100, slide: 0, spacer: 0, travel: 215, offset: 65, rf: 346, fk: 5, fpre: 18, fUn: 35, fLad: 75,
-    armLen: 530, rr: 323, eye: 378, stroke: 60, k: 95, preload: 5, wUnladen: 40, wLaden: 100 }, LINK)
 };
 const clone = o => JSON.parse(JSON.stringify(o));
-// CRF style: Joel's '02-03 CRF450R rocker (eyes 48.5 / 77 / 70 mm) hung under the arm, CR forks as Build.
-// Plan (19 Oct): CRF arm and rocker, with a custom dogbone forward to the XL's own lower mount, so the dogbone mount is the frame's (same as Build).
-// Rocker spot on the arm, the dogbone and the shock are fitted guesses (277 mm travel, ratio 4.4 to 3.1, arm 4.5° at rider sag) until measured.
-DEF_TABS.crf = Object.assign(clone(DEF_TABS.build), { rockerArm: [180, -20], dog: 145, rD: 48.5, rS: 77, incl: -63, eye: 450, stroke: 75, shape: 'tri' });
-const TAB_NAMES = { build: 'Build', stock: 'Stock XL', crf: 'CRF style' };
+// 19 Oct: just the one tab now (Joel dropped Stock XL and CRF style). Its linkage starts from the CRF plan: CRF arm and '02-03 CRF450R rocker (eyes 48.5 / 77 / 70 mm)
+// with a custom dogbone forward to the XL's own lower mount. Rocker spot, dogbone and shock are fitted guesses (277 mm travel, ratio 4.4 to 3.1) until designed or measured.
+const OLD_BUILD_LINK = clone(LINK);
+Object.assign(DEF_TABS.build, { rockerArm: [180, -20], dog: 145, rD: 48.5, rS: 77, incl: -63, eye: 450, stroke: 75, shape: 'tri' });
+const TAB_NAMES = { build: 'Build' };
 const $ = id => document.getElementById(id);
 const store = { get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} } };
 
 let frame = clone(DEF_FRAME), tabs = clone(DEF_TABS), active = 'build';
 let pos = { state: 'rider', f: 0, r: 0 };
-try { const s = JSON.parse(store.get('xl-chassis-v2') || 'null'); if (s) { frame = Object.assign(frame, s.frame); Object.keys(DEF_TABS).forEach(k => { if (s.tabs && s.tabs[k]) tabs[k] = Object.assign(tabs[k], s.tabs[k]); }); if (s.active in tabs) active = s.active; } } catch (e) {}
-const other = () => active === 'stock' ? 'build' : 'stock'; // Build and CRF style compare with Stock; Stock compares with Build
+try { const s = JSON.parse(store.get('xl-chassis-v2') || 'null'); if (s) { frame = Object.assign(frame, s.frame); Object.keys(DEF_TABS).forEach(k => { if (s.tabs && s.tabs[k]) tabs[k] = Object.assign(tabs[k], s.tabs[k]); }); oneTab(s.tabs); } } catch (e) {}
+// Saved from when there were three tabs: if Build still has the old XL-style linkage guesses, it takes the CRF style tab's linkage (the plan, and where designs were sent), padlocks kept
+function oneTab(st) {
+  const c = tabs.build, o = OLD_BUILD_LINK; if (!st || !st.crf) return;
+  if (c.rD !== o.rD || c.rS !== o.rS || c.incl !== o.incl || c.dog !== o.dog) return;
+  ['armAngle', 'rockerArm', 'dog', 'rD', 'rS', 'incl', 'eye', 'stroke', 'branch', 'shape', 'armLen', 'k', 'preload', 'wUnladen', 'wLaden']
+    .forEach(k => { if (st.crf[k] !== undefined && !(c.locks || []).includes(k)) c[k] = clone(st.crf[k]); });
+}
 
 // ---------- Whole-bike solver ----------
 function frameGeom(fr) {
@@ -1397,16 +1389,10 @@ const num = (id, fb) => { const v = parseFloat($(id).value); return isFinite(v) 
 // Tabs saved before the C-shaped rocker still hold the old made-up top-of-arm rocker; swap in the new guesses unless locked
 const OLD_LINK = { rockerArm: [203, 68], dog: 100, rD: 127, rS: 88, incl: -74, eye: 337, stroke: 75 };
 function migrateLink() {
-  ['build', 'stock'].forEach(t => { const c = tabs[t];
+  ['build'].forEach(t => { const c = tabs[t];
     if (!c.rockerArm || c.rockerArm[0] !== 203 || c.rockerArm[1] !== 68 || c.rD !== 127 || c.rS !== 88) return;
     Object.keys(OLD_LINK).forEach(k => { if (JSON.stringify(c[k]) === JSON.stringify(OLD_LINK[k]) && !isLocked(c, k)) c[k] = clone(DEF_TABS[t][k]); });
-    c.shape = 'c'; });
-  // CRF style saved before 19 Oct still has its own made-up dogbone lug; move it onto the XL lower mount with the refitted guesses, unless locked
-  const c = tabs.crf, OLD_CRF = { rockerArm: [120, -30], frameLink: [10, -88], dog: 96, eye: 406 };
-  if (c && JSON.stringify(c.frameLink) === JSON.stringify(OLD_CRF.frameLink) && !isLocked(c, 'frameLink')) {
-    c.frameLink = clone(tabs.build.frameLink);
-    Object.keys(OLD_CRF).forEach(k => { if (k !== 'frameLink' && JSON.stringify(c[k]) === JSON.stringify(OLD_CRF[k]) && !isLocked(c, k)) c[k] = clone(DEF_TABS.crf[k]); });
-  }
+    c.shape = DEF_TABS.build.shape; });
 }
 // A blank or broken number saved on the phone (null, NaN) would draw nothing at all; put the default back for just that number
 function sanitise() {
@@ -1421,18 +1407,13 @@ function toForm() {
   const c = tabs[active];
   TAB_SINGLE.forEach(k => $(k).value = c[k]); TAB_PAIRS.forEach(k => { $(k+'0').value = c[k][0]; $(k+'1').value = c[k][1]; });
   $('branch').checked = !!c.branch;
-  $('armTarget').checked = !!c.armTarget; $('armWant').value = c.armWant ?? 13; $('armAt').value = c.armAt || 'unladen';
   showLocks();
-  document.querySelectorAll('[data-tab]').forEach(b => b.setAttribute('aria-selected', b.dataset.tab === active));
 }
 function fromForm() {
   FRAME_SINGLE.forEach(k => frame[k] = num(k, frame[k])); FRAME_PAIRS.forEach(k => frame[k] = [num(k+'0', 0), num(k+'1', 0)]);
   const c = tabs[active];
   TAB_SINGLE.forEach(k => c[k] = num(k, c[k])); TAB_PAIRS.forEach(k => c[k] = [num(k+'0', 0), num(k+'1', 0)]);
   c.branch = $('branch').checked;
-  if ($('armTarget').checked && !c.armTarget) { c.armWant = armNow(c); $('armWant').value = c.armWant; } // switching on starts from where the arm sits now, so nothing jumps
-  else c.armWant = num('armWant', c.armWant ?? 13);
-  c.armTarget = $('armTarget').checked; c.armAt = $('armAt').value;
   if (!(frame.pivotHead > 100)) frame.pivotHead = DEF_FRAME.pivotHead;
   if (!(c.fk > 0)) c.fk = 0.1;
 }
@@ -1459,44 +1440,6 @@ document.querySelectorAll('#sheet .row').forEach(row => {
 });
 const keepLocked = (o, d) => { const n = clone(d); (o.locks || []).forEach(k => { n[k] = o[k]; }); n.locks = (o.locks || []).slice(); return n; };
 
-// ---------- Target swingarm angle: find the shock eye to eye that puts the arm at the angle asked for ----------
-const AT_NAMES = { unladen: 'unladen', rider: 'at rider sag', top: 'topped out' };
-const fitCache = new Map();
-function armAt(c, e, fg) {
-  const P = prepare(Object.assign({}, c, { eye: e })); if (P.error) return null;
-  const s = P.sag[c.armAt] || P.sag.unladen; return solve(P, fg, s[0], s[1]).m.arm;
-}
-function armNow(c) { try { const a = armAt(c, c.eye, F || frameGeom(frame)); return a === null ? 13 : Math.round(a * 2) / 2; } catch (e) { return 13; } }
-function fitEye(c, fg) {
-  const key = JSON.stringify([Object.assign({}, c, { eye: 0, locks: 0 }), frame]);
-  if (fitCache.has(key)) return fitCache.get(key);
-  const want = c.armWant, pts = [];
-  for (let e = 200; e <= 650; e += 5) { const a = armAt(c, e, fg); if (a !== null) pts.push([e, a]); }
-  let out = { ok: false, near: null };
-  for (let i = 1; i < pts.length; i++) {
-    const [e0, a0] = pts[i-1], [e1, a1] = pts[i];
-    if (e1 - e0 > 5.01 || (a0 - want) * (a1 - want) > 0) continue;
-    let lo = e0, hi = e1, alo = a0;
-    for (let j = 0; j < 22; j++) { const m = (lo + hi) / 2, am = armAt(c, m, fg); if (am === null) break; if ((alo - want) * (am - want) <= 0) hi = m; else { lo = m; alo = am; } }
-    out = { ok: true, eye: Math.round((lo + hi) / 2 * 10) / 10 }; break;
-  }
-  if (!out.ok && pts.length) out.near = pts.reduce((b, p) => Math.abs(p[1] - want) < Math.abs(b[1] - want) ? p : b);
-  if (fitCache.size > 40) fitCache.clear();
-  fitCache.set(key, out); return out;
-}
-function applyTarget(c, fg, show) {
-  let note = 'The bench sets the shock length to give this angle, and the head angle, trail and the rest follow from it.';
-  if (c.armTarget) {
-    const at = AT_NAMES[c.armAt] || 'unladen';
-    if (isLocked(c, 'eye')) note = 'The shock length is locked. Unlock it to build around the swingarm angle.';
-    else { const r = fitEye(c, fg);
-      if (r.ok) { c.eye = r.eye; note = `Shock eye to eye set to ${fmt(r.eye, 1)} mm to put the swingarm at ${c.armWant}° ${at}.`; }
-      else note = r.near ? `This linkage can't put the swingarm at ${c.armWant}° ${at}. The nearest is ${fmt(r.near[1], 1)}° with a ${r.near[0]} mm shock.${c.armAt === 'top' ? '' : ' A stiffer shock spring or more preload would hold it higher.'}` : `This linkage can't put the swingarm at ${c.armWant}° ${at}.`; }
-  }
-  if (show) { $('armNote').textContent = note; $('eye').value = c.eye; $('eye').readOnly = !!c.armTarget || isLocked(c, 'eye');
-    $('eye').closest('.row').classList.toggle('locked', !!c.armTarget || isLocked(c, 'eye')); }
-}
-
 // ---------- Render ----------
 let F, PA, PO, SA, SO;
 const fmt = (v, d = 0) => (v === undefined || v === null || !isFinite(v)) ? '–' : v.toFixed(d);
@@ -1514,15 +1457,15 @@ function renderBench() {
   fromForm();
   store.set('xl-chassis-v2', JSON.stringify({ frame, tabs, active })); cloudSave();
   F = frameGeom(frame);
-  applyTarget(tabs[active], F, true); applyTarget(tabs[other()], F, false);
-  PA = prepare(tabs[active]); PO = prepare(tabs[other()]);
+  PA = prepare(tabs[active]); PO = { error: 'none' }; // no second tab to compare with any more
+  dogSlider();
   const Wn = $('warnings'); Wn.innerHTML = '';
   const warn = t => { const p = document.createElement('p'); p.className = 'banner'; p.textContent = t; Wn.appendChild(p); };
   if (PA.error) { warn('Rear linkage: ' + PA.error); $('drawing').innerHTML = ''; $('tiles').innerHTML = ''; $('table').innerHTML = '';
     // without a working linkage there's no bike to draw, so offer a one-tap way back to this tab's starting linkage (locked numbers stay)
     const b = document.createElement('button'); b.type = 'button'; b.textContent = `Put back the ${TAB_NAMES[active]} linkage guesses`;
     b.addEventListener('click', () => { const c = tabs[active], d = DEF_TABS[active];
-      ['armAngle', 'rockerArm', 'frameLink', 'shockTop', 'dog', 'rD', 'rS', 'incl', 'eye', 'stroke', 'branch', 'shape'].forEach(k => { if (!isLocked(c, k)) c[k] = clone(d[k]); }); c.armTarget = false;
+      ['armAngle', 'rockerArm', 'frameLink', 'shockTop', 'dog', 'rD', 'rS', 'incl', 'eye', 'stroke', 'branch', 'shape'].forEach(k => { if (!isLocked(c, k)) c[k] = clone(d[k]); });
       toForm(); render(); });
     Wn.lastChild.appendChild(document.createElement('br')); Wn.lastChild.appendChild(b); return; }
   PA.warn.forEach(t => warn('Rear linkage: ' + t));
@@ -1537,10 +1480,10 @@ function renderBench() {
   $('fOut').textContent = `${fmt(f)} of ${fmt(PA.fT)} mm`; $('rOut').textContent = `${fmt(r)} of ${fmt(PA.rT)} mm`;
   document.querySelectorAll('[data-state]').forEach(b => b.setAttribute('aria-pressed', b.dataset.state === pos.state));
   renderTiles(); renderTable(); draw(); drawChart('chartLR', 'lr'); drawChart('chartWR', 'wr');
-  $('legend').innerHTML = `<span><i></i>${TAB_NAMES[active]}</span>` + (PO.error ? '' : `<span><i class="cmp"></i>${TAB_NAMES[other()]}</span>`);
+  $('legend').innerHTML = '';
 }
 function tile(k, v, unit, cmpv, note) {
-  return `<div class="tile"><div class="k">${k}</div><div class="v">${v}${unit ? ` <small>${unit}</small>` : ''}</div><div class="c">${note || ''}${cmpv !== null ? `${note ? ' · ' : ''}<span class="cmpv">${TAB_NAMES[other()]} ${cmpv}</span>` : ''}</div></div>`;
+  return `<div class="tile"><div class="k">${k}</div><div class="v">${v}${unit ? ` <small>${unit}</small>` : ''}</div><div class="c">${note || ''}${cmpv !== null ? `${note ? ' · ' : ''}<span class="cmpv">${cmpv}</span>` : ''}</div></div>`;
 }
 function renderTiles() {
   const a = SA.m, o = SO ? SO.m : null, ov = (k, d = 0, u = '') => o ? fmt(o[k], d) + u : null;
@@ -1581,7 +1524,7 @@ function bikeShapes(S, P) {
 function draw() {
   const svg = $('drawing'); svg.innerHTML = '';
   const css = getComputedStyle(document.documentElement), C = n => css.getPropertyValue(n).trim();
-  const A = bikeShapes(SA, PA), O = SO && $('ghost').checked ? bikeShapes(SO, PO) : null;
+  const A = bikeShapes(SA, PA), O = null;
   const xs = [], ys = [0];
   [A, O].filter(Boolean).forEach((B, i) => { const P = i ? PO : PA;
     xs.push(B.af[0] - P.c.rf, B.ar[0] + P.c.rr); ys.push(B.af[1] + P.c.rf, B.ar[1] + P.c.rr);
@@ -1616,16 +1559,16 @@ function draw() {
     el('circle', { cx: p[0], cy: -p[1], r: 7 * s, fill: C('--ink') }, svg);
   });
   el('polygon', { points: B.engine.map(P).join(' '), fill: C('--steel'), opacity: .22 }, svg);
-  line(B.pivot, B.ar, { stroke: C('--steel'), 'stroke-width': 14 * s });
+  line(B.pivot, B.ar, { stroke: C('--steel'), 'stroke-width': 40, opacity: zoom ? .55 : 1 }); // swingarm about 40 mm deep, see-through in the zoom so the rocker shows
   line(B.fork[0], B.fork[1], { stroke: C('--steel'), 'stroke-width': 16 * s });
   B.yokes.forEach(([a, b]) => line(a, b, { stroke: C('--ink'), 'stroke-width': 10 * s }));
   B.lines.forEach(l => poly(l, { stroke: C('--ink'), 'stroke-width': 7 * s }));
   line(B.headTube[0], B.headTube[1], { stroke: C('--ink'), 'stroke-width': 18 * s });
-  const ls = s * (zoom ? 1.7 : 0.35); // linkage parts: slim on the whole bike, chunky in the zoom
+  const ls = 2.4; // linkage parts at roughly real size (mm), so they read on the whole bike as well as in the zoom
   // mounting gussets: a plate from the nearest frame tube out to the shock top and dogbone mount
   const gusset = (foot, dir, q, half) => { const a = [foot[0] - dir[0] * half, foot[1] - dir[1] * half], b = [foot[0] + dir[0] * half, foot[1] + dir[1] * half];
     el('polygon', { points: [a, q, b].map(P).join(' '), fill: C('--muted'), stroke: C('--ink'), 'stroke-width': 2 * ls, 'stroke-linejoin': 'round', opacity: .9 }, svg); };
-  const clevis = q => el('circle', { cx: q[0], cy: -q[1], r: 16 * ls, fill: C('--muted'), stroke: C('--ink'), 'stroke-width': 2 * ls, opacity: .9 }, svg);
+  const clevis = q => el('circle', { cx: q[0], cy: -q[1], r: 9 * ls, fill: C('--muted'), stroke: C('--ink'), 'stroke-width': 2 * ls, opacity: .9 }, svg);
   [B.shA, B.other, B.R].forEach(clevis);
   [PA.c.shockTop, PA.c.frameLink].forEach(q => { let best = null; Object.values(F.lines).forEach(l => { for (let i = 1; i < l.length; i++) { const a = l[i-1], b = l[i], dx = b[0]-a[0], dy = b[1]-a[1], L2 = dx*dx + dy*dy, t = Math.max(0, Math.min(1, ((q[0]-a[0])*dx + (q[1]-a[1])*dy) / L2)), f = [a[0] + t*dx, a[1] + t*dy], d = Math.hypot(q[0]-f[0], q[1]-f[1]); if (!best || d < best[0]) best = [d, f, a, b]; } });
     if (!best) return; const fa = B.W(best[2]), fb = B.W(best[3]), Lf = Math.hypot(fb[0]-fa[0], fb[1]-fa[1]);
@@ -1639,16 +1582,17 @@ function draw() {
     line(A2, B2, { stroke: C('--accent'), 'stroke-width': 30 * ls, opacity: .2 });
     line(A2, mid, { stroke: C('--accent'), 'stroke-width': 15 * ls });
     line(mid, B2, { stroke: C('--accent'), 'stroke-width': 6 * ls }); }
-  line(B.D, B.other, { stroke: C('--ink'), 'stroke-width': 8 * ls });
+  const lk = C('--cmp'); // rocker and dogbone in blue so they stand out from the frame and arm
+  line(B.D, B.other, { stroke: lk, 'stroke-width': 8 * ls });
   if (PA.c.shape === 'c') { // C-shaped rocker: a curve from the arm end to the dogbone end, passing through the shock eye
     const cp = [2 * B.S[0] - (B.R[0] + B.D[0]) / 2, 2 * B.S[1] - (B.R[1] + B.D[1]) / 2];
-    el('path', { d: `M${P(B.R)} Q${P(cp)} ${P(B.D)}`, fill: 'none', stroke: C('--ink'), opacity: .88, 'stroke-width': 22 * ls, 'stroke-linecap': 'round' }, svg);
-  } else if (PA.c.shape === 'tooth') { // shark's tooth from the rocker designer: hollow front edge, round back edge, hooking forwards round the arm
-    const fr = B.D[0] < B.R[0] ? B.D : B.R, bk = fr === B.D ? B.R : B.D;
-    const s0 = Math.sign((B.S[0]-bk[0])*(fr[1]-bk[1]) - (B.S[1]-bk[1])*(fr[0]-bk[0])) || 1;
+    el('path', { d: `M${P(B.R)} Q${P(cp)} ${P(B.D)}`, fill: 'none', stroke: lk, opacity: .88, 'stroke-width': 22 * ls, 'stroke-linecap': 'round' }, svg);
+  } else if (PA.c.shape === 'tooth') { // shark's tooth from the rocker designer: leaves the pivot slightly downhill, then hooks back up to the shock eye
+    const R = B.R, S2 = B.S, D = B.D, cr = (S2[0]-R[0])*(D[1]-R[1]) - (S2[1]-R[1])*(D[0]-R[0]), s0 = Math.sign(cr) || 1, L = Math.hypot(S2[0]-R[0], S2[1]-R[1]) || 1;
+    const hollow = Math.min(0.4, 0.9 * Math.abs(cr) / L / L);
     const ctl = (a, b, k) => { const d = [b[0]-a[0], b[1]-a[1]]; return [(a[0]+b[0])/2 + s0*d[1]*k, (a[1]+b[1])/2 - s0*d[0]*k]; };
-    el('path', { d: `M${P(bk)} Q${P(ctl(bk, B.S, 0.16))} ${P(B.S)} Q${P(ctl(B.S, fr, -0.24))} ${P(fr)} Z`, fill: C('--ink'), opacity: .88, stroke: C('--ink'), 'stroke-width': 14 * ls, 'stroke-linejoin': 'round' }, svg);
-  } else el('polygon', { points: [B.R, B.D, B.S].map(P).join(' '), fill: C('--ink'), opacity: .88, stroke: C('--ink'), 'stroke-width': 4 * ls, 'stroke-linejoin': 'round' }, svg);
+    el('path', { d: `M${P(R)} Q${P(ctl(R, S2, -hollow))} ${P(S2)} Q${P(ctl(S2, D, 0.16))} ${P(D)} Z`, fill: lk, opacity: .9, stroke: lk, 'stroke-width': 9 * ls, 'stroke-linejoin': 'round' }, svg);
+  } else el('polygon', { points: [B.R, B.D, B.S].map(P).join(' '), fill: lk, opacity: .9, stroke: lk, 'stroke-width': 4 * ls, 'stroke-linejoin': 'round' }, svg);
   [B.shA, B.S, B.R, B.D, B.other].forEach(q => el('circle', { cx: q[0], cy: -q[1], r: 5 * ls, fill: C('--panel'), stroke: C('--ink'), 'stroke-width': 2 * ls }, svg));
   el('rect', { x: B.peg[0] - 25 * s, y: -B.peg[1] - 6 * s, width: 50 * s, height: 12 * s, fill: C('--ink') }, svg);
   [B.junction, B.cradleCorner, B.railEnd].forEach(q => el('circle', { cx: q[0], cy: -q[1], r: 6 * s, fill: C('--panel'), stroke: C('--ink'), 'stroke-width': 2.5 * s }, svg));
@@ -1665,7 +1609,7 @@ function draw() {
   const uw = [B.headTube[0][0] - B.headTube[1][0], B.headTube[0][1] - B.headTube[1][1]], t = -B.headTube[0][1] / uw[1];
   line(B.headTube[1], [B.headTube[0][0] + uw[0] * t, 0], { stroke: C('--accent'), 'stroke-width': 1.5 * s, 'stroke-dasharray': `${6*s} ${5*s}` });
   txt(B.headTube[1], `${fmt(SA.m.head, 1)}°`, 14, -4);
-  txt(B.pivot, 'pivot', 12, 22);
+  txt(B.pivot, 'pivot', -48, -14);
   if (zoom) {
     [[B.R, 'rocker pivot'], [B.D, 'dogbone eye'], [B.S, 'shock eye'], [B.other, 'dogbone mount'], [B.shA, 'shock top']].forEach(([q, t]) => {
       txt(q, t, 32, -18); });
@@ -1714,7 +1658,7 @@ function drawChart(id, key) {
     const wv = atW(evt), q = nearest(cur, wv), o = cc.length ? nearest(cc, wv) : null, r = svg.getBoundingClientRect(), br = box.getBoundingClientRect();
     tip.hidden = false; tip.style.left = (evt.clientX - br.left) + 'px'; tip.style.top = (r.top - br.top + Y(q[1]) / CH.h * r.height) + 'px';
     const f = v => key === 'lr' ? v.toFixed(2) : v.toFixed(1);
-    tip.textContent = `${wv.toFixed(0)} mm · ${f(q[1])}` + (o && wv <= PO.rT ? ` · ${TAB_NAMES[other()]} ${f(o[1])}` : '');
+    tip.textContent = `${wv.toFixed(0)} mm · ${f(q[1])}`;
     if (evt.buttons) go(wv);
   });
   hit.addEventListener('pointerdown', evt => go(atW(evt)));
@@ -1723,7 +1667,6 @@ function drawChart(id, key) {
 
 // ---------- Wiring ----------
 $('sheet').addEventListener('input', render);
-document.querySelectorAll('[data-tab]').forEach(b => b.addEventListener('click', () => { if (b.dataset.tab === active) return; fromForm(); active = b.dataset.tab; toForm(); render(); }));
 document.querySelectorAll('[data-state]').forEach(b => b.addEventListener('click', () => { pos.state = b.dataset.state; render(); }));
 function slide(which) {
   const fv = $('fPos').value / 1000, rv = $('rPos').value / 1000, link = $('linkEnds').checked;
@@ -1731,15 +1674,21 @@ function slide(which) {
   pos = { state: null, f: ff * PA.fT, r: rf * PA.rT }; render();
 }
 $('fPos').addEventListener('input', () => slide('f'));
+// Dogbone slider: same number as the Dogbone eye to eye box, so the whole bike updates as it moves. A padlocked dogbone holds it still.
+function dogSlider() {
+  const c = tabs[active], s = $('dogPos'), on = isLocked(c, 'dog');
+  s.max = Math.max(260, Math.ceil(c.dog / 10) * 10 + 20); s.min = Math.min(60, Math.floor(c.dog / 10) * 10 - 20);
+  s.value = c.dog; s.disabled = on; $('dogOut').textContent = `${fmt(c.dog, 1)} mm${on ? ' 🔒' : ''}`;
+}
+$('dogPos').addEventListener('input', () => { if (isLocked(tabs[active], 'dog')) return; $('dog').value = +$('dogPos').value; render(); });
 $('rPos').addEventListener('input', () => slide('r'));
 // Drive the sliders from the finger directly: iOS hands a drag on a range inside a pinned panel to page scrolling,
 // so the range ignores touches (touch-action: none) and we set its value from where the finger is.
-['fPos', 'rPos'].forEach(id => { const s = $(id);
+['fPos', 'rPos', 'dogPos'].forEach(id => { const s = $(id);
   const setFrom = e => { const r = s.getBoundingClientRect(), t = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width));
-    s.value = Math.round(t * +s.max); s.dispatchEvent(new Event('input', { bubbles: true })); };
+    const st = +s.step || 1; s.value = +s.min + Math.round(t * (s.max - s.min) / st) * st; s.dispatchEvent(new Event('input', { bubbles: true })); };
   s.addEventListener('pointerdown', e => { if (e.pointerType === 'mouse') return; e.preventDefault(); s.setPointerCapture(e.pointerId); setFrom(e); });
   s.addEventListener('pointermove', e => { if (e.pointerType !== 'mouse' && s.hasPointerCapture(e.pointerId)) setFrom(e); }); });
-$('ghost').addEventListener('change', render);
 $('zoom').addEventListener('change', render);
 // Folding sections: tap a section's title to fold it away; remembered per device
 document.querySelectorAll('#sheet fieldset > legend, .board .card:not(.view-card):not(details) h2').forEach(h => {
@@ -1755,10 +1704,10 @@ document.querySelectorAll('#sheet fieldset > legend, .board .card:not(.view-card
 { const setPin = on => { document.body.classList.toggle('pinned', on); $('pin').checked = on; };
   setPin(store.get('xl-chassis-pin') !== '0');
   $('pin').addEventListener('change', e => { setPin(e.target.checked); store.set('xl-chassis-pin', e.target.checked ? '1' : '0'); }); }
-// Only the tab you're on goes back to its starting numbers, padlocks included; the other tabs and the shared frame numbers stay as they are
+// The bike's numbers go back to their starting values, padlocks included; the frame numbers stay as they are
 $('resetTab').addEventListener('click', () => {
   if (view === 'rocker') { RK.reset(); return; }
-  if (!confirm(`Put every number on the ${TAB_NAMES[active]} tab back to its default? Padlocked numbers on this tab get reset too. The other tabs aren't touched.`)) return;
+  if (!confirm(`Put every number on the ${TAB_NAMES[active]} tab back to its default? Padlocked numbers on this tab get reset too. The frame numbers aren't touched.`)) return;
   tabs[active] = clone(DEF_TABS[active]); toForm(); render(); });
 window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', render);
 new MutationObserver(render).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
@@ -1798,7 +1747,6 @@ const MSTEPS = [
   { id: 'low', title: 'Low points', hl: 'low', fields: [{ k: 'engLow', label: 'Lowest point under the engine', pair: true }, { k: 'peg', label: 'Footpeg, middle of the top face', pair: true }],
     text: 'These set the ground clearance. If the engine isn\'t in yet, skip it and just do the footpeg (the middle of the peg bracket\'s pivot is fine). Both are usually in front of and below the pivot.' },
   { id: 'forks', title: 'Forks', hl: 'forks', fields: [{ k: 'forkLen', label: 'Axle centre to top of fork tube, fully extended', unit: 'mm' }, { k: 'stack', label: 'Top of tube to underside of bottom yoke, tubes flush', unit: 'mm' }, { k: 'slide', label: 'How far the tubes stick up above the top yoke', unit: 'mm' }],
-    choice: { k: 'forkTab', label: 'These forks are', opts: [['build', 'The CR forks (Build and CRF style tabs)'], ['stock', 'The stock XL forks (Stock tab)']] },
     text: 'Fork leg off the floor, fully extended. Measure axle centre to the very top of the tube. Then, with the tops flush in the yokes, from the top of the tube to the underside of the bottom yoke.' },
   { id: 'review', title: 'Check and apply', hl: 'none',
     text: 'Here is everything you have entered so far, from every part. Anything left blank keeps its current value. Tap Apply to put them into the bench.' }
@@ -1933,8 +1881,8 @@ function measRender() {
      ['Footpeg (X, Y)', 'peg', 'mm'], ['Fork, axle to top of tube', 'forkLen', 'mm'], ['Fork stack', 'stack', 'mm'], ['Tubes above top yoke', 'slideUp', 'mm']]
       .forEach(([t, k, u]) => { const v = r[k]; if (v !== null && v !== undefined) rows.push(`<tr><td>${t}</td><td>${f1(v)} ${u}</td></tr>`); });
     html = rows.length ? `<table class="mreview">${rows.join('')}</table>
-      <label class="check"><input type="checkbox" id="mBoth" ${meas.v.both === false ? '' : 'checked'}> Use the measured frame mounts, rocker, dogbone and shock on both tabs</label>
-      <p class="note">Frame points always go on every tab, CRF style included. The swingarm length goes on the Stock tab only, because the build gets a longer arm. The forks go on the tab you picked.</p>`
+      <label class="check"><input type="checkbox" id="mBoth" ${meas.v.both ? 'checked' : ''}> Also put the measured rocker, dogbone and shock on the bike</label>
+      <p class="note">The frame points, arm angle and forks always go in. Leave the box off if you measured the stock XL rocker but you're designing your own. The stock swingarm length isn't used, because the build gets a longer arm.</p>`
       : '<p class="note">Nothing entered yet. Go back and fill in what you have.</p>';
   }
   $('mBody').innerHTML = html;
@@ -1948,16 +1896,13 @@ function measRender() {
 }
 function measApply() {
   fromForm();
-  const r = measResults(), both = meas.v.both !== false, put = (o, k, v) => { if (v !== null && v !== undefined && !isLocked(o, k)) o[k] = v; };
+  const r = measResults(), both = !!meas.v.both, put = (o, k, v) => { if (v !== null && v !== undefined && !isLocked(o, k)) o[k] = v; };
   ['pivotHead', 'rho', 'engLow', 'peg'].forEach(k => put(frame, k, r[k]));
-  (both ? ['build', 'stock'] : ['stock']).forEach(t => ['armAngle', 'shockTop', 'frameLink', 'rockerArm', 'rD', 'rS', 'incl', 'dog', 'eye', 'stroke'].forEach(k => put(tabs[t], k, r[k])));
-  ['shockTop', 'frameLink'].forEach(k => ['build', 'stock'].forEach(t => put(tabs[t], k, r[k])));
-  // CRF style keeps its own rocker, dogbone and shock; it shares the frame's shock top and dogbone mount, the arm angle and (with the CR forks) the fork numbers
-  put(tabs.crf, 'shockTop', r.shockTop); put(tabs.crf, 'frameLink', r.frameLink); put(tabs.crf, 'armAngle', r.armAngle);
-  put(tabs.stock, 'armLen', r.armLen);
+  const c = tabs.build;
+  ['shockTop', 'frameLink', 'armAngle'].forEach(k => put(c, k, r[k]));
+  if (both) ['rockerArm', 'rD', 'rS', 'incl', 'dog', 'eye', 'stroke'].forEach(k => put(c, k, r[k]));
   // Tubes showing above the top yoke is what the bench calls slide-up, once the top yoke's own height is counted in the stack
-  const ftabs = (meas.v.forkTab || 'build') === 'build' ? [tabs.build, tabs.crf] : [tabs.stock];
-  ftabs.forEach(ft => { put(ft, 'forkLen', r.forkLen); put(ft, 'stack', r.stack); put(ft, 'slide', r.slideUp); });
+  put(c, 'forkLen', r.forkLen); put(c, 'stack', r.stack); put(c, 'slide', r.slideUp);
   toForm(); render(); measClose();
   const n = $('warnings'), note = document.createElement('div'); note.className = 'banner'; note.textContent = 'Your measurements are in. Blank and locked ones kept their old values.';
   n.prepend(note); setTimeout(() => note.remove(), 6000);
@@ -1997,6 +1942,7 @@ function applySaved(s) {
   if (!s) return;
   frame = Object.assign(clone(DEF_FRAME), s.frame || {});
   Object.keys(DEF_TABS).forEach(k => { tabs[k] = Object.assign(clone(DEF_TABS[k]), (s.tabs || {})[k] || {}); });
+  oneTab(s.tabs);
   if (s.active in tabs) active = s.active;
 }
 function cloudSave() { saveNote('Saved on this phone · ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })); }
@@ -2167,8 +2113,9 @@ inp = tabState[active].inp; design = tabState[active].design; zoom = saved.zoom 
 }
 loadSaved(store.get());
 // Which whole-bike tab the design goes onto, and whether the spring and weights go with it
-const SEND_TABS = [['crf', 'CRF style'], ['build', 'Build'], ['stock', 'Stock XL']];
-let sendTab = SEND_TABS.some(t => t[0] === saved.sendTab) ? saved.sendTab : 'crf', sendSpring = saved.sendSpring !== false;
+// The whole bike has just the one tab now
+const sendTab = 'build';
+let sendSpring = saved.sendSpring !== false;
 const save = () => { tabState[active] = { inp, design }; store.set({ tabs: tabState, active, zoom, ghosts, sendTab, sendSpring }); };
 
 // Field specs. sign: [label for +, label for −]. Values are stored signed; the box shows the size and the buttons the direction (no minus key on the iPhone pad).
@@ -2509,22 +2456,21 @@ function rockerParts() {
   const holes = [circ(f.P, inp.pivotHole / 2, 48, true), circ(f.D, inp.eyeHole / 2, 48, true), circ(f.S, inp.eyeHole / 2, 48, true)];
   return { f, outline, holes };
 }
-// Shark's tooth: the pivot and dogbone eye make the base under the arm, and its edges sweep up to the shock eye at the tip.
-// The front edge is hollowed and the back edge rounded, so the tooth hooks forwards round the swingarm's body.
-const HOOK = 0.24, BULGE = 0.16;
+// Shark's tooth: it leaves the rocker pivot heading slightly downhill, then hooks back up to the shock eye at the tip.
+// The pivot-to-shock-eye edge is hollowed to clear the swingarm's body; the outside edge round the dogbone eye is rounded.
+const BULGE = 0.16;
 const qb = (a, c, b, t) => [(1-t)*(1-t)*a[0] + 2*(1-t)*t*c[0] + t*t*b[0], (1-t)*(1-t)*a[1] + 2*(1-t)*t*c[1] + t*t*b[1]];
 const qd = (a, c, b, t) => [2*(1-t)*(c[0]-a[0]) + 2*t*(b[0]-c[0]), 2*(1-t)*(c[1]-a[1]) + 2*t*(b[1]-c[1])];
-// Control points for the three edges, back edge, front edge and base, given the base's front and back eyes and the tip
-function toothCurves(front, back, tip) {
-  const s = Math.sign((tip[0]-back[0])*(front[1]-back[1]) - (tip[1]-back[1])*(front[0]-back[0])) || 1; // +1 when back, tip, front run anticlockwise
-  const out = (a, b) => { const d = [b[0]-a[0], b[1]-a[1]], L = Math.hypot(d[0], d[1]) || 1; return [s * d[1] / L, -s * d[0] / L]; };
-  const ctl = (a, b, k) => { const n = out(a, b), L = dist(a, b); return [(a[0]+b[0])/2 + n[0]*k*L, (a[1]+b[1])/2 + n[1]*k*L]; };
-  return { s, out, back: ctl(back, tip, BULGE), front: ctl(tip, front, -HOOK) };
+// Control points for the inside edge (pivot to tip) and the outside edge (tip to dogbone eye); the base, dogbone eye back to the pivot, is straight
+function toothCurves(P, S, D) {
+  const cr = (S[0]-P[0])*(D[1]-P[1]) - (S[1]-P[1])*(D[0]-P[0]), s = Math.sign(cr) || 1; // +1 when pivot, tip, dogbone eye run anticlockwise
+  const ctl = (a, b, k) => { const d = [b[0]-a[0], b[1]-a[1]]; return [(a[0]+b[0])/2 + s*d[1]*k, (a[1]+b[1])/2 - s*d[0]*k]; };
+  const L = dist(P, S) || 1, hollow = Math.min(0.4, 0.9 * Math.abs(cr) / L / L); // never sags past about half way to the dogbone eye
+  return { s, inner: ctl(P, S, -hollow), outer: ctl(S, D, BULGE) };
 }
 function toothOutline(f, rP, rE) {
-  const dFront = f.D[0] < f.P[0], A = dFront ? f.D : f.P, B = dFront ? f.P : f.D, rA = dFront ? rE : rP, rB = dFront ? rP : rE, T = f.S;
-  const k = toothCurves(A, B, T), N = 28, pts = [];
-  const edges = [[B, k.back, T, rB, rE], [T, k.front, A, rE, rA], [A, [(A[0]+B[0])/2, (A[1]+B[1])/2], B, rA, rB]];
+  const P = f.P, S = f.S, D = f.D, k = toothCurves(P, S, D), N = 28, pts = [];
+  const edges = [[P, k.inner, S, rP, rE], [S, k.outer, D, rE, rE], [D, [(D[0]+P[0])/2, (D[1]+P[1])/2], P, rE, rP]];
   const nrm = (e, t) => { const d = qd(e[0], e[1], e[2], t), L = Math.hypot(d[0], d[1]) || 1; return [k.s * d[1] / L, -k.s * d[0] / L]; };
   edges.forEach((e, i) => {
     for (let j = 0; j <= N; j++) { const t = j / N, q = qb(e[0], e[1], e[2], t), n = nrm(e, t), r = e[3] + (e[4] - e[3]) * t; pts.push([q[0] + n[0]*r, q[1] + n[1]*r]); }
@@ -2640,17 +2586,15 @@ root.addEventListener('click', e => {
 
 // ---------- Putting the design on the whole bike (a tab of the bench view) ----------
 function drawSend() {
-  $('sendTab').innerHTML = SEND_TABS.map(([v, t]) => `<button type="button" data-st="${v}" aria-pressed="${v === sendTab}">${t}</button>`).join('');
   $('sendSpring').checked = sendSpring;
   $('sendBtn').disabled = !(design && an && an.res);
 }
-root.addEventListener('click', e => { const b = e.target.closest('[data-st]'); if (!b) return; sendTab = b.dataset.st; save(); drawSend(); $('sendMsg').innerHTML = ''; });
 $('sendSpring').onchange = e => { sendSpring = e.target.checked; save(); };
 const r1 = v => Math.round(v * 10) / 10;
 function sendToBench() {
   if (!(design && an && an.res)) return;
   BENCH.fromForm();
-  const c = BENCH.tabs()[sendTab], name = BENCH.names[sendTab], held = [];
+  const c = BENCH.tabs()[sendTab], held = [];
   const put = (k, v, label) => { if (!BENCH.isLocked(c, k)) c[k] = v; else if (JSON.stringify(c[k]) !== JSON.stringify(v)) held.push(label); };
   put('armLen', inp.armLen, 'pivot to axle');
   put('rockerArm', inp.rocker.map(r1), 'rocker pivot'); put('frameLink', inp.dogMount.map(r1), 'dogbone mount'); put('shockTop', inp.shockTop.map(r1), 'shock top mount');
@@ -2661,7 +2605,6 @@ function sendToBench() {
     put('wUnladen', Math.round(L.bike), 'sprung load unladen'); put('wLaden', Math.round(L.rider), 'sprung load with rider'); }
   c.shape = inp.place === 'through' ? 'tooth' : 'tri';
   const notes = [];
-  if (c.armTarget && !BENCH.isLocked(c, 'eye')) { c.armTarget = false; notes.push('Build around the swingarm angle I want was on for that tab, so it’s been switched off. Otherwise it would change the shock length straight back.'); }
   // The bench starts its sweep from its arm angle and picks the rocker's way up there, so find the start that gives this design's travel
   const want = an.travel, b0 = !!design.branch, angs = BENCH.isLocked(c, 'armAngle') ? [c.armAngle] : [r1(inp.topAng - 0.1), r1(inp.topAng - 1), r1(inp.topAng - 3), r1(inp.topAng + 1)];
   let ok = false;
@@ -2669,10 +2612,10 @@ function sendToBench() {
     const r = analyse(linkCfg(Object.assign({}, c, { branch: br, armAngle: a })));
     if (r && r.res && Math.abs(r.travel - want) < 3) { c.branch = br; c.armAngle = a; ok = true; break; } } if (ok) break; }
   if (!ok) { c.branch = b0; if (!BENCH.isLocked(c, 'armAngle')) c.armAngle = r1(inp.topAng - 0.1); }
-  if (held.length) notes.push(`Padlocked on that tab, so not changed: ${held.join(', ')}.`);
-  if (!ok) notes.push(`The bench doesn't get the same ${fmt(want, 0)} mm of travel from it${held.length ? ', probably because of the padlocked numbers' : ''}. Check the Rear linkage numbers on that tab.`);
-  const msg = `<b>The ${TABS[active].name} design from the rocker &amp; dogbone designer is on the ${name} tab.</b> ${fmt(design.rD, 1)} / ${fmt(design.rS, 1)} mm rocker, ${fmt(design.dog, 1)} mm dogbone, ${fmt(design.eye, 1)} mm shock. ${notes.join(' ')}`;
-  $('sendMsg').innerHTML = `<div class="tip">Sent to the ${name} tab. ${notes.join(' ')}</div>`;
+  if (held.length) notes.push(`Padlocked, so not changed: ${held.join(', ')}.`);
+  if (!ok) notes.push(`The bench doesn't get the same ${fmt(want, 0)} mm of travel from it${held.length ? ', probably because of the padlocked numbers' : ''}. Check the Rear linkage numbers on the whole bike.`);
+  const msg = `<b>The ${TABS[active].name} design from the rocker &amp; dogbone designer is on the whole bike.</b> ${fmt(design.rD, 1)} / ${fmt(design.rS, 1)} mm rocker, ${fmt(design.dog, 1)} mm dogbone, ${fmt(design.eye, 1)} mm shock. ${notes.join(' ')}`;
+  $('sendMsg').innerHTML = `<div class="tip">Sent to the whole bike. ${notes.join(' ')}</div>`;
   BENCH.show(sendTab, msg);
 }
 $('sendBtn').onclick = sendToBench;
