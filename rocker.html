@@ -295,7 +295,8 @@ function quick(ctx, rD, phi, step) {
   if (dog < p.dogMin || dog > p.dogMax) return null;
   if (dist(D0, ctx.S0) < p.eyeBoss + 2) return null;
   if (dist(D0, ctx.S0) > p.maxRocker || rD > p.maxRocker) return null;
-  if (p.place === 'under' && armY(D0, ctx.th0) > p.rocker[1] + 5) return null;
+  // Under the arm and through the arm both keep the dogbone eye down by the pivot, under the arm; through the arm points the shock eye up through it (a shark's tooth)
+  if ((p.place === 'under' || p.place === 'through') && armY(D0, ctx.th0) > p.rocker[1] + 5) return null;
   const incl = ctx.angS - phi, minS = Math.sin(p.minTA * D2R);
   let prevD = D0, prevL = ctx.Lext, prevW = 0, minTA = 90;
   const ay0 = rot([p.armLen, 0], ctx.th0)[1], pts = [[0, 0]];
@@ -363,6 +364,7 @@ function generate(p, maxSeeds = 10) {
   }
   out.opts = picks.map(k => Object.assign(quick(ctx, k[1], k[2], 0.2*D2R), { cost: k[0], rS: ctx.rS }));
   out.opts.sort((a, b) => a.cost - b.cost);
+  if (!out.opts.length) out.error = 'No rocker and dogbone within your limits gives a working linkage with these mounts. Try a bigger rocker, a wider dogbone range, or a different shock angle.';
   return out;
 }
 </script>
@@ -378,16 +380,16 @@ const DEF = {
   offset: 10, pivotHole: 22, pivotBoss: 36, pivotWidth: 30, eyeHole: 12, eyeBoss: 28, eyeWidth: 22, plate: 10,
   dogHole: 12, dogBoss: 26, dogThick: 16, link: 'crf', linkTab: 'crf'
 };
-// Through the arm, old Pro-Link style: rocker pivot on top of the arm and the shock's bottom eye above the arm's centreline, so the shock passes through the arm.
+// Through the arm, old Pro-Link style: rocker pivot and dogbone eye under the arm, with the rocker pointing up through it like a shark's tooth so the shock's bottom eye sits above the arm's centreline.
 // Shock angle left for it to find, since the bench's angle is for the CRF style rocker under the arm.
-const DEF_THROUGH = Object.assign(clone(DEF), { rocker: [170, 30], eye: 400, angMode: 'find', angMin: 15, angMax: 40, place: 'through' });
+const DEF_THROUGH = Object.assign(clone(DEF), { eye: 400, lenMode: 'find', eyeMin: 340, eyeMax: 440, angMode: 'find', angMin: 15, angMax: 40, place: 'through' });
 const TABS = { under: { name: 'Under the arm', sub: 'CRF style rocker hung below the swingarm', def: DEF,
     note: 'The rocker hangs under the swingarm, like the CRF450. The shock comes down in front of the arm to the rocker.' },
-  through: { name: 'Through the arm', sub: 'Old Pro-Link: shock eye above the centreline', def: DEF_THROUGH,
-    note: 'The rocker pivots on top of the swingarm and the shock drops through the arm, with its bottom eye kept above the arm\u2019s centreline like an early Pro-Link. Check the shock body clears the arm\u2019s cross-member.' } };
-// Numbers the bench owns while this page is kept in step with it. The through-the-arm rocker has its own pivot and shock angle.
+  through: { name: 'Through the arm', sub: 'Shark\u2019s tooth rocker, shock eye above the centreline', def: DEF_THROUGH,
+    note: 'The rocker pivots under the swingarm with the dogbone, and points up through the arm like a shark\u2019s tooth, so the shock\u2019s bottom eye sits above the arm\u2019s centreline like an early Pro-Link. Check the shock and rocker clear the arm\u2019s cross-member.' } };
+// Numbers the bench owns while this page is kept in step with it. Through the arm finds its own shock angle.
 const LINKED_ALL = ['armLen', 'topAng', 'rocker', 'shockTop', 'dogMount', 'eye', 'stroke', 'shockAng'];
-const linkedKeys = () => inp.place === 'through' ? LINKED_ALL.filter(k => k !== 'rocker' && k !== 'shockAng') : LINKED_ALL;
+const linkedKeys = () => inp.place === 'through' ? LINKED_ALL.filter(k => k !== 'shockAng') : LINKED_ALL;
 const BENCH_TABS = [['crf', 'CRF style'], ['build', 'Build'], ['stock', 'Stock XL']];
 const $ = id => document.getElementById(id);
 const store = { get() { try { return JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { return null; } }, set(v) { try { localStorage.setItem(KEY, JSON.stringify(v)); } catch (e) {} } };
@@ -398,7 +400,7 @@ Object.keys(TABS).forEach(t => {
   const old = t === 'under' && !saved.tabs ? { inp: saved.inp, design: saved.design } : (saved.tabs && saved.tabs[t]) || {};
   const i = Object.assign(clone(TABS[t].def), old.inp || {});
   if (!i.v2) { if (i.minTA === 30) i.minTA = DEF.minTA; if (i.underArm === false) i.place = 'any'; delete i.underArm; i.v2 = true; } // 30° let it get too close to over centre
-  if (t === 'through') i.place = 'through';
+  if (t === 'through') { i.place = 'through'; if (!i.v3) { i.rocker = clone(DEF_THROUGH.rocker); ['lenMode', 'eyeMin', 'eyeMax'].forEach(k => i[k] = DEF_THROUGH[k]); i.v3 = true; } } // the first version wrongly put this rocker on top of the arm
   tabState[t] = { inp: i, design: old.design || null };
 });
 let active = saved.active in TABS ? saved.active : 'under';
@@ -554,7 +556,9 @@ function drawMsg() {
     const off = [];
     if (q && Math.abs(q.travel - inp.travel) > 5) off.push(`${fmt(q.travel, 0)} mm travel instead of ${inp.travel}`);
     if (q && Math.abs(q.prog - inp.prog) > 5) off.push(`a ${fmt(q.prog, 0)}% rising rate instead of ${inp.prog}%`);
-    if (off.length) m.push(`<b>This isn't what you asked for.</b> The closest it can get with these mounts and this shock is ${off.join(' and ')}. ${inp.angMode === 'fixed' ? 'Set the shock angle to Find it for me, or try' : 'Try'} a different shock length or stroke, or allow a bigger rocker.`);
+    const tip = q.travel > inp.travel + 5 ? 'The rocker is giving too much leverage. A shorter stroke, or the rocker pivot further back along the arm, would bring the travel down.'
+      : q.travel < inp.travel - 5 ? 'A longer stroke, a bigger rocker, or the rocker pivot further forward would give more travel.' : 'A different shock length or angle may get closer.';
+    if (off.length) m.push(`<b>This isn't what you asked for.</b> The closest it can get with these mounts and this shock is ${off.join(' and ')}. ${tip}${inp.angMode === 'fixed' ? ' Setting the shock angle to Find it for me may also help.' : ''}`);
   }
   $('msg').innerHTML = m.map(t => `<div class="tip">${t}</div>`).join('');
 }
@@ -763,7 +767,7 @@ function benchTab(t) {
 function pullBench(t) {
   const c = benchTab(t), name = BENCH_TABS.find(b => b[0] === t)[1];
   if (!c) return { note: `No saved Chassis Bench numbers on this phone yet, so this page is using its own defaults (the same as the bench's ${name} defaults). Open the bench once, change anything, and they'll come through.`, changed: false };
-  const keys = linkedKeys(), keep = { rocker: inp.rocker.slice(), shockAng: inp.shockAng }, before = JSON.stringify(keys.map(k => inp[k]));
+  const keys = linkedKeys(), keep = { shockAng: inp.shockAng }, before = JSON.stringify(keys.map(k => inp[k]));
   ['armLen', 'eye', 'stroke'].forEach(k => { if (isFinite(c[k])) inp[k] = c[k]; });
   if (Array.isArray(c.rockerArm)) inp.rocker = c.rockerArm.slice();
   if (Array.isArray(c.shockTop)) inp.shockTop = c.shockTop.slice();
@@ -782,7 +786,7 @@ function pullBench(t) {
     note = ' The bench\u2019s linkage on that tab doesn\u2019t assemble, so the arm angle is its measured angle and the shock angle is left as it was.';
   }
   let what = `with the shock at ${fmt(inp.shockAng, 1)}°`;
-  if (inp.place === 'through') { inp.rocker = keep.rocker; inp.shockAng = keep.shockAng; what = '(this tab keeps its own rocker pivot and shock angle)'; }
+  if (inp.place === 'through') { inp.shockAng = keep.shockAng; what = '(this tab finds its own shock angle)'; }
   return { note: `Using the bench's ${name} tab: arm ${inp.armLen} mm, shock ${inp.eye} mm with ${inp.stroke} mm stroke, topping out at ${fmt(inp.topAng, 1)}° ${what}.` + note, changed: JSON.stringify(keys.map(k => inp[k])) !== before };
 }
 let linkNote = '';
