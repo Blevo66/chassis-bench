@@ -990,7 +990,7 @@ body { padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-are
     </div>
     <div class="hdr-tools">
       <button type="button" class="primary" id="measureBtn">Measuring mode</button>
-      <span class="note">Version 19 Oct 23:30</span>
+      <span class="note">Version 19 Oct 23:45</span>
       <span class="note" id="saveNote" aria-live="polite"></span>
       <button type="button" id="exportBtn">Back up</button>
       <button type="button" id="importBtn">Restore</button>
@@ -1013,7 +1013,6 @@ body { padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-are
     <button type="button" role="tab" data-tab="crf" aria-selected="false"><b>CRF style</b><span>CRF450 rocker under the arm</span></button>
   </div>
 
-  <div class="banner"><b>Educated guesses.</b> The frame shape comes from your LiDAR scan, scaled and set at an angle so a stock XL comes out at 28° and 1355 mm. The scan's head tube is too lumpy to read its angle. The fork stack, offsets, springs and linkage are estimates. Put in the real numbers as you measure them.</div>
 
   <div class="main">
     <form class="sheet" id="sheet" autocomplete="off">
@@ -1644,6 +1643,11 @@ function draw() {
   if (PA.c.shape === 'c') { // C-shaped rocker: a curve from the arm end to the dogbone end, passing through the shock eye
     const cp = [2 * B.S[0] - (B.R[0] + B.D[0]) / 2, 2 * B.S[1] - (B.R[1] + B.D[1]) / 2];
     el('path', { d: `M${P(B.R)} Q${P(cp)} ${P(B.D)}`, fill: 'none', stroke: C('--ink'), opacity: .88, 'stroke-width': 22 * ls, 'stroke-linecap': 'round' }, svg);
+  } else if (PA.c.shape === 'tooth') { // shark's tooth from the rocker designer: hollow front edge, round back edge, hooking forwards round the arm
+    const fr = B.D[0] < B.R[0] ? B.D : B.R, bk = fr === B.D ? B.R : B.D;
+    const s0 = Math.sign((B.S[0]-bk[0])*(fr[1]-bk[1]) - (B.S[1]-bk[1])*(fr[0]-bk[0])) || 1;
+    const ctl = (a, b, k) => { const d = [b[0]-a[0], b[1]-a[1]]; return [(a[0]+b[0])/2 + s0*d[1]*k, (a[1]+b[1])/2 - s0*d[0]*k]; };
+    el('path', { d: `M${P(bk)} Q${P(ctl(bk, B.S, 0.16))} ${P(B.S)} Q${P(ctl(B.S, fr, -0.24))} ${P(fr)} Z`, fill: C('--ink'), opacity: .88, stroke: C('--ink'), 'stroke-width': 14 * ls, 'stroke-linejoin': 'round' }, svg);
   } else el('polygon', { points: [B.R, B.D, B.S].map(P).join(' '), fill: C('--ink'), opacity: .88, stroke: C('--ink'), 'stroke-width': 4 * ls, 'stroke-linejoin': 'round' }, svg);
   [B.shA, B.S, B.R, B.D, B.other].forEach(q => el('circle', { cx: q[0], cy: -q[1], r: 5 * ls, fill: C('--panel'), stroke: C('--ink'), 'stroke-width': 2 * ls }, svg));
   el('rect', { x: B.peg[0] - 25 * s, y: -B.peg[1] - 6 * s, width: 50 * s, height: 12 * s, fill: C('--ink') }, svg);
@@ -1983,7 +1987,8 @@ document.querySelectorAll('[data-view]').forEach(b => b.addEventListener('click'
 $('rkBack').addEventListener('click', () => { $('rkSent').hidden = true; setView('rocker'); window.scrollTo(0, 0); });
 // What the designer needs from the bench to put a linkage on one of its tabs
 const BENCH = { tabs: () => tabs, names: TAB_NAMES, isLocked, fromForm,
-  show(t, msg) { fromForm(); active = t; toForm(); $('rkSentText').innerHTML = msg; $('rkSent').hidden = false; setView('bike'); window.scrollTo(0, 0); } };
+  // The form was read before the design went onto the tab, so show() mustn't read it again over the top
+  show(t, msg) { active = t; toForm(); $('rkSentText').innerHTML = msg; $('rkSent').hidden = false; setView('bike'); window.scrollTo(0, 0); } };
 
 // ---------- Saving (installed app) ----------
 // The app keeps everything in this phone's storage. Back up writes a JSON file you can keep in Files; Restore reads one back.
@@ -2139,9 +2144,8 @@ const DEF = {
 // Through the arm, old Pro-Link style: rocker pivot and dogbone eye under the arm, with the rocker pointing up through it like a shark's tooth so the shock's bottom eye sits above the arm's centreline.
 // Shock angle left for it to find, since the bench's angle is for the CRF style rocker under the arm.
 const DEF_THROUGH = Object.assign(clone(DEF), { eye: 400, lenMode: 'find', eyeMin: 340, eyeMax: 440, angMode: 'find', angMin: 15, angMax: 40, place: 'through' });
-const TABS = { under: { name: 'Under the arm', sub: 'CRF style rocker hung below the swingarm', def: DEF,
-    note: 'The rocker hangs under the swingarm, like the CRF450. The shock comes down in front of the arm to the rocker.' },
-  through: { name: 'Through the arm', sub: 'Shark\u2019s tooth rocker, shock eye above the centreline', def: DEF_THROUGH,
+// Joel dropped the Under the arm (CRF style) tab on 19 Oct; the through-the-arm shark's tooth is the plan
+const TABS = { through: { name: 'Through the arm', sub: 'Shark\u2019s tooth rocker, shock eye above the centreline', def: DEF_THROUGH,
     note: 'The rocker pivots under the swingarm with the dogbone, and points up through the arm like a shark\u2019s tooth, so the shock\u2019s bottom eye sits above the arm\u2019s centreline like an early Pro-Link. Check the shock and rocker clear the arm\u2019s cross-member.' } };
 const root = document.getElementById('rk'), $ = id => document.getElementById('rk-' + id);
 const store = { get() { try { return JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { return null; } }, set(v) { try { localStorage.setItem(KEY, JSON.stringify(v)); } catch (e) {} } };
@@ -2158,7 +2162,7 @@ Object.keys(TABS).forEach(t => {
   if (t === 'through') { i.place = 'through'; if (!i.v3) { i.rocker = clone(DEF_THROUGH.rocker); ['lenMode', 'eyeMin', 'eyeMax'].forEach(k => i[k] = DEF_THROUGH[k]); i.v3 = true; } } // the first version wrongly put this rocker on top of the arm
   tabState[t] = { inp: i, design: old.design || null };
 });
-active = saved.active in TABS ? saved.active : 'under';
+active = saved.active in TABS ? saved.active : 'through';
 inp = tabState[active].inp; design = tabState[active].design; zoom = saved.zoom !== false; ghosts = saved.ghosts !== false;
 }
 loadSaved(store.get());
@@ -2501,9 +2505,36 @@ function rockerFlat() {
 function rockerParts() {
   const f = rockerFlat(); if (!f) return null;
   const r1 = inp.pivotBoss / 2, r2 = inp.eyeBoss / 2;
-  const outline = hull([...circ(f.P, r1), ...circ(f.D, r2), ...circ(f.S, r2)]);
+  const outline = inp.place === 'through' ? toothOutline(f, r1, r2) : hull([...circ(f.P, r1), ...circ(f.D, r2), ...circ(f.S, r2)]);
   const holes = [circ(f.P, inp.pivotHole / 2, 48, true), circ(f.D, inp.eyeHole / 2, 48, true), circ(f.S, inp.eyeHole / 2, 48, true)];
   return { f, outline, holes };
+}
+// Shark's tooth: the pivot and dogbone eye make the base under the arm, and its edges sweep up to the shock eye at the tip.
+// The front edge is hollowed and the back edge rounded, so the tooth hooks forwards round the swingarm's body.
+const HOOK = 0.24, BULGE = 0.16;
+const qb = (a, c, b, t) => [(1-t)*(1-t)*a[0] + 2*(1-t)*t*c[0] + t*t*b[0], (1-t)*(1-t)*a[1] + 2*(1-t)*t*c[1] + t*t*b[1]];
+const qd = (a, c, b, t) => [2*(1-t)*(c[0]-a[0]) + 2*t*(b[0]-c[0]), 2*(1-t)*(c[1]-a[1]) + 2*t*(b[1]-c[1])];
+// Control points for the three edges, back edge, front edge and base, given the base's front and back eyes and the tip
+function toothCurves(front, back, tip) {
+  const s = Math.sign((tip[0]-back[0])*(front[1]-back[1]) - (tip[1]-back[1])*(front[0]-back[0])) || 1; // +1 when back, tip, front run anticlockwise
+  const out = (a, b) => { const d = [b[0]-a[0], b[1]-a[1]], L = Math.hypot(d[0], d[1]) || 1; return [s * d[1] / L, -s * d[0] / L]; };
+  const ctl = (a, b, k) => { const n = out(a, b), L = dist(a, b); return [(a[0]+b[0])/2 + n[0]*k*L, (a[1]+b[1])/2 + n[1]*k*L]; };
+  return { s, out, back: ctl(back, tip, BULGE), front: ctl(tip, front, -HOOK) };
+}
+function toothOutline(f, rP, rE) {
+  const dFront = f.D[0] < f.P[0], A = dFront ? f.D : f.P, B = dFront ? f.P : f.D, rA = dFront ? rE : rP, rB = dFront ? rP : rE, T = f.S;
+  const k = toothCurves(A, B, T), N = 28, pts = [];
+  const edges = [[B, k.back, T, rB, rE], [T, k.front, A, rE, rA], [A, [(A[0]+B[0])/2, (A[1]+B[1])/2], B, rA, rB]];
+  const nrm = (e, t) => { const d = qd(e[0], e[1], e[2], t), L = Math.hypot(d[0], d[1]) || 1; return [k.s * d[1] / L, -k.s * d[0] / L]; };
+  edges.forEach((e, i) => {
+    for (let j = 0; j <= N; j++) { const t = j / N, q = qb(e[0], e[1], e[2], t), n = nrm(e, t), r = e[3] + (e[4] - e[3]) * t; pts.push([q[0] + n[0]*r, q[1] + n[1]*r]); }
+    // round the corner at the end of this edge onto the next one
+    const nx = edges[(i + 1) % 3], c = e[2], r = e[4], a1 = Math.atan2(...nrm(e, 1).slice().reverse()), n2 = nrm(nx, 0);
+    let a2 = Math.atan2(n2[1], n2[0]);
+    if (k.s > 0) { while (a2 < a1) a2 += 2 * Math.PI; } else { while (a2 > a1) a2 -= 2 * Math.PI; }
+    for (let j = 1; j < 12; j++) { const a = a1 + (a2 - a1) * j / 12; pts.push([c[0] + r * Math.cos(a), c[1] + r * Math.sin(a)]); }
+  });
+  return k.s > 0 ? pts : pts.reverse(); // anticlockwise, like hull()
 }
 function prism(tris, outline, holes, z0, z1) {
   const flat = [], hi = [], loops = [outline, ...holes];
@@ -2594,8 +2625,9 @@ $('pos').oninput = e => { posK = e.target.value / 1000; drawView(); drawChart();
 $('zoomBtn').onclick = () => { zoom = !zoom; save(); draw(); };
 $('ghostBtn').onclick = () => { ghosts = !ghosts; save(); draw(); };
 $('genBtn').onclick = () => { clearTimeout(timer); runGen(); };
-const resetTab = () => { if (!confirm(`Put every number on the ${TABS[active].name} tab back to its default? Padlocked numbers on this tab get reset too. The other tab isn't touched.`)) return; inp = clone(TABS[active].def); design = null; renderForms(); runGen(); };
+const resetTab = () => { if (!confirm(`Put every number on the ${TABS[active].name} tab back to its default? Padlocked numbers on this tab get reset too. The rest of the bench isn't touched.`)) return; inp = clone(TABS[active].def); design = null; renderForms(); runGen(); };
 function drawTabs() {
+  $('tabs').hidden = Object.keys(TABS).length < 2;
   $('tabs').innerHTML = Object.entries(TABS).map(([k, t]) => `<button type="button" role="tab" data-rtab="${k}" aria-pressed="${k === active}" aria-selected="${k === active}"><b>${t.name}</b><span>${t.sub}</span></button>`).join('');
   $('tabNote').textContent = TABS[active].note;
 }
@@ -2627,7 +2659,7 @@ function sendToBench() {
   if (sendSpring) { const L = sagLoads();
     put('k', r1(inp.spring * LBIN), 'shock spring'); put('preload', inp.preload, 'shock preload');
     put('wUnladen', Math.round(L.bike), 'sprung load unladen'); put('wLaden', Math.round(L.rider), 'sprung load with rider'); }
-  c.shape = 'tri';
+  c.shape = inp.place === 'through' ? 'tooth' : 'tri';
   const notes = [];
   if (c.armTarget && !BENCH.isLocked(c, 'eye')) { c.armTarget = false; notes.push('Build around the swingarm angle I want was on for that tab, so it’s been switched off. Otherwise it would change the shock length straight back.'); }
   // The bench starts its sweep from its arm angle and picks the rocker's way up there, so find the start that gives this design's travel
