@@ -144,6 +144,7 @@ svg .dim { stroke: var(--ink); stroke-width: .8; stroke-dasharray: 3 2; fill: no
         <div class="stats" id="stats"></div>
         <div class="opts" id="opts"></div>
       </div>
+      <div class="card chart"><h2>Spring and sag</h2><p class="small">How stiff the back feels at the wheel through the travel, with your spring. The dashed line is the spring that would give the rider sag you're after. The marks are where it sits with just the bike, and with you on it.</p><div id="sagStats" class="stats"></div><div id="sagChart"></div></div>
       <div class="card chart"><h2>Leverage ratio</h2><p class="small">Wheel movement per mm of shock movement, through the travel. Falling from left to right is a rising rate: the rear gets stiffer as it compresses.</p><div id="chart"></div></div>
     </section>
 
@@ -375,7 +376,8 @@ const DEF = {
   angMode: 'fixed', angMin: 15, angMax: 40,
   travel: 280, prog: 40, maxRocker: 120, dogMin: 60, dogMax: 260, place: 'under', throughClear: 0, minTA: 40,
   offset: 10, pivotHole: 22, pivotBoss: 36, pivotWidth: 30, eyeHole: 12, eyeBoss: 28, eyeWidth: 22, plate: 10,
-  dogHole: 12, dogBoss: 26, dogThick: 16, locks: []
+  dogHole: 12, dogBoss: 26, dogThick: 16, locks: [],
+  spring: 1000, preload: 5, bikeKg: 115, riderKg: 80, unsprung: 15, bikeRear: 50, riderRear: 70, sagPct: 33
 };
 // Through the arm, old Pro-Link style: rocker pivot and dogbone eye under the arm, with the rocker pointing up through it like a shark's tooth so the shock's bottom eye sits above the arm's centreline.
 // Shock angle left for it to find, since the bench's angle is for the CRF style rocker under the arm.
@@ -424,6 +426,15 @@ const FORMS = [
   { title: 'What you want', open: true, fields: [
     { k: 'travel', label: 'Rear wheel travel', unit: 'mm' },
     { k: 'prog', label: 'Rising rate', unit: '%', hint: 'How much stiffer the end of the travel is than the start. 0 is linear; modern motocross bikes are roughly 30 to 50.' } ] },
+  { title: 'Spring and weight', open: true, fields: [
+    { k: 'spring', label: 'Shock spring rate', unit: 'lb/in', hint: 'The number on the spring. 1000 lb/in is 175 N/mm or 17.9 kg/mm.' },
+    { k: 'preload', label: 'Spring preload', unit: 'mm', hint: 'How far the collar squashes the spring with the shock fully extended.' },
+    { k: 'riderKg', label: 'You, in your kit', unit: 'kg' },
+    { k: 'bikeKg', label: 'Bike, ready to ride', unit: 'kg', hint: 'With fuel and luggage. A stock XL125R is about 110 kg wet.' },
+    { k: 'sagPct', label: 'Rider sag you want', unit: '% of travel', hint: 'About 33% is usual off road. A rally bike with luggage often runs a little less.' },
+    { k: 'bikeRear', label: 'Bike weight on the back wheel', unit: '%' },
+    { k: 'riderRear', label: 'Your weight on the back wheel', unit: '%', hint: 'Sat down. Around 70% is a fair guess.' },
+    { k: 'unsprung', label: 'Unsprung weight at the back', unit: 'kg', hint: 'Wheel, tyre, brake and about half the swingarm. It does not squash the spring.' } ] },
   { title: 'Limits', open: false, fields: [
     { k: 'maxRocker', label: 'Biggest rocker, any eye to any eye', unit: 'mm' },
     { k: 'dogMin', label: 'Shortest dogbone', unit: 'mm' },
@@ -467,13 +478,14 @@ function renderForms() {
 }
 function renderTune() { $('tune').innerHTML = design ? TUNE.map(f => fieldHTML(f, design, 'des')).join('') : '<p class="small">Design the linkage first.</p>'; }
 const scopeObj = s => s === 'inp' ? inp : design;
-const PRINT_KEYS = PRINT.map(f => f.k);
+const PRINT_KEYS = PRINT.map(f => f.k), SPRING_KEYS = FORMS.find(s => s.title === 'Spring and weight').fields.map(f => f.k);
 function setVal(s, k, i, v) { const o = scopeObj(s); if (i >= 0) o[k][i] = v; else o[k] = v; }
 function getVal(s, k, i) { const o = scopeObj(s); return i >= 0 ? o[k][i] : o[k]; }
 function changed(s, k) {
   save();
   if (s === 'des') { design.hand = true; save(); analyseDesign(); draw(); return; }
   if (PRINT_KEYS.includes(k)) { drawRockerSketch(); return; }
+  if (SPRING_KEYS.includes(k)) { drawSag(); return; }
   if (k === 'lenMode' || k === 'angMode') renderForms();
   scheduleGen();
 }
@@ -538,7 +550,7 @@ const W = 400, H = 330;
 let posK = 0;
 function poseAt(k) { if (!an || !an.res) return null; const r = an.res; return r[Math.round(k * (r.length - 1))]; }
 function draw() {
-  drawMsg(); drawView(); drawChart(); drawStats(); drawOpts(); drawBench(); drawRockerSketch(); drawNotes();
+  drawMsg(); drawView(); drawChart(); drawSag(); drawStats(); drawOpts(); drawBench(); drawRockerSketch(); drawNotes();
   $('zoomBtn').setAttribute('aria-pressed', zoom); $('zoomBtn').textContent = zoom ? 'Linkage close-up' : 'Whole swingarm';
   $('ghostBtn').setAttribute('aria-pressed', ghosts);
 }
@@ -622,6 +634,49 @@ function drawChart() {
   s += `<path class="curve" d="${res.map((p, i) => `${i ? 'L' : 'M'}${X(p.wheel).toFixed(1)},${Y(p.lr).toFixed(1)}`).join(' ')}"/>`;
   const p = poseAt(posK); if (p) s += `<circle class="mark" cx="${X(p.wheel)}" cy="${Y(p.lr)}" r="5"/><text x="${X(p.wheel) + 8}" y="${Y(p.lr) - 8}" font-size="13">${p.lr.toFixed(2)}</text>`;
   $('chart').innerHTML = s + '</svg>';
+}
+// ---------- Spring and sag ----------
+const LBIN = 0.175127; // lb/in to N/mm
+function sagLoads() {
+  const bike = Math.max(0, inp.bikeKg * inp.bikeRear / 100 - inp.unsprung);
+  return { bike, rider: bike + inp.riderKg * inp.riderRear / 100 };
+}
+// Where the wheel settles under a load (kg at the axle) for a spring of k N/mm
+const sagFor = (k, kg) => sagAt(an, { k, preload: inp.preload }, kg);
+// The spring that gives the rider sag asked for. More spring, less sag, so halve the gap until it lands.
+function springFor(kg, want) {
+  let lo = 1, hi = 2000;
+  for (let i = 0; i < 60; i++) { const m = (lo + hi) / 2, s = sagFor(m, kg); if (s && s.wheel > want) lo = m; else hi = m; }
+  return (lo + hi) / 2;
+}
+function drawSag() {
+  const res = an && an.res;
+  if (!res || !design) { $('sagStats').innerHTML = ''; $('sagChart').innerHTML = '<p class="small">Nothing to show yet.</p>'; return; }
+  const k = inp.spring * LBIN, L = sagLoads(), want = an.travel * inp.sagPct / 100;
+  const st = sagFor(k, L.bike), rs = sagFor(k, L.rider), kWant = springFor(L.rider, want);
+  const sg = s => !s ? '–' : s.topped ? 'none, preload holds it' : s.bottomed ? 'bottoms out' : `${fmt(s.wheel, 0)} mm`;
+  const wr = p => k / (p.lr * p.lr);
+  $('sagStats').innerHTML = [
+    [sg(rs), `rider sag (${fmt(rs && !rs.topped && !rs.bottomed ? rs.wheel / an.travel * 100 : 0, 0)}% of travel, you want ${fmt(want, 0)})`],
+    [sg(st), 'static sag, bike on its own'],
+    [`${Math.round(kWant / LBIN / 10) * 10} lb/in`, `spring for ${inp.sagPct}% rider sag (${fmt(kWant, 0)} N/mm)`],
+    [`${fmt(wr(res[0]), 1)} → ${fmt(wr(res[res.length - 1]), 1)}`, 'stiffness at the wheel, top to bottom, N/mm'],
+  ].map(([v, t]) => `<div class="stat"><b>${v}</b><span>${t}</span></div>`).join('');
+  const cw = 420, ch = 250, ml = 40, mb = 34, mt = 12, mr = 12, f = kWant / k;
+  const tmax = Math.ceil(an.travel / 50) * 50, vals = res.map(wr).concat(res.map(p => wr(p) * f)).filter(isFinite);
+  const yStep = Math.max(...vals) > 40 ? 10 : Math.max(...vals) > 16 ? 5 : 2, hi = Math.ceil(Math.max(...vals) * 1.08 / yStep) * yStep;
+  const X = v => ml + v / tmax * (cw - ml - mr), Y = v => mt + (hi - v) / hi * (ch - mt - mb);
+  let s = `<svg viewBox="0 0 ${cw} ${ch}" role="img" aria-label="Stiffness at the back wheel against wheel travel">`;
+  for (let v = 0; v <= tmax; v += 50) s += `<line class="gridl" x1="${X(v)}" x2="${X(v)}" y1="${mt}" y2="${ch - mb}"/><text class="m" x="${X(v)}" y="${ch - mb + 18}" font-size="12" text-anchor="middle">${v}</text>`;
+  for (let v = 0; v <= hi + 1e-9; v += yStep) s += `<line class="gridl" x1="${ml}" x2="${cw - mr}" y1="${Y(v)}" y2="${Y(v)}"/><text class="m" x="${ml - 6}" y="${Y(v) + 4}" font-size="12" text-anchor="end">${v}</text>`;
+  s += `<text class="m" x="${ml + 4}" y="${mt + 12}" font-size="12">N/mm at the wheel</text><text class="m" x="${cw - mr}" y="${ch - 4}" font-size="12" text-anchor="end">wheel travel, mm</text>`;
+  const line = g => res.map((p, i) => `${i ? 'L' : 'M'}${X(p.wheel).toFixed(1)},${Y(g(p)).toFixed(1)}`).join(' ');
+  if (Math.abs(f - 1) > 0.02) s += `<path class="curve" style="stroke:var(--cmp);stroke-dasharray:6 5;stroke-width:2" d="${line(p => wr(p) * f)}"/>`;
+  s += `<path class="curve" d="${line(wr)}"/>`;
+  const vmark = (q, t, dy) => { if (!q || q.topped || q.bottomed) return; const x = X(q.wheel); s += `<line class="dim" x1="${x}" x2="${x}" y1="${mt}" y2="${ch - mb}"/><text x="${x + 4}" y="${ch - mb - dy}" font-size="12">${t}</text>`; };
+  vmark(st, 'bike', 8); vmark(rs, 'with you', 24);
+  const p = poseAt(posK); if (p) s += `<circle class="mark" cx="${X(p.wheel)}" cy="${Y(wr(p))}" r="5"/><text x="${X(p.wheel) + 8}" y="${Y(wr(p)) - 8}" font-size="13">${wr(p).toFixed(1)}</text>`;
+  $('sagChart').innerHTML = s + '</svg>';
 }
 const shockAngle = q => Math.atan2(q.S[0] - inp.shockTop[0], inp.shockTop[1] - q.S[1]) / D2R;
 const minTrans = res => Math.min(...res.map(q => { const R = q.R, D = q.D, F = inp.dogMount; const s = Math.abs(((R[0]-D[0])*(F[1]-D[1]) - (R[1]-D[1])*(F[0]-D[0])) / (dist(R, D) * dist(F, D))); return Math.asin(Math.min(1, s)) / D2R; }));
@@ -764,7 +819,7 @@ document.addEventListener('click', e => {
 });
 
 // ---------- Wiring ----------
-$('pos').oninput = e => { posK = e.target.value / 1000; drawView(); drawChart(); };
+$('pos').oninput = e => { posK = e.target.value / 1000; drawView(); drawChart(); drawSag(); };
 $('zoomBtn').onclick = () => { zoom = !zoom; save(); draw(); };
 $('ghostBtn').onclick = () => { ghosts = !ghosts; save(); draw(); };
 $('genBtn').onclick = () => { clearTimeout(timer); runGen(); };
