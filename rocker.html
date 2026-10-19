@@ -44,6 +44,10 @@ header a { color: var(--ink); font-size: 14px; }
 h2 { font-family: var(--display); font-weight: 700; font-size: 22px; line-height: 1.1; margin: 0 0 8px; text-transform: uppercase; }
 p { margin: 0 0 10px; }
 .grid { display: grid; gap: 14px; }
+.tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 6px; }
+.tabs button { text-align: left; line-height: 1.2; }
+.tabs button b { display: block; font-family: var(--display); font-size: 18px; text-transform: uppercase; }
+.tabs button span { font-size: 12px; opacity: .8; }
 .grid > * { min-width: 0; }
 @media (min-width: 900px) { .grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); align-items: start; } .out { position: sticky; top: 12px; order: 2; } .ins { order: 1; } }
 .card { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 12px; margin-bottom: 12px; }
@@ -121,6 +125,8 @@ svg .dim { stroke: var(--ink); stroke-width: .8; stroke-dasharray: 3 2; fill: no
     <h1>Rocker &amp; <span>dogbone</span> designer</h1>
     <a href="./">Back to the Chassis Bench</a>
   </header>
+  <div class="tabs" role="tablist" id="tabs"></div>
+  <p class="small" id="tabNote" style="margin:0 0 12px"></p>
   <div class="grid">
     <section class="out">
       <div class="card">
@@ -178,7 +184,7 @@ svg .dim { stroke: var(--ink); stroke-width: .8; stroke-dasharray: 3 2; fill: no
           </div>
         </div>
       </details>
-      <div class="btns"><button type="button" id="resetBtn">Put everything back to default</button></div>
+      <div class="btns"><button type="button" id="resetBtn">Put this tab back to default</button></div>
       <p class="small" style="margin-top:12px">Without the bench, the defaults are its CRF style guesses: CRF450 arm, the XL's own shock top and lower dogbone mount. The page keeps your numbers on this phone.</p>
     </section>
   </div>
@@ -273,6 +279,7 @@ function sagAt(an, g, kg) {
 
 </script>
 <script>// ---------- Generator: given the mounts, the shock and its angle at full extension, search the rocker and dogbone ----------
+const fmtN = v => (Math.round(v)).toString();
 function setupCtx(p) {
   const th0 = -p.topAng * D2R, R0w = rot(p.rocker, th0);
   const a = p.shockAng * D2R, S0 = [p.shockTop[0] + p.eye * Math.sin(a), p.shockTop[1] - p.eye * Math.cos(a)];
@@ -288,7 +295,7 @@ function quick(ctx, rD, phi, step) {
   if (dog < p.dogMin || dog > p.dogMax) return null;
   if (dist(D0, ctx.S0) < p.eyeBoss + 2) return null;
   if (dist(D0, ctx.S0) > p.maxRocker || rD > p.maxRocker) return null;
-  if (p.underArm && armY(D0, ctx.th0) > p.rocker[1] + 5) return null;
+  if (p.place === 'under' && armY(D0, ctx.th0) > p.rocker[1] + 5) return null;
   const incl = ctx.angS - phi, minS = Math.sin(p.minTA * D2R);
   let prevD = D0, prevL = ctx.Lext, prevW = 0, minTA = 90;
   const ay0 = rot([p.armLen, 0], ctx.th0)[1], pts = [[0, 0]];
@@ -317,12 +324,16 @@ function costOf(q, p) {
   if (!q) return Infinity;
   const e1 = (q.travel - p.travel) / p.travel, e2 = (q.prog - p.prog) / 100;
   const span = Math.max(q.rD, q.rS || 0, q.eyes || 0);
-  return 4*e1*e1 + e2*e2 + 2e-4 * (span / 50) ** 2 + 0.02 * Math.max(0, (45 - q.minTA) / 45) ** 2;
+  return 4*e1*e1 + e2*e2 + 2e-4 * (span / 50) ** 2 + 0.6 * Math.max(0, (55 - q.minTA) / 55) ** 2; // stay well clear of over centre
 }
 function generate(p, maxSeeds = 10) {
   const ctx = setupCtx(p), out = { ctx, opts: [] };
+  const reach = dist(p.shockTop, ctx.R0w);
+  if (p.eye < reach - p.maxRocker || p.eye > reach + p.maxRocker) { out.error = `The shock top is ${fmtN(reach)} mm from the rocker pivot, so a ${fmtN(p.eye)} mm shock can't get its bottom eye onto a rocker no bigger than ${p.maxRocker} mm. Use a shock between ${fmtN(Math.max(0, reach - p.maxRocker))} and ${fmtN(reach + p.maxRocker)} mm, move the rocker pivot, or allow a bigger rocker.`; return out; }
   if (ctx.rS > p.maxRocker) { out.error = `With the shock at that angle its bottom eye sits ${ctx.rS.toFixed(0)} mm from the rocker pivot, more than the biggest rocker you allowed (${p.maxRocker} mm). Change the shock angle or length, or allow a bigger rocker.`; return out; }
   if (ctx.rS < (p.pivotBoss + p.eyeBoss) / 2 + 2) { out.error = `With the shock at that angle its bottom eye lands ${ctx.rS.toFixed(0)} mm from the rocker pivot, too close for the two bosses to fit. Change the shock angle or length.`; return out; }
+  if (p.place === 'under' && armY(ctx.S0, ctx.th0) > p.rocker[1] + 5) { out.error = `With the shock at that angle and length its bottom eye sits above the rocker pivot, so the rocker can't hang under the arm. Try a longer shock or a different angle, or use the Through the arm tab.`; return out; }
+  if (p.place === 'through' && armY(ctx.S0, ctx.th0) < p.throughClear) { out.error = `With the shock at that angle and length its bottom eye lands ${fmtN(-armY(ctx.S0, ctx.th0) + p.throughClear)} mm too low to sit above the arm's centreline. Try a shorter shock or a different angle.`; return out; }
   const rMin = (p.pivotBoss + p.eyeBoss) / 2 + 2, cands = [];
   for (let rD = rMin; rD <= p.maxRocker; rD += 4)
     for (let ph = 0; ph < 360; ph += 4) { const q = quick(ctx, rD, ph * D2R, 1.5 * D2R), c = costOf(q, p); if (c < Infinity) cands.push([c, rD, ph * D2R]); }
@@ -358,22 +369,41 @@ function generate(p, maxSeeds = 10) {
 <script>
 // ---------- Inputs ----------
 const KEY = 'rocker-designer-v1';
+const clone = o => JSON.parse(JSON.stringify(o));
 const DEF = {
   armLen: 630, topAng: 15, rocker: [180, -20], shockTop: [-80, 300], dogMount: [38, -66],
   lenMode: 'fixed', eye: 450, eyeMin: 380, eyeMax: 480, stroke: 75, shockAng: 24,
-  travel: 280, prog: 40, maxRocker: 120, dogMin: 60, dogMax: 260, underArm: true, minTA: 30,
+  angMode: 'fixed', angMin: 15, angMax: 40,
+  travel: 280, prog: 40, maxRocker: 120, dogMin: 60, dogMax: 260, place: 'under', throughClear: 0, minTA: 40,
   offset: 10, pivotHole: 22, pivotBoss: 36, pivotWidth: 30, eyeHole: 12, eyeBoss: 28, eyeWidth: 22, plate: 10,
   dogHole: 12, dogBoss: 26, dogThick: 16, link: 'crf', linkTab: 'crf'
 };
-// Numbers the bench owns while this page is kept in step with it
-const LINKED = ['armLen', 'topAng', 'rocker', 'shockTop', 'dogMount', 'eye', 'stroke', 'shockAng'];
+// Through the arm, old Pro-Link style: rocker pivot on top of the arm and the shock's bottom eye above the arm's centreline, so the shock passes through the arm.
+// Shock angle left for it to find, since the bench's angle is for the CRF style rocker under the arm.
+const DEF_THROUGH = Object.assign(clone(DEF), { rocker: [170, 30], eye: 400, angMode: 'find', angMin: 15, angMax: 40, place: 'through' });
+const TABS = { under: { name: 'Under the arm', sub: 'CRF style rocker hung below the swingarm', def: DEF,
+    note: 'The rocker hangs under the swingarm, like the CRF450. The shock comes down in front of the arm to the rocker.' },
+  through: { name: 'Through the arm', sub: 'Old Pro-Link: shock eye above the centreline', def: DEF_THROUGH,
+    note: 'The rocker pivots on top of the swingarm and the shock drops through the arm, with its bottom eye kept above the arm\u2019s centreline like an early Pro-Link. Check the shock body clears the arm\u2019s cross-member.' } };
+// Numbers the bench owns while this page is kept in step with it. The through-the-arm rocker has its own pivot and shock angle.
+const LINKED_ALL = ['armLen', 'topAng', 'rocker', 'shockTop', 'dogMount', 'eye', 'stroke', 'shockAng'];
+const linkedKeys = () => inp.place === 'through' ? LINKED_ALL.filter(k => k !== 'rocker' && k !== 'shockAng') : LINKED_ALL;
 const BENCH_TABS = [['crf', 'CRF style'], ['build', 'Build'], ['stock', 'Stock XL']];
 const $ = id => document.getElementById(id);
-const clone = o => JSON.parse(JSON.stringify(o));
 const store = { get() { try { return JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { return null; } }, set(v) { try { localStorage.setItem(KEY, JSON.stringify(v)); } catch (e) {} } };
 let saved = store.get() || {};
-let inp = Object.assign(clone(DEF), saved.inp || {}), design = saved.design || null, zoom = saved.zoom !== false, ghosts = saved.ghosts !== false;
-const save = () => store.set({ inp, design, zoom, ghosts });
+// Each tab keeps its own numbers and design. Pages saved before the tabs existed become the Under the arm tab.
+const tabState = {};
+Object.keys(TABS).forEach(t => {
+  const old = t === 'under' && !saved.tabs ? { inp: saved.inp, design: saved.design } : (saved.tabs && saved.tabs[t]) || {};
+  const i = Object.assign(clone(TABS[t].def), old.inp || {});
+  if (!i.v2) { if (i.minTA === 30) i.minTA = DEF.minTA; if (i.underArm === false) i.place = 'any'; delete i.underArm; i.v2 = true; } // 30° let it get too close to over centre
+  if (t === 'through') i.place = 'through';
+  tabState[t] = { inp: i, design: old.design || null };
+});
+let active = saved.active in TABS ? saved.active : 'under';
+let inp = tabState[active].inp, design = tabState[active].design, zoom = saved.zoom !== false, ghosts = saved.ghosts !== false;
+const save = () => { tabState[active] = { inp, design }; store.set({ tabs: tabState, active, zoom, ghosts }); };
 
 // Field specs. sign: [label for +, label for −]. Values are stored signed; the box shows the size and the buttons the direction (no minus key on the iPhone pad).
 const XS = ['Behind', 'In front'], YS = ['Above', 'Below'];
@@ -391,7 +421,10 @@ const FORMS = [
     { k: 'eyeMin', label: 'Shortest shock to try', unit: 'mm', when: () => inp.lenMode === 'find' },
     { k: 'eyeMax', label: 'Longest shock to try', unit: 'mm', when: () => inp.lenMode === 'find' },
     { k: 'stroke', label: 'Stroke', unit: 'mm' },
-    { k: 'shockAng', label: 'Shock angle, fully extended', unit: '°', sign: ['Bottom eye behind top', 'Bottom eye in front'], hint: 'Lean of the shock from vertical, seen from the side. This sets where the shock’s bottom eye, and so the rocker, has to be.' } ] },
+    { k: 'angMode', label: 'Shock angle', choice: [['fixed', 'I know it'], ['find', 'Find it for me']], hint: 'Lean of the shock from vertical with it fully extended, seen from the side. With the length, this sets where the shock’s bottom eye, and so the rocker, has to be. If you change the length, let it find the angle too, or the rocker may not fit.' },
+    { k: 'shockAng', label: 'Shock angle, fully extended', unit: '°', sign: ['Bottom eye behind top', 'Bottom eye in front'], when: () => inp.angMode === 'fixed' },
+    { k: 'angMin', label: 'Least lean to try (bottom eye behind top)', unit: '°', when: () => inp.angMode === 'find' },
+    { k: 'angMax', label: 'Most lean to try', unit: '°', when: () => inp.angMode === 'find' } ] },
   { title: 'What you want', open: true, fields: [
     { k: 'travel', label: 'Rear wheel travel', unit: 'mm' },
     { k: 'prog', label: 'Rising rate', unit: '%', hint: 'How much stiffer the end of the travel is than the start. 0 is linear; modern motocross bikes are roughly 30 to 50.' } ] },
@@ -399,8 +432,9 @@ const FORMS = [
     { k: 'maxRocker', label: 'Biggest rocker, any eye to any eye', unit: 'mm' },
     { k: 'dogMin', label: 'Shortest dogbone', unit: 'mm' },
     { k: 'dogMax', label: 'Longest dogbone', unit: 'mm' },
-    { k: 'minTA', label: 'Smallest angle between dogbone and rocker', unit: '°', hint: 'Keeps it well away from going over centre. 30° or more is safe.' },
-    { k: 'underArm', label: 'Rocker hangs under the arm', choice: [[true, 'Yes, keep the eyes below its pivot'], [false, 'Anywhere']] } ] }
+    { k: 'minTA', label: 'Smallest angle between dogbone and rocker', unit: '°', hint: 'Keeps it away from going over centre. 40° is the least it allows by default, and it aims for 55° or more.' },
+    { k: 'place', label: 'Rocker hangs under the arm', choice: [['under', 'Yes, keep the eyes below its pivot'], ['any', 'Anywhere']], when: () => inp.place !== 'through' },
+    { k: 'throughClear', label: 'Shock eye above the arm centreline by at least', unit: 'mm', when: () => inp.place === 'through' } ] }
 ];
 const PRINT = [
   { k: 'offset', label: 'Shock and dogbone line, sideways from the pivot boss', unit: 'mm', sign: ['Left', 'Right'], hint: 'Your shock top and lower dogbone mount are about 10 mm left of centre.' },
@@ -414,7 +448,6 @@ const TUNE = [
   { k: 'rS', label: 'Rocker pivot to shock eye', unit: 'mm' },
   { k: 'incl', label: 'Angle from dogbone eye round to shock eye', unit: '°', sign: ['+ anticlockwise', '− clockwise'], hint: 'Measured at the rocker pivot, seen from the right. The same number and sign as the bench’s rocker angle.' },
   { k: 'dog', label: 'Dogbone, eye to eye', unit: 'mm' },
-  { k: 'eye', label: 'Shock eye to eye', unit: 'mm' },
   { k: 'branch', label: 'Which way the rocker sits', choice: [[false, 'As designed'], [true, 'Flipped']], hint: 'The same rocker and dogbone can join up two ways. Flipped is the other one.' }
 ];
 
@@ -439,11 +472,11 @@ const PRINT_KEYS = PRINT.map(f => f.k);
 function setVal(s, k, i, v) { const o = scopeObj(s); if (i >= 0) o[k][i] = v; else o[k] = v; }
 function getVal(s, k, i) { const o = scopeObj(s); return i >= 0 ? o[k][i] : o[k]; }
 function changed(s, k) {
-  if (s === 'inp' && inp.link && LINKED.includes(k)) { inp.link = null; drawLink(); }
+  if (s === 'inp' && inp.link && linkedKeys().includes(k)) { inp.link = null; drawLink(); }
   save();
   if (s === 'des') { design.hand = true; save(); analyseDesign(); draw(); return; }
   if (PRINT_KEYS.includes(k)) { drawRockerSketch(); return; }
-  if (k === 'lenMode') renderForms();
+  if (k === 'lenMode' || k === 'angMode') renderForms();
   scheduleGen();
 }
 document.addEventListener('input', e => {
@@ -466,35 +499,37 @@ document.addEventListener('click', e => {
 let gen = null, an = null, timer = null;
 function scheduleGen() { clearTimeout(timer); timer = setTimeout(runGen, 450); }
 function benchG(d) {
-  return { layout: 'arm', armLen: inp.armLen, armAngle: inp.topAng, rockerArm: inp.rocker, frameLink: inp.dogMount, rD: d.rD, rS: d.rS, incl: d.incl, dog: d.dog,
+  // Start the bench solver a hair above full extension, so it finds the top-out crossing whichever way rounding falls
+  return { layout: 'arm', armLen: inp.armLen, armAngle: inp.topAng - 0.01, rockerArm: inp.rocker, frameLink: inp.dogMount, rD: d.rD, rS: d.rS, incl: d.incl, dog: d.dog,
     branch: !!d.branch, topOn: 'frame', botOn: 'rocker', shockTop: inp.shockTop, shockLow: [0, 0], shockArm: [0, 0], lug: [0, 0], rocker: [0, 0], eye: d.eye, stroke: inp.stroke, k: 1 };
 }
 function toDesign(q, ctx) {
   const R0w = ctx.R0w, sols = circles(R0w, q.rD, inp.dogMount, q.dog);
   const branch = !!sols && dist(sols[1], q.D0) < dist(sols[0], q.D0);
-  return { rD: q.rD, rS: q.rS, incl: q.incl, dog: q.dog, eye: ctx.p.eye, branch, travel: q.travel, prog: q.prog };
+  return { rD: q.rD, rS: q.rS, incl: q.incl, dog: q.dog, eye: ctx.p.eye, shockAng: ctx.p.shockAng, branch, travel: q.travel, prog: q.prog };
 }
+function range(lo, hi, n, minStep) { lo = Math.min(lo, hi); hi = Math.max(lo, hi); const st = Math.max(minStep, (hi - lo) / n), out = []; for (let v = lo; v <= hi + 1e-9; v += st) out.push(v); return out; }
 function runGen() {
   const p = Object.assign({}, inp);
-  let out;
-  if (inp.lenMode === 'find') {
-    const lo = Math.min(inp.eyeMin, inp.eyeMax), hi = Math.max(inp.eyeMin, inp.eyeMax), all = [];
-    let firstErr = null;
-    for (let L = lo; L <= hi + 1e-9; L += Math.max(2.5, (hi - lo) / 40)) {
-      const o = generate(Object.assign({}, p, { eye: L }), 3);
-      if (o.error) { firstErr = firstErr || o.error; continue; }
-      o.opts.forEach(q => all.push({ q, ctx: o.ctx }));
-    }
-    all.sort((a, b) => a.q.cost - b.q.cost);
-    const picks = [];
-    for (const c of all) { if (picks.length >= 3) break; if (picks.some(k => Math.abs(k.ctx.p.eye - c.ctx.p.eye) < 15)) continue; picks.push(c); }
-    out = { opts: picks, error: picks.length ? null : (firstErr && firstErr.replace(/^With the shock/, 'At every length tried, with the shock') || 'No shock length in that range gives a working linkage within your limits.') };
-  } else {
-    const o = generate(p);
-    out = { opts: o.opts.map(q => ({ q, ctx: o.ctx })), error: o.error };
+  const both = inp.lenMode === 'find' && inp.angMode === 'find';
+  const Ls = inp.lenMode === 'find' ? range(inp.eyeMin, inp.eyeMax, both ? 12 : 40, 2.5) : [inp.eye];
+  const As = inp.angMode === 'find' ? range(inp.angMin, inp.angMax, both ? 12 : 30, 1) : [inp.shockAng];
+  const all = [], combos = Ls.length * As.length;
+  let firstErr = null;
+  for (const L of Ls) for (const A of As) {
+    const o = generate(Object.assign({}, p, { eye: L, shockAng: A }), combos > 1 ? 2 : 10);
+    if (o.error) { if (!firstErr || /shock top is/.test(o.error)) firstErr = o.error; continue; }
+    o.opts.forEach(q => all.push({ q, ctx: o.ctx }));
   }
-  gen = out;
-  if (out.opts.length) { design = toDesign(out.opts[0].q, out.opts[0].ctx); design.pick = 0; }
+  all.sort((a, b) => a.q.cost - b.q.cost);
+  const picks = [];
+  const same = (k, c) => Math.abs(k.ctx.p.eye - c.ctx.p.eye) < 15 && Math.abs(k.ctx.p.shockAng - c.ctx.p.shockAng) < 4 && (combos > 1 || Math.abs(k.q.rD - c.q.rD) < 25);
+  for (const c of all) { if (picks.length >= 3) break; if (picks.some(k => same(k, c))) continue; picks.push(c); }
+  let err = null;
+  if (!picks.length) err = combos > 1 ? 'None of the shock ' + (inp.lenMode === 'find' && inp.angMode === 'find' ? 'lengths and angles' : inp.lenMode === 'find' ? 'lengths' : 'angles') + ` tried gives a working linkage within your limits. The first problem it hit: ${firstErr || 'the linkage would not assemble.'}` : firstErr;
+  if (err && inp.angMode === 'fixed') err += ' Setting the shock angle to Find it for me usually sorts this.';
+  gen = { opts: picks, error: err };
+  if (picks.length) { design = toDesign(picks[0].q, picks[0].ctx); design.pick = 0; }
   else design = null;
   save(); renderTune(); analyseDesign(); draw();
 }
@@ -516,8 +551,10 @@ function drawMsg() {
   if (an && an.warn) m.push(...an.warn);
   if (design && !design.hand && an && an.res && gen && gen.opts.length) {
     const q = gen.opts[design.pick ?? 0]?.q;
-    if (q && Math.abs(q.travel - inp.travel) > 5) m.push(`The closest it can get to ${inp.travel} mm travel within your limits is ${fmt(q.travel, 0)} mm. A longer stroke, a different shock angle, or a bigger rocker would get nearer.`);
-    if (q && Math.abs(q.prog - inp.prog) > 5) m.push(`The closest it can get to a ${inp.prog}% rising rate is ${fmt(q.prog, 0)}%.`);
+    const off = [];
+    if (q && Math.abs(q.travel - inp.travel) > 5) off.push(`${fmt(q.travel, 0)} mm travel instead of ${inp.travel}`);
+    if (q && Math.abs(q.prog - inp.prog) > 5) off.push(`a ${fmt(q.prog, 0)}% rising rate instead of ${inp.prog}%`);
+    if (off.length) m.push(`<b>This isn't what you asked for.</b> The closest it can get with these mounts and this shock is ${off.join(' and ')}. ${inp.angMode === 'fixed' ? 'Set the shock angle to Find it for me, or try' : 'Try'} a different shock length or stroke, or allow a bigger rocker.`);
   }
   $('msg').innerHTML = m.map(t => `<div class="tip">${t}</div>`).join('');
 }
@@ -600,7 +637,7 @@ function drawStats() {
 }
 function drawOpts() {
   if (!gen || gen.opts.length < 2) { $('opts').innerHTML = ''; return; }
-  $('opts').innerHTML = '<p class="small" style="margin:4px 0 0">Other ways it found to do it. Tap one to look at it.</p>' + gen.opts.map((o, i) => `<button type="button" data-opt="${i}" aria-pressed="${design && design.pick === i}"><b>Option ${i + 1}${i ? '' : ', closest'}</b>${fmt(o.q.travel, 0)} mm travel, ${fmt(o.q.prog, 0)}% rising rate. Rocker ${fmt(o.q.rD, 0)} / ${fmt(o.q.rS, 0)} mm, dogbone ${fmt(o.q.dog, 0)} mm${inp.lenMode === 'find' ? `, shock ${fmt(o.ctx.p.eye, 1)} mm` : ''}.</button>`).join('');
+  $('opts').innerHTML = '<p class="small" style="margin:4px 0 0">Other ways it found to do it. Tap one to look at it.</p>' + gen.opts.map((o, i) => `<button type="button" data-opt="${i}" aria-pressed="${design && design.pick === i}"><b>Option ${i + 1}${i ? '' : ', closest'}</b>${fmt(o.q.travel, 0)} mm travel, ${fmt(o.q.prog, 0)}% rising rate. Rocker ${fmt(o.q.rD, 0)} / ${fmt(o.q.rS, 0)} mm, dogbone ${fmt(o.q.dog, 0)} mm${inp.lenMode === 'find' ? `, shock ${fmt(o.ctx.p.eye, 1)} mm` : ''}${inp.angMode === 'find' ? ` at ${fmt(o.ctx.p.shockAng, 1)}°` : ''}.</button>`).join('');
 }
 document.addEventListener('click', e => { const b = e.target.closest('[data-opt]'); if (!b) return; const i = +b.dataset.opt, o = gen.opts[i]; design = toDesign(o.q, o.ctx); design.pick = i; save(); renderTune(); analyseDesign(); draw(); });
 function drawBench() {
@@ -615,7 +652,7 @@ function drawBench() {
 }
 function drawNotes() {
   const el = $('note-Shock'); if (!el) return;
-  if (inp.lenMode === 'find') { el.innerHTML = ''; return; }
+  if (inp.lenMode === 'find' || inp.angMode === 'find') { el.innerHTML = design ? `<p class="small">It picked a ${fmt(design.eye, 1)} mm shock at ${fmt(design.shockAng ?? inp.shockAng, 1)}° from vertical.</p>` : ''; return; }
   const c = setupCtx(Object.assign({}, inp));
   el.innerHTML = `<p class="small">At that angle and length the shock's bottom eye lands ${fmt(c.rS, 0)} mm from the rocker pivot, so that is one arm of the rocker.</p>`;
 }
@@ -726,7 +763,7 @@ function benchTab(t) {
 function pullBench(t) {
   const c = benchTab(t), name = BENCH_TABS.find(b => b[0] === t)[1];
   if (!c) return { note: `No saved Chassis Bench numbers on this phone yet, so this page is using its own defaults (the same as the bench's ${name} defaults). Open the bench once, change anything, and they'll come through.`, changed: false };
-  const before = JSON.stringify(LINKED.map(k => inp[k]));
+  const keys = linkedKeys(), keep = { rocker: inp.rocker.slice(), shockAng: inp.shockAng }, before = JSON.stringify(keys.map(k => inp[k]));
   ['armLen', 'eye', 'stroke'].forEach(k => { if (isFinite(c[k])) inp[k] = c[k]; });
   if (Array.isArray(c.rockerArm)) inp.rocker = c.rockerArm.slice();
   if (Array.isArray(c.shockTop)) inp.shockTop = c.shockTop.slice();
@@ -744,7 +781,9 @@ function pullBench(t) {
     if (isFinite(c.armAngle)) inp.topAng = c.armAngle;
     note = ' The bench\u2019s linkage on that tab doesn\u2019t assemble, so the arm angle is its measured angle and the shock angle is left as it was.';
   }
-  return { note: `Using the bench's ${name} tab: arm ${inp.armLen} mm, shock ${inp.eye} mm with ${inp.stroke} mm stroke, topping out at ${fmt(inp.topAng, 1)}° with the shock at ${fmt(inp.shockAng, 1)}°.` + note, changed: JSON.stringify(LINKED.map(k => inp[k])) !== before };
+  let what = `with the shock at ${fmt(inp.shockAng, 1)}°`;
+  if (inp.place === 'through') { inp.rocker = keep.rocker; inp.shockAng = keep.shockAng; what = '(this tab keeps its own rocker pivot and shock angle)'; }
+  return { note: `Using the bench's ${name} tab: arm ${inp.armLen} mm, shock ${inp.eye} mm with ${inp.stroke} mm stroke, topping out at ${fmt(inp.topAng, 1)}° ${what}.` + note, changed: JSON.stringify(keys.map(k => inp[k])) !== before };
 }
 let linkNote = '';
 function drawLink() {
@@ -767,9 +806,21 @@ $('pos').oninput = e => { posK = e.target.value / 1000; drawView(); drawChart();
 $('zoomBtn').onclick = () => { zoom = !zoom; save(); draw(); };
 $('ghostBtn').onclick = () => { ghosts = !ghosts; save(); draw(); };
 $('genBtn').onclick = () => { clearTimeout(timer); runGen(); };
-$('resetBtn').onclick = () => { if (!confirm('Put every number on this page back to the default?')) return; inp = clone(DEF); design = null; syncBench(false); renderForms(); runGen(); };
+$('resetBtn').onclick = () => { if (!confirm(`Put the numbers on the ${TABS[active].name} tab back to default?`)) return; inp = clone(TABS[active].def); design = null; syncBench(false); renderForms(); runGen(); };
+function drawTabs() {
+  $('tabs').innerHTML = Object.entries(TABS).map(([k, t]) => `<button type="button" role="tab" data-tab="${k}" aria-pressed="${k === active}" aria-selected="${k === active}"><b>${t.name}</b><span>${t.sub}</span></button>`).join('');
+  $('tabNote').textContent = TABS[active].note;
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-tab]'); if (!b || b.dataset.tab === active) return;
+  save(); active = b.dataset.tab; inp = tabState[active].inp; design = tabState[active].design; gen = null; posK = 0; $('pos').value = 0;
+  const moved = syncBench(false); if (moved) design = null;
+  save(); drawTabs(); renderForms(); renderTune(); drawLink();
+  if (design) { analyseDesign(); draw(); if (!an || !an.res) runGen(); } else runGen();
+});
+drawTabs();
 const benchMoved = syncBench(false);
-renderForms();
+renderForms(); drawLink();
 if (benchMoved) design = null;
 if (design) { renderTune(); analyseDesign(); draw(); if (!an || !an.res) runGen(); } else runGen();
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(() => {});
