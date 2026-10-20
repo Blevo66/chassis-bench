@@ -990,7 +990,7 @@ body { padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-are
     </div>
     <div class="hdr-tools">
       <button type="button" class="primary" id="measureBtn">Measuring mode</button>
-      <span class="note">Version 19 Oct 23:55</span>
+      <span class="note">Version 20 Oct 07:10</span>
       <span class="note" id="saveNote" aria-live="polite"></span>
       <button type="button" id="exportBtn">Back up</button>
       <button type="button" id="importBtn">Restore</button>
@@ -1083,7 +1083,6 @@ body { padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-are
         <div class="sliders">
           <label for="fPos">Front</label><input type="range" id="fPos" min="0" max="1000" value="0"><output id="fOut"></output>
           <label for="rPos">Rear</label><input type="range" id="rPos" min="0" max="1000" value="0"><output id="rOut"></output>
-          <label for="dogPos">Dogbone</label><input type="range" id="dogPos" min="60" max="260" step="0.1" value="145"><output id="dogOut"></output>
         </div>
         <details class="view-opts">
           <summary>View options</summary>
@@ -1458,7 +1457,6 @@ function renderBench() {
   store.set('xl-chassis-v2', JSON.stringify({ frame, tabs, active })); cloudSave();
   F = frameGeom(frame);
   PA = prepare(tabs[active]); PO = { error: 'none' }; // no second tab to compare with any more
-  dogSlider();
   const Wn = $('warnings'); Wn.innerHTML = '';
   const warn = t => { const p = document.createElement('p'); p.className = 'banner'; p.textContent = t; Wn.appendChild(p); };
   if (PA.error) { warn('Rear linkage: ' + PA.error); $('drawing').innerHTML = ''; $('tiles').innerHTML = ''; $('table').innerHTML = '';
@@ -1674,17 +1672,10 @@ function slide(which) {
   pos = { state: null, f: ff * PA.fT, r: rf * PA.rT }; render();
 }
 $('fPos').addEventListener('input', () => slide('f'));
-// Dogbone slider: same number as the Dogbone eye to eye box, so the whole bike updates as it moves. A padlocked dogbone holds it still.
-function dogSlider() {
-  const c = tabs[active], s = $('dogPos'), on = isLocked(c, 'dog');
-  s.max = Math.max(260, Math.ceil(c.dog / 10) * 10 + 20); s.min = Math.min(60, Math.floor(c.dog / 10) * 10 - 20);
-  s.value = c.dog; s.disabled = on; $('dogOut').textContent = `${fmt(c.dog, 1)} mm${on ? ' 🔒' : ''}`;
-}
-$('dogPos').addEventListener('input', () => { if (isLocked(tabs[active], 'dog')) return; $('dog').value = +$('dogPos').value; render(); });
 $('rPos').addEventListener('input', () => slide('r'));
 // Drive the sliders from the finger directly: iOS hands a drag on a range inside a pinned panel to page scrolling,
 // so the range ignores touches (touch-action: none) and we set its value from where the finger is.
-['fPos', 'rPos', 'dogPos'].forEach(id => { const s = $(id);
+['fPos', 'rPos'].forEach(id => { const s = $(id);
   const setFrom = e => { const r = s.getBoundingClientRect(), t = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width));
     const st = +s.step || 1; s.value = +s.min + Math.round(t * (s.max - s.min) / st) * st; s.dispatchEvent(new Event('input', { bubbles: true })); };
   s.addEventListener('pointerdown', e => { if (e.pointerType === 'mouse') return; e.preventDefault(); s.setPointerCapture(e.pointerId); setFrom(e); });
