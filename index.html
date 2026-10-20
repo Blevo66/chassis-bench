@@ -2319,6 +2319,8 @@ function drawMsg() {
     const r = an.res, top = r[0].lr, bot = r[r.length - 1].lr, mean = an.travel / an.stroke, peak = Math.max(...r.map(p => p.lr));
     const prog = (top / bot - 1) * 100, bad = an.travel > inp.travel + 30 || an.travel < inp.travel - 60 || Math.abs(prog - inp.prog) > 30;
     if (peak > 1.6 * mean) m.push(`<b>The ratio shoots up to ${peak.toFixed(1)} near the top of the travel.</b> The shock is nearly in line with the rocker there, so the back would be very soft at first and then very hard. Don't trust the spring and sag numbers for this one.`);
+    const sTA = minShockTrans(r);
+    if (prog > inp.prog + 15 && sTA < inp.minTA + 6) m.push(`<b>Why the rising rate is so high:</b> the shock's bottom eye starts only ${fmt(sTA, 0)}\u00b0 off the line through the rocker pivot, right at the over-centre limit. Near that line the shock barely moves at first, so the leverage starts very high and falls away fast. ${inp.ahead ? 'Keeping both eyes in front of the pivot forces this here, because the shock comes down from in front. Letting the shock eye go behind the pivot (Limits), or the rocker pivot further back and closer to the arm, brings it down.' : 'Moving the rocker pivot further back along the arm, or a different shock angle, brings it down.'}`);
     if (design.hand && bad) m.push(`<b>This has been changed by hand</b> in Fine-tune the rocker, and it now gives ${fmt(an.travel, 0)} mm travel and a ${fmt(prog, 0)}% rising rate against your ${inp.travel} mm most and ${inp.prog}%. Tap Design the linkage to start again from your numbers.`);
   }
   if (design && !design.hand && an && an.res && gen && gen.opts.length) {
