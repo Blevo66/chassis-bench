@@ -1990,7 +1990,9 @@ function setupCtx(p) {
   const rS = dist(S0, R0w), angS = Math.atan2(S0[1] - R0w[1], S0[0] - R0w[0]);
   return { p, th0, R0w, S0, rS, angS, Lext: p.eye, Lbump: p.eye - p.stroke };
 }
-const armY = (pt, th) => rot(pt, -th)[1];
+const armY = (pt, th) => rot(pt, -th)[1], armX = (pt, th) => rot(pt, -th)[0];
+// Travel is a ceiling: going over costs a lot, falling short a little, so it still uses what you allow
+const travelOK = (t, max) => t <= max + 5 && t >= max - 25;
 // Quick sweep from full extension to the bump stop. Returns null if the design breaks a limit.
 // While the grid search runs, count which limit rules each rocker out, so the page can say what is stopping it
 let WHY = null;
@@ -2004,6 +2006,8 @@ function quick(ctx, rD, phi, step) {
   if (dist(D0, ctx.S0) > p.maxRocker || rD > p.maxRocker) return no('tooBig');
   // Under the arm and through the arm both keep the dogbone eye down by the pivot, under the arm; through the arm points the shock eye up through it (a shark's tooth)
   if ((p.place === 'under' || p.place === 'through') && armY(D0, ctx.th0) > p.rocker[1] + 5) return no('place');
+  // Both eyes stay forward of the rocker pivot, towards the swingarm pivot, not back towards the axle
+  if (p.ahead && armX(D0, ctx.th0) > p.rocker[0]) return no('behind');
   const incl = ctx.angS - phi, minS = Math.sin(p.minTA * D2R);
   // The shock side can go over centre too: the shock's line passing through the rocker pivot
   const shockS = (R, S, L) => Math.abs(((R[0]-S[0])*(T[1]-S[1]) - (R[1]-S[1])*(T[0]-S[0])) / (ctx.rS * L));
@@ -2020,7 +2024,8 @@ function quick(ctx, rD, phi, step) {
     minTA = Math.min(minTA, Math.asin(Math.min(1, s)) / D2R);
     const ang = Math.atan2(D[1]-R[1], D[0]-R[0]) + incl, S = [R[0] + ctx.rS*Math.cos(ang), R[1] + ctx.rS*Math.sin(ang)];
     const L = dist(T, S), w = rot([p.armLen, 0], th)[1] - ay0;
-    if (L >= prevL) return no('lengthens'); // shock must keep compressing
+    if (L >= prevL) return no('lengthens');
+    if (p.ahead && (armX(D, th) > p.rocker[0] || armX(S, th) > p.rocker[0])) return no('behind'); // shock must keep compressing
     const s2 = shockS(R, S, L);
     if (s2 < minS) return no('shockAngle');
     minTS = Math.min(minTS, Math.asin(Math.min(1, s2)) / D2R);
@@ -2040,9 +2045,9 @@ function quick(ctx, rD, phi, step) {
 }
 function costOf(q, p) {
   if (!q) return Infinity;
-  const e1 = (q.travel - p.travel) / p.travel, e2 = (q.prog - p.prog) / 100;
+  const e1 = Math.max(0, q.travel - p.travel) / p.travel, e0 = Math.max(0, p.travel - q.travel) / p.travel, e2 = (q.prog - p.prog) / 100;
   const span = Math.max(q.rD, q.rS || 0, q.eyes || 0);
-  return 4*e1*e1 + e2*e2 + 2e-4 * (span / 50) ** 2 + 0.6 * Math.max(0, (55 - Math.min(q.minTA, q.minTS ?? 90)) / 55) ** 2; // stay well clear of over centre
+  return 4*e1*e1 + 0.8*e0*e0 + e2*e2 + 2e-4 * (span / 50) ** 2 + 0.6 * Math.max(0, (55 - Math.min(q.minTA, q.minTS ?? 90)) / 55) ** 2; // stay well clear of over centre
 }
 function generate(p, maxSeeds = 10) {
   const ctx = setupCtx(p), out = { ctx, opts: [] };
@@ -2051,6 +2056,7 @@ function generate(p, maxSeeds = 10) {
   if (ctx.rS > p.maxRocker) { out.why = { rSbig: 1 }; out.error = `With the shock at that angle its bottom eye sits ${ctx.rS.toFixed(0)} mm from the rocker pivot, more than the biggest rocker you allowed (${p.maxRocker} mm). Change the shock angle or length, or allow a bigger rocker.`; return out; }
   if (ctx.rS < (p.pivotBoss + p.eyeBoss) / 2 + 2) { out.why = { rSsmall: 1 }; out.error = `With the shock at that angle its bottom eye lands ${ctx.rS.toFixed(0)} mm from the rocker pivot, too close for the two bosses to fit. Change the shock angle or length.`; return out; }
   if (p.place === 'under' && armY(ctx.S0, ctx.th0) > p.rocker[1] + 5) { out.why = { placeS: 1 }; out.error = `With the shock at that angle and length its bottom eye sits above the rocker pivot, so the rocker can't hang under the arm. Try a longer shock or a different angle, or use the Through the arm tab.`; return out; }
+  if (p.ahead && armX(ctx.S0, ctx.th0) > p.rocker[0]) { out.why = { shockBehind: 1 }; out.error = `With the shock at that angle and length its bottom eye lands ${fmtN(armX(ctx.S0, ctx.th0) - p.rocker[0])} mm behind the rocker pivot, towards the axle, and you want both eyes in front of it. Try a different shock angle or length, or move the rocker pivot further back along the arm.`; return out; }
   if (p.place === 'through' && armY(ctx.S0, ctx.th0) < p.throughClear) { out.why = { throughLow: 1 }; out.error = `With the shock at that angle and length its bottom eye lands ${fmtN(-armY(ctx.S0, ctx.th0) + p.throughClear)} mm too low to sit above the arm's centreline. Try a shorter shock or a different angle.`; return out; }
   { const T = p.shockTop, R = ctx.R0w, S = ctx.S0, a = Math.asin(Math.min(1, Math.abs(((R[0]-S[0])*(T[1]-S[1]) - (R[1]-S[1])*(T[0]-S[0])) / (ctx.rS * p.eye)))) / D2R;
     if (a < p.minTA) { out.why = { shockStart: 1 }; out.error = `With the shock at that angle and length, its line passes only ${a.toFixed(0)}° from the rocker at full extension, so the shock side of the rocker starts close to over centre (you allowed ${p.minTA}°). Change the shock angle or length, or the rocker's pivot to shock eye length.`; return out; } }
@@ -2098,7 +2104,7 @@ const DEF = {
   armLen: 630, topAng: 15, rocker: [180, -20], shockTop: [-80, 300], dogMount: [38, -66],
   lenMode: 'fixed', eye: 450, eyeMin: 380, eyeMax: 480, stroke: 75, shockAng: 24,
   angMode: 'fixed', angMin: 15, angMax: 40,
-  travel: 280, prog: 40, maxRocker: 120, dogMin: 60, dogMax: 260, place: 'under', throughClear: 0, minTA: 40,
+  travel: 280, prog: 40, maxRocker: 120, dogMin: 60, dogMax: 260, place: 'under', throughClear: 0, minTA: 40, ahead: true,
   offset: 10, pivotHole: 22, pivotBoss: 36, pivotWidth: 30, eyeHole: 12, eyeBoss: 28, eyeWidth: 22, plate: 10,
   dogHole: 12, dogBoss: 26, dogThick: 16, locks: [],
   rDMode: 'find', rDFix: 50, rSMode: 'find', rSFix: 80,
@@ -2156,7 +2162,7 @@ const FORMS = [
     { k: 'angMin', label: 'Least lean to try (bottom eye behind top)', unit: '°', when: () => inp.rSMode !== 'fixed' && inp.angMode === 'find' },
     { k: 'angMax', label: 'Most lean to try', unit: '°', when: () => inp.rSMode !== 'fixed' && inp.angMode === 'find' } ] },
   { title: 'What you want', open: true, fields: [
-    { k: 'travel', label: 'Rear wheel travel', unit: 'mm' },
+    { k: 'travel', label: 'Most rear wheel travel', unit: 'mm', hint: 'The most you want. It gets as close as it can without going over.' },
     { k: 'prog', label: 'Rising rate', unit: '%', hint: 'How much stiffer the end of the travel is than the start. 0 is linear; modern motocross bikes are roughly 30 to 50.' } ] },
   { title: 'Rocker arms', open: true, fields: [
     { k: 'rSMode', label: 'Rocker pivot to shock eye', choice: [['find', 'Find it for me'], ['fixed', 'I know it']], hint: 'If you set this, it works out the shock angle to suit, so the shock angle boxes are hidden.' },
@@ -2177,6 +2183,7 @@ const FORMS = [
     { k: 'dogMin', label: 'Shortest dogbone', unit: 'mm' },
     { k: 'dogMax', label: 'Longest dogbone', unit: 'mm' },
     { k: 'minTA', label: 'Smallest angle at the rocker eyes', unit: '°', hint: 'Between the dogbone and the rocker, and between the shock and the rocker. Keeps both sides away from going over centre. 40° is the least it allows by default, and it aims for 55° or more.' },
+    { k: 'ahead', label: 'Both rocker eyes in front of its pivot', choice: [[true, 'Yes, towards the swingarm pivot'], [false, 'Anywhere']], hint: 'Keeps the shock and dogbone eyes forward of the rocker pivot all through the travel, never back towards the axle.' },
     { k: 'place', label: 'Rocker hangs under the arm', choice: [['under', 'Yes, keep the eyes below its pivot'], ['any', 'Anywhere']], when: () => inp.place !== 'through' },
     { k: 'throughClear', label: 'Shock eye above the arm centreline by at least', unit: 'mm', when: () => inp.place === 'through' } ] }
 ];
@@ -2310,17 +2317,18 @@ function drawMsg() {
   if (design && an && an.res) {
     // Check the linkage it actually drew, whatever made it: the generator, a hand tweak or a flip
     const r = an.res, top = r[0].lr, bot = r[r.length - 1].lr, mean = an.travel / an.stroke, peak = Math.max(...r.map(p => p.lr));
-    const prog = (top / bot - 1) * 100, bad = Math.abs(an.travel - inp.travel) > 30 || Math.abs(prog - inp.prog) > 30;
+    const prog = (top / bot - 1) * 100, bad = an.travel > inp.travel + 30 || an.travel < inp.travel - 60 || Math.abs(prog - inp.prog) > 30;
     if (peak > 1.6 * mean) m.push(`<b>The ratio shoots up to ${peak.toFixed(1)} near the top of the travel.</b> The shock is nearly in line with the rocker there, so the back would be very soft at first and then very hard. Don't trust the spring and sag numbers for this one.`);
-    if (design.hand && bad) m.push(`<b>This has been changed by hand</b> in Fine-tune the rocker, and it now gives ${fmt(an.travel, 0)} mm travel and a ${fmt(prog, 0)}% rising rate instead of the ${inp.travel} mm and ${inp.prog}% you asked for. Tap Design the linkage to start again from your numbers.`);
+    if (design.hand && bad) m.push(`<b>This has been changed by hand</b> in Fine-tune the rocker, and it now gives ${fmt(an.travel, 0)} mm travel and a ${fmt(prog, 0)}% rising rate against your ${inp.travel} mm most and ${inp.prog}%. Tap Design the linkage to start again from your numbers.`);
   }
   if (design && !design.hand && an && an.res && gen && gen.opts.length) {
     const q = gen.opts[design.pick ?? 0]?.q;
     const off = [];
-    if (q && Math.abs(q.travel - inp.travel) > 5) off.push(`${fmt(q.travel, 0)} mm travel instead of ${inp.travel}`);
+    if (q && q.travel > inp.travel + 5) off.push(`${fmt(q.travel, 0)} mm travel, more than your ${inp.travel} mm most`);
+    else if (q && q.travel < inp.travel - 25) off.push(`only ${fmt(q.travel, 0)} mm travel against your ${inp.travel} mm most`);
     if (q && Math.abs(q.prog - inp.prog) > 5) off.push(`a ${fmt(q.prog, 0)}% rising rate instead of ${inp.prog}%`);
     const tip = q.travel > inp.travel + 5 ? 'The rocker is giving too much leverage. A shorter stroke, or the rocker pivot further back along the arm, would bring the travel down.'
-      : q.travel < inp.travel - 5 ? 'A longer stroke, a bigger rocker, or the rocker pivot further forward would give more travel.' : 'A different shock length or angle may get closer.';
+      : q.travel < inp.travel - 25 ? 'A longer stroke, a bigger rocker, or the rocker pivot further forward would give more travel.' : 'A different shock length or angle may get closer.';
     if (off.length) m.push(`<b>This isn't what you asked for.</b> The closest it can get with these mounts and this shock is ${off.join(' and ')}. ${tip}${inp.angMode === 'fixed' && inp.rSMode !== 'fixed' ? ' Setting the shock angle to Find it for me may also help.' : ''}`);
   }
   $('msg').innerHTML = m.map(t => `<div class="tip">${t}</div>`).join('');
@@ -2334,12 +2342,13 @@ const WHY_TEXT = {
   place: 'the dogbone eye would sit above the rocker pivot instead of under the arm', noAssemble: 'the dogbone can\u2019t reach the rocker somewhere in the travel',
   dogAngle: 'the dogbone side gets too close to over centre', shockAngle: 'the shock side gets too close to over centre',
   lengthens: 'the shock would get longer as the wheel rises', deadSpot: 'a dead spot: the ratio spikes somewhere in the travel',
-  noBump: 'it runs out of movement before the shock uses its stroke',
+  noBump: 'it runs out of movement before the shock uses its stroke', behind: 'a rocker eye would go behind its pivot, towards the axle',
+  shockBehind: 'the shock\u2019s bottom eye lands behind the rocker pivot',
   reach: 'the shock can\u2019t reach a rocker that size from the shock top', rSbig: 'the shock\u2019s bottom eye lands further from the rocker pivot than your biggest rocker',
   rSsmall: 'the shock\u2019s bottom eye lands too close to the rocker pivot', placeS: 'the shock\u2019s bottom eye lands above the rocker pivot',
   throughLow: 'the shock\u2019s bottom eye lands too low to clear the arm\u2019s centreline', shockStart: 'the shock starts nearly in line with the rocker (over centre)'
 };
-const PRE = ['reach', 'rSbig', 'rSsmall', 'placeS', 'throughLow', 'shockStart'];
+const PRE = ['reach', 'rSbig', 'rSsmall', 'placeS', 'throughLow', 'shockStart', 'shockBehind'];
 // Things worth trying: ease each limit, nudge each input. Each one is a full search, so they run one at a time.
 function whatIfs() {
   const v = [], r = inp.rocker, upDown = y => `${Math.abs(y)} mm ${y < 0 ? 'below' : 'above'} the arm`;
@@ -2353,6 +2362,8 @@ function whatIfs() {
   v.push(['Rocker pivot closer to the arm', upDown(r[1] + 15), { rocker: [r[0], r[1] + 15] }]);
   v.push(['Longer stroke', `${inp.stroke + 10} mm`, { stroke: inp.stroke + 10 }]);
   v.push(['Shorter stroke', `${inp.stroke - 10} mm`, { stroke: inp.stroke - 10 }]);
+  if (inp.lenMode === 'find') v.push(['Try a wider range of shock lengths', `${inp.eyeMin - 60} to ${inp.eyeMax + 60} mm`, { eyeMin: inp.eyeMin - 60, eyeMax: inp.eyeMax + 60 }]);
+  if (inp.angMode === 'find' && inp.rSMode !== 'fixed') v.push(['Try a wider range of shock angles', `${Math.max(0, inp.angMin - 10)} to ${inp.angMax + 15}\u00b0`, { angMin: Math.max(0, inp.angMin - 10), angMax: inp.angMax + 15 }]);
   if (inp.lenMode === 'fixed' && inp.rSMode !== 'fixed') v.push(['Let it find the shock length', `${inp.eye - 60} to ${inp.eye + 60} mm`, { lenMode: 'find', eyeMin: inp.eye - 60, eyeMax: inp.eye + 60 }]);
   if (inp.angMode === 'fixed' && inp.rSMode !== 'fixed') v.push(['Let it find the shock angle', '0 to 45\u00b0', { angMode: 'find', angMin: 0, angMax: 45 }]);
   if (inp.rSMode === 'fixed') v.push(['Let it find the pivot to shock eye length', '', { rSMode: 'find' }]);
@@ -2370,7 +2381,7 @@ function whyReasons(w) {
   if (tot) h += `<p>Of the rocker shapes it tried, the most common reasons one was thrown out:</p><ul>${top.map(([k, n]) => `<li>${WHY_TEXT[k]} (${Math.round(n / tot * 100)}%)</li>`).join('')}</ul>`;
   return h;
 }
-const offTarget = () => !gen || !gen.opts.length || (() => { const q = gen.opts[0].q; return Math.abs(q.travel - inp.travel) > 5 || Math.abs(q.prog - inp.prog) > 5; })();
+const offTarget = () => !gen || !gen.opts.length || (() => { const q = gen.opts[0].q; return !travelOK(q.travel, inp.travel) || Math.abs(q.prog - inp.prog) > 5; })();
 function drawWhy() {
   const el = $('why'); if (!el) return;
   if (!gen || (design && design.hand) || !offTarget()) { el.innerHTML = ''; return; }
@@ -2379,7 +2390,7 @@ function drawWhy() {
   if (whyOut.running) h += `<p class="small">Trying changes, ${whyOut.done} of ${whyOut.total}\u2026</p>`;
   const ok = whyOut.rows.filter(r => r.q).sort((a, b) => a.q.cost - b.q.cost), base = gen.opts.length ? gen.opts[0].q.cost : Infinity;
   const better = ok.filter(r => r.q.cost < base * 0.9);
-  if (better.length) h += `<p>${base === Infinity ? 'Changes that give a working linkage' : 'Changes that get it closer'}, one at a time:</p><ul>${better.slice(0, 5).map(r => { const hit = Math.abs(r.q.travel - inp.travel) <= 5 && Math.abs(r.q.prog - inp.prog) <= 5;
+  if (better.length) h += `<p>${base === Infinity ? 'Changes that give a working linkage' : 'Changes that get it closer'}, one at a time:</p><ul>${better.slice(0, 5).map(r => { const hit = travelOK(r.q.travel, inp.travel) && Math.abs(r.q.prog - inp.prog) <= 5;
     return `<li><b>${r.name}</b>${r.val ? ` (${r.val})` : ''}: ${fmt(r.q.travel, 0)} mm travel, ${fmt(r.q.prog, 0)}% rising rate${hit ? ' <span class="good">does it</span>' : ''}</li>`; }).join('')}</ul>`;
   else if (!whyOut.running) h += `<p>None of the single changes it tried gets closer. It may need two things changed at once, most likely the rocker pivot's position along the arm together with the stroke.</p>`;
   el.innerHTML = h + '</div>';
