@@ -2061,7 +2061,7 @@ function generate(p, maxSeeds = 10) {
   { const T = p.shockTop, R = ctx.R0w, S = ctx.S0, a = Math.asin(Math.min(1, Math.abs(((R[0]-S[0])*(T[1]-S[1]) - (R[1]-S[1])*(T[0]-S[0])) / (ctx.rS * p.eye)))) / D2R;
     if (a < p.minTA) { out.why = { shockStart: 1 }; out.error = `With the shock at that angle and length, its line passes only ${a.toFixed(0)}° from the rocker at full extension, so the shock side of the rocker starts close to over centre (you allowed ${p.minTA}°). Change the shock angle or length, or the rocker's pivot to shock eye length.`; return out; } }
   const rMin = (p.pivotBoss + p.eyeBoss) / 2 + 2, cands = [];
-  const rDs = p.rDMode === 'fixed' ? [p.rDFix] : []; if (!rDs.length) for (let r = rMin; r <= p.maxRocker; r += 4) rDs.push(r);
+  const rDs = p.rDMode === 'fixed' ? [p.rDFix] : []; if (!rDs.length) for (let r = rMin; r <= p.maxRocker; r += Math.max(4, (p.maxRocker - rMin) / 30)) rDs.push(r);
   WHY = out.why = {};
   for (const rD of rDs)
     for (let ph = 0; ph < 360; ph += 4) { const q = quick(ctx, rD, ph * D2R, 1.5 * D2R), c = costOf(q, p); if (c < Infinity) cands.push([c, rD, ph * D2R]); }
@@ -2115,7 +2115,12 @@ const DEF = {
 const DEF_THROUGH = Object.assign(clone(DEF), { eye: 400, lenMode: 'find', eyeMin: 340, eyeMax: 440, angMode: 'find', angMin: 15, angMax: 40, place: 'through' });
 // Joel dropped the Under the arm (CRF style) tab on 19 Oct; the through-the-arm shark's tooth is the plan
 const TABS = { through: { name: 'Through the arm', sub: 'Shark\u2019s tooth rocker, shock eye above the centreline', def: DEF_THROUGH,
-    note: 'The rocker pivots under the swingarm with the dogbone, and points up through the arm like a shark\u2019s tooth, so the shock\u2019s bottom eye sits above the arm\u2019s centreline like an early Pro-Link. Check the shock and rocker clear the arm\u2019s cross-member.' } };
+    note: 'The rocker pivots under the swingarm with the dogbone, and points up through the arm like a shark\u2019s tooth, so the shock\u2019s bottom eye sits above the arm\u2019s centreline like an early Pro-Link. Check the shock and rocker clear the arm\u2019s cross-member.' },
+  // Same numbers as Through the arm, but the Limits are ignored, to show the rocker it would pick if nothing held it back
+  perfect: { name: 'Perfect rocker', sub: 'Your numbers, no limits', def: DEF_THROUGH,
+    note: 'Uses the same numbers as Through the arm (change them on either tab) but ignores everything under Limits, including keeping the eyes in front of the pivot, so you can see the ideal rocker. It still won\u2019t go over centre or have a dead spot.' } };
+// What the Perfect rocker tab searches with: the Limits opened right up, the layout and your shock left as they are
+const unlimited = p => Object.assign({}, p, { maxRocker: 300, dogMin: 20, dogMax: 600, minTA: 30, ahead: false, throughClear: Math.min(p.throughClear, 0) });
 const root = document.getElementById('rk'), $ = id => document.getElementById('rk-' + id);
 const store = { get() { try { return JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { return null; } }, set(v) { try { localStorage.setItem(KEY, JSON.stringify(v)); } catch (e) {} } };
 let saved, tabState, active, inp, design, zoom, ghosts;
@@ -2131,6 +2136,7 @@ Object.keys(TABS).forEach(t => {
   if (t === 'through') { i.place = 'through'; if (!i.v3) { i.rocker = clone(DEF_THROUGH.rocker); ['lenMode', 'eyeMin', 'eyeMax'].forEach(k => i[k] = DEF_THROUGH[k]); i.v3 = true; } } // the first version wrongly put this rocker on top of the arm
   tabState[t] = { inp: i, design: old.design || null };
 });
+tabState.perfect.inp = tabState.through.inp; // one set of numbers for both
 active = saved.active in TABS ? saved.active : 'through';
 inp = tabState[active].inp; design = tabState[active].design; zoom = saved.zoom !== false; ghosts = saved.ghosts !== false;
 }
@@ -2217,7 +2223,7 @@ function fieldHTML(f, obj, scope) {
   return `<div class="field${on ? ' locked' : ''}"><span class="lab lockrow"><span>${f.label}${f.hint ? `<small>${f.hint}</small>` : ''}</span>${lock}</span>${rows}</div>`;
 }
 function renderForms() {
-  $('forms').innerHTML = FORMS.map(s => `<details class="card"${s.open ? ' open' : ''}><summary>${s.title}</summary><div class="in">${s.fields.filter(f => !f.when || f.when()).map(f => fieldHTML(f, inp, 'inp')).join('')}<div id="rk-note-${s.title.replace(/\W/g, '')}"></div></div></details>`).join('');
+  $('forms').innerHTML = FORMS.filter(s => !(active === 'perfect' && s.title === 'Limits')).map(s => `<details class="card"${s.open ? ' open' : ''}><summary>${s.title}</summary><div class="in">${s.fields.filter(f => !f.when || f.when()).map(f => fieldHTML(f, inp, 'inp')).join('')}<div id="rk-note-${s.title.replace(/\W/g, '')}"></div></div></details>`).join('');
   $('printForm').innerHTML = PRINT.map(f => fieldHTML(f, inp, 'inp')).join('');
 }
 function renderTune() { $('tune').innerHTML = design ? TUNE.map(f => fieldHTML(f, design, 'des')).join('') : '<p class="small">Design the linkage first.</p>'; }
@@ -2290,8 +2296,9 @@ function search(p) {
   if (err && p.angMode === 'fixed' && p.rSMode !== 'fixed') err += ' Setting the shock angle to Find it for me usually sorts this.';
   return { picks, err, why };
 }
+const searchTab = p => search(active === 'perfect' ? unlimited(p) : p);
 function runGen() {
-  const r = search(inp);
+  const r = searchTab(inp);
   gen = { opts: r.picks, error: r.err, why: r.why }; whyOut = null; whyRun++;
   const picks = r.picks;
   if (picks.length) { design = toDesign(picks[0].q, picks[0].ctx); design.pick = 0; }
@@ -2354,10 +2361,12 @@ const PRE = ['reach', 'rSbig', 'rSsmall', 'placeS', 'throughLow', 'shockStart', 
 // Things worth trying: ease each limit, nudge each input. Each one is a full search, so they run one at a time.
 function whatIfs() {
   const v = [], r = inp.rocker, upDown = y => `${Math.abs(y)} mm ${y < 0 ? 'below' : 'above'} the arm`;
+  if (active !== 'perfect') { // the Perfect rocker tab has no limits to ease
   v.push(['Allow a bigger rocker', `${Math.round(inp.maxRocker * 1.5)} mm`, { maxRocker: Math.round(inp.maxRocker * 1.5) }]);
   v.push(['Allow a wider dogbone range', `${Math.max(20, inp.dogMin - 30)} to ${inp.dogMax + 80} mm`, { dogMin: Math.max(20, inp.dogMin - 30), dogMax: inp.dogMax + 80 }]);
   v.push(['Allow it closer to over centre', `${inp.minTA - 10}\u00b0`, { minTA: inp.minTA - 10 }]);
   if (inp.place === 'through') v.push(['Let the shock eye sit lower', inp.throughClear - 15 < 0 ? `${15 - inp.throughClear} mm below the centreline` : `${inp.throughClear - 15} mm above the centreline`, { throughClear: inp.throughClear - 15 }]);
+  }
   v.push(['Rocker pivot further back along the arm', `${r[0] + 30} mm along`, { rocker: [r[0] + 30, r[1]] }]);
   v.push(['Rocker pivot further forward', `${r[0] - 30} mm along`, { rocker: [r[0] - 30, r[1]] }]);
   v.push(['Rocker pivot further below the arm', upDown(r[1] - 15), { rocker: [r[0], r[1] - 15] }]);
@@ -2404,7 +2413,7 @@ function runWhy() {
     if (id !== whyRun) return; // the numbers changed, so this run is stale
     if (i >= list.length) { whyOut.running = false; drawWhy(); return; }
     const [name, val, change] = list[i], p = Object.assign(clone(inp), change);
-    let q = null; try { const r = search(p); if (r.picks.length) { q = r.picks[0].q; q.cost = costOf(q, inp); } } catch (e) {}
+    let q = null; try { const r = searchTab(p); if (r.picks.length) { q = r.picks[0].q; q.cost = costOf(q, inp); } } catch (e) {}
     whyOut.rows.push({ name, val, q }); whyOut.done = i + 1; drawWhy();
     setTimeout(() => step(i + 1), 0);
   };
@@ -2691,7 +2700,7 @@ $('pos').oninput = e => { posK = e.target.value / 1000; drawView(); drawChart();
 $('zoomBtn').onclick = () => { zoom = !zoom; save(); draw(); };
 $('ghostBtn').onclick = () => { ghosts = !ghosts; save(); draw(); };
 $('genBtn').onclick = () => { clearTimeout(timer); runGen(); };
-const resetTab = () => { if (!confirm(`Put every number on the ${TABS[active].name} tab back to its default? Padlocked numbers on this tab get reset too. The rest of the bench isn't touched.`)) return; inp = clone(TABS[active].def); design = null; renderForms(); runGen(); };
+const resetTab = () => { if (!confirm(`Put every number on the ${TABS[active].name} tab back to its default?${active === 'through' || active === 'perfect' ? ' The Through the arm and Perfect rocker tabs share their numbers, so both change.' : ''} Padlocked numbers get reset too. The rest of the bench isn't touched.`)) return; inp = clone(TABS[active].def); design = null; if (active === 'through' || active === 'perfect') tabState.through.inp = tabState.perfect.inp = inp; renderForms(); runGen(); };
 function drawTabs() {
   $('tabs').hidden = Object.keys(TABS).length < 2;
   $('tabs').innerHTML = Object.entries(TABS).map(([k, t]) => `<button type="button" role="tab" data-rtab="${k}" aria-pressed="${k === active}" aria-selected="${k === active}"><b>${t.name}</b><span>${t.sub}</span></button>`).join('');
