@@ -2260,6 +2260,7 @@ root.addEventListener('click', e => {
 
 // ---------- Design ----------
 let gen = null, an = null, timer = null, whyOut = null, whyRun = 0;
+let tried = null; // after a Try it: your own numbers and the list, so the list stays and you can flip between them
 function scheduleGen() { clearTimeout(timer); timer = setTimeout(runGen, 450); }
 function benchG(d) {
   // Start the bench solver a hair above full extension, so it finds the top-out crossing whichever way rounding falls
@@ -2299,14 +2300,15 @@ function search(p) {
   if (err && p.angMode === 'fixed' && p.rSMode !== 'fixed') err += ' Setting the shock angle to Find it for me usually sorts this.';
   return { picks, err, why };
 }
-function runGen() {
+function runGen(keepTried) {
+  if (!keepTried) tried = null;
   const r = search(inp);
-  gen = { opts: r.picks, error: r.err, why: r.why }; whyOut = null; whyRun++;
+  gen = { opts: r.picks, error: r.err, why: r.why }; whyOut = tried ? tried.out : null; whyRun++;
   const picks = r.picks;
   if (picks.length) { design = toDesign(picks[0].q, picks[0].ctx); design.pick = 0; }
   else design = null;
   save(); renderTune(); analyseDesign(); draw();
-  if (offTarget()) runWhy();
+  if (!tried && offTarget()) runWhy();
 }
 function analyseDesign() { an = design ? analyse(benchG(design)) : null; }
 
@@ -2398,13 +2400,14 @@ const offTarget = () => !gen || !gen.opts.length || (() => { const q = gen.opts[
 const hits = q => travelOK(q.travel, inp.travel) && Math.abs(q.prog - inp.prog) <= 5;
 function drawWhy() {
   const el = $('why'); if (!el) return;
-  if (!gen || (design && design.hand) || !offTarget()) { el.innerHTML = ''; return; }
+  if (!gen || (design && design.hand) || (!tried && !offTarget())) { el.innerHTML = ''; return; }
   if (!whyOut) { el.innerHTML = `<button type="button" id="rk-whyBtn">What can I change to get what I asked for?</button>`; return; }
-  const base = gen.opts.length ? gen.opts[0].q.cost : Infinity;
+  const base = tried ? tried.cost : gen.opts.length ? gen.opts[0].q.cost : Infinity;
   let h = `<div class="why"><h3>What you can change to get what you asked for</h3>`;
   const ok = whyOut.rows.filter(r => r.q).sort((a, b) => (hits(b.q) - hits(a.q)) || a.q.cost - b.q.cost), better = ok.filter(r => r.q.cost < base * 0.9);
-  if (better.length) h += `<p>${better.some(r => hits(r.q)) ? 'These get you there' : base === Infinity ? 'These give a working linkage' : 'These get it closer'}, best first. Tap Try it to put the change in:</p><ul>${better.slice(0, 6).map(r =>
-    `<li><b>${r.name}</b>${r.val ? ` (${r.val})` : ''}: ${fmt(r.q.travel, 0)} mm travel, ${fmt(r.q.prog, 0)}% rising rate${hits(r.q) ? ' <span class="good">does it</span>' : ''}<button type="button" data-rktry="${whyOut.rows.indexOf(r)}">Try it</button></li>`).join('')}</ul>`;
+  if (better.length) h += `<p>${better.some(r => hits(r.q)) ? 'These get you there' : base === Infinity ? 'These give a working linkage' : 'These get it closer'}, best first. Tap Try it to put the change in${tried ? ', or another to swap to that one instead' : ''}:</p><ul>${better.slice(0, 6).map(r =>
+    `<li><b>${r.name}</b>${r.val ? ` (${r.val})` : ''}: ${fmt(r.q.travel, 0)} mm travel, ${fmt(r.q.prog, 0)}% rising rate${hits(r.q) ? ' <span class="good">does it</span>' : ''}${tried && tried.pick === whyOut.rows.indexOf(r) ? ' <b class="good">\u2190 using this</b>' : `<button type="button" data-rktry="${whyOut.rows.indexOf(r)}">Try it</button>`}</li>`).join('')}</ul>`;
+  if (tried) h += `<button type="button" id="rk-untry">Back to my numbers</button>`;
   else if (!whyOut.running) h += `<p>None of the changes it tried, alone or two at a time, gets closer. Your travel and rising rate may not go together with this shock and pivot spot: try asking for a different rising rate, or a different stroke.</p>`;
   if (whyOut.running) h += `<p class="small">Trying changes, ${whyOut.done} of ${whyOut.total}\u2026</p>`;
   h += `<details><summary class="small">Why it can\u2019t do it as it is</summary>${whyReasons(gen.why)}</details>`;
@@ -2436,7 +2439,11 @@ function runWhy() {
   setTimeout(() => step(0), 30);
 }
 root.addEventListener('click', e => { if (e.target.closest('#rk-whyBtn')) runWhy();
-  const t = e.target.closest('[data-rktry]'); if (t && whyOut) { const r = whyOut.rows[+t.dataset.rktry]; if (r) { Object.assign(inp, clone(r.change)); renderForms(); runGen(); } } });
+  // Each Try it starts from your own numbers, so trying another one swaps rather than stacks
+  const setInp = o => { Object.keys(inp).forEach(k => delete inp[k]); Object.assign(inp, clone(o)); };
+  const t = e.target.closest('[data-rktry]'); if (t && whyOut) { const i = +t.dataset.rktry, r = whyOut.rows[i];
+    if (r) { if (!tried) tried = { base: clone(inp), out: whyOut, cost: gen && gen.opts.length ? gen.opts[0].q.cost : Infinity }; tried.pick = i; setInp(Object.assign(clone(tried.base), clone(r.change))); renderForms(); runGen(true); } }
+  if (e.target.closest('#rk-untry') && tried) { setInp(tried.base); tried = null; renderForms(); runGen(); } });
 function bounds(pts) { const xs = pts.map(p => p[0]), ys = pts.map(p => p[1]); return [Math.min(...xs), Math.max(...xs), Math.min(...ys), Math.max(...ys)]; }
 function drawView() {
   const res = an && an.res, p = poseAt(posK), sh = (a, b) => `M${a[0]},${-a[1]} L${b[0]},${-b[1]}`;
