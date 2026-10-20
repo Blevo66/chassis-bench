@@ -2008,6 +2008,12 @@ function quick(ctx, rD, phi, step) {
   if ((p.place === 'under' || p.place === 'through') && armY(D0, ctx.th0) > p.rocker[1] + 5) return no('place');
   // Both eyes stay forward of the rocker pivot, towards the swingarm pivot, not back towards the axle
   if (p.ahead && armX(D0, ctx.th0) > p.rocker[0]) return no('behind');
+  if (p.tooth) {
+    // A shark's tooth: the pivot and dogbone eye make the base, and the shock eye is the tip, standing up over that base rather than off to one side
+    const R = ctx.R0w, b = [D0[0] - R[0], D0[1] - R[1]], v = [ctx.S0[0] - R[0], ctx.S0[1] - R[1]];
+    const h = Math.abs(b[0] * v[1] - b[1] * v[0]) / rD, t = (b[0] * v[0] + b[1] * v[1]) / (rD * rD);
+    if (h < 0.8 * rD || t < -0.25 || t > 1.25) return no('notTooth');
+  }
   const incl = ctx.angS - phi, minS = Math.sin(p.minTA * D2R);
   // The shock side can go over centre too: the shock's line passing through the rocker pivot
   const shockS = (R, S, L) => Math.abs(((R[0]-S[0])*(T[1]-S[1]) - (R[1]-S[1])*(T[0]-S[0])) / (ctx.rS * L));
@@ -2118,9 +2124,9 @@ const TABS = { through: { name: 'Through the arm', sub: 'Shark\u2019s tooth rock
     note: 'The rocker pivots under the swingarm with the dogbone, and points up through the arm like a shark\u2019s tooth, so the shock\u2019s bottom eye sits above the arm\u2019s centreline like an early Pro-Link. Check the shock and rocker clear the arm\u2019s cross-member.' },
   // Same numbers as Through the arm, but the Limits are ignored, to show the rocker it would pick if nothing held it back
   perfect: { name: 'Perfect rocker', sub: 'Your numbers, no limits', def: DEF_THROUGH,
-    note: 'Uses the same numbers as Through the arm (change them on either tab) but ignores everything under Limits, including keeping the eyes in front of the pivot, so you can see the ideal rocker. It still won\u2019t go over centre or have a dead spot.' } };
+    note: 'Uses the same numbers as Through the arm (change them on either tab) but ignores everything under Limits, including keeping the eyes in front of the pivot, so you can see the ideal rocker. It keeps it a proper shark\u2019s tooth, with the shock eye standing up over the pivot and dogbone eye, and it still won\u2019t go over centre or have a dead spot.' } };
 // What the Perfect rocker tab searches with: the Limits opened right up, the layout and your shock left as they are
-const unlimited = p => Object.assign({}, p, { maxRocker: 300, dogMin: 20, dogMax: 600, minTA: 30, ahead: false, throughClear: Math.min(p.throughClear, 0) });
+const unlimited = p => Object.assign({}, p, { maxRocker: 300, dogMin: 20, dogMax: 600, minTA: 30, ahead: false, tooth: true, throughClear: Math.min(p.throughClear, 0) });
 const root = document.getElementById('rk'), $ = id => document.getElementById('rk-' + id);
 const store = { get() { try { return JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { return null; } }, set(v) { try { localStorage.setItem(KEY, JSON.stringify(v)); } catch (e) {} } };
 let saved, tabState, active, inp, design, zoom, ghosts;
@@ -2351,7 +2357,7 @@ const WHY_TEXT = {
   place: 'the dogbone eye would sit above the rocker pivot instead of under the arm', noAssemble: 'the dogbone can\u2019t reach the rocker somewhere in the travel',
   dogAngle: 'the dogbone side gets too close to over centre', shockAngle: 'the shock side gets too close to over centre',
   lengthens: 'the shock would get longer as the wheel rises', deadSpot: 'a dead spot: the ratio spikes somewhere in the travel',
-  noBump: 'it runs out of movement before the shock uses its stroke', behind: 'a rocker eye would go behind its pivot, towards the axle',
+  noBump: 'it runs out of movement before the shock uses its stroke', behind: 'a rocker eye would go behind its pivot, towards the axle', notTooth: 'it wouldn\u2019t be a shark\u2019s tooth shape (the shock eye has to stand up over the pivot and dogbone eye)',
   shockBehind: 'the shock\u2019s bottom eye lands behind the rocker pivot',
   reach: 'the shock can\u2019t reach a rocker that size from the shock top', rSbig: 'the shock\u2019s bottom eye lands further from the rocker pivot than your biggest rocker',
   rSsmall: 'the shock\u2019s bottom eye lands too close to the rocker pivot', placeS: 'the shock\u2019s bottom eye lands above the rocker pivot',
