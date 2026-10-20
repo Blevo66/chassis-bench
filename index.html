@@ -901,6 +901,12 @@ body { padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-are
 @media (min-width: 900px) { #rk .grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); align-items: start; }
 #rk .out { position: sticky; top: 12px; order: 2; }
 #rk .ins { order: 1; } }
+/* Phone: the linkage drawing stays pinned at the top while scrolling, like the bike's side view */
+@media (max-width: 899px) { #rk .out { display: contents; }
+  .pinned #rk .viewcard { position: sticky; top: 0; z-index: 5; padding: 8px 10px; box-shadow: 0 6px 14px -10px rgba(0,0,0,.35); }
+  .pinned #rk .viewcard .view svg { max-height: 30vh; width: auto; max-width: 100%; margin: 0 auto; }
+  .pinned #rk .viewcard .slider, .pinned #rk .viewcard .viewbtns { margin-top: 4px; }
+  .pinned #rk .viewcard .viewbtns button { min-height: 32px; font-size: 13px; padding: 4px; } }
 #rk .card { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 12px; margin-bottom: 12px; }
 #rk details.card { padding: 0; }
 #rk details.card > summary { list-style: none; cursor: pointer; padding: 12px; font-family: var(--display); font-weight: 700; font-size: 20px; text-transform: uppercase; display: flex; justify-content: space-between; gap: 10px; }
@@ -950,6 +956,7 @@ body { padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-are
 #rk .why ul { margin: 4px 0 8px; padding-left: 20px; }
 #rk .why li { margin: 3px 0; }
 #rk .why .good { color: var(--ok); font-weight: 600; }
+#rk .why li button { margin-left: 6px; padding: 2px 10px; min-height: 30px; font-size: 13px; }
 #rk .opts button { text-align: left; font-size: 14px; display: block; width: 100%; }
 #rk .opts button b { font-family: var(--display); font-size: 17px; text-transform: uppercase; display: block; }
 #rk table.sum { width: 100%; border-collapse: collapse; font-size: 15px; }
@@ -1136,13 +1143,15 @@ body { padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-are
   <p class="small" id="rk-tabNote" style="margin:0 0 12px"></p>
   <div class="grid">
     <section class="out">
-      <div class="card">
+      <div class="card viewcard">
         <div class="view" id="rk-view"></div>
         <div class="slider"><input type="range" id="rk-pos" min="0" max="1000" value="0" aria-label="Wheel position through the travel"><output id="rk-posOut"></output></div>
         <div class="viewbtns">
           <button type="button" id="rk-zoomBtn" aria-pressed="true">Linkage close-up</button>
           <button type="button" id="rk-ghostBtn" aria-pressed="true">Show top and bottom</button>
         </div>
+      </div>
+      <div class="card">
         <div id="rk-msg"></div>
         <div id="rk-why"></div>
         <div class="stats" id="rk-stats"></div>
@@ -2008,12 +2017,6 @@ function quick(ctx, rD, phi, step) {
   if ((p.place === 'under' || p.place === 'through') && armY(D0, ctx.th0) > p.rocker[1] + 5) return no('place');
   // Both eyes stay forward of the rocker pivot, towards the swingarm pivot, not back towards the axle
   if (p.ahead && armX(D0, ctx.th0) > p.rocker[0]) return no('behind');
-  if (p.tooth) {
-    // A shark's tooth: the pivot and dogbone eye make the base, and the shock eye is the tip, standing up over that base rather than off to one side
-    const R = ctx.R0w, b = [D0[0] - R[0], D0[1] - R[1]], v = [ctx.S0[0] - R[0], ctx.S0[1] - R[1]];
-    const h = Math.abs(b[0] * v[1] - b[1] * v[0]) / rD, t = (b[0] * v[0] + b[1] * v[1]) / (rD * rD);
-    if (h < 0.8 * rD || t < -0.25 || t > 1.25) return no('notTooth');
-  }
   const incl = ctx.angS - phi, minS = Math.sin(p.minTA * D2R);
   // The shock side can go over centre too: the shock's line passing through the rocker pivot
   const shockS = (R, S, L) => Math.abs(((R[0]-S[0])*(T[1]-S[1]) - (R[1]-S[1])*(T[0]-S[0])) / (ctx.rS * L));
@@ -2121,12 +2124,7 @@ const DEF = {
 const DEF_THROUGH = Object.assign(clone(DEF), { eye: 400, lenMode: 'find', eyeMin: 340, eyeMax: 440, angMode: 'find', angMin: 15, angMax: 40, place: 'through' });
 // Joel dropped the Under the arm (CRF style) tab on 19 Oct; the through-the-arm shark's tooth is the plan
 const TABS = { through: { name: 'Through the arm', sub: 'Shark\u2019s tooth rocker, shock eye above the centreline', def: DEF_THROUGH,
-    note: 'The rocker pivots under the swingarm with the dogbone, and points up through the arm like a shark\u2019s tooth, so the shock\u2019s bottom eye sits above the arm\u2019s centreline like an early Pro-Link. Check the shock and rocker clear the arm\u2019s cross-member.' },
-  // Same numbers as Through the arm, but the Limits are ignored, to show the rocker it would pick if nothing held it back
-  perfect: { name: 'Perfect rocker', sub: 'Your numbers, no limits', def: DEF_THROUGH,
-    note: 'Uses the same numbers as Through the arm (change them on either tab) but ignores everything under Limits, including keeping the eyes in front of the pivot, so you can see the ideal rocker. It keeps it a proper shark\u2019s tooth, with the shock eye standing up over the pivot and dogbone eye, and it still won\u2019t go over centre or have a dead spot.' } };
-// What the Perfect rocker tab searches with: the Limits opened right up, the layout and your shock left as they are
-const unlimited = p => Object.assign({}, p, { maxRocker: 300, dogMin: 20, dogMax: 600, minTA: 30, ahead: false, tooth: true, throughClear: Math.min(p.throughClear, 0) });
+    note: 'The rocker pivots under the swingarm with the dogbone, and points up through the arm like a shark\u2019s tooth, so the shock\u2019s bottom eye sits above the arm\u2019s centreline like an early Pro-Link. Check the shock and rocker clear the arm\u2019s cross-member.' } };
 const root = document.getElementById('rk'), $ = id => document.getElementById('rk-' + id);
 const store = { get() { try { return JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { return null; } }, set(v) { try { localStorage.setItem(KEY, JSON.stringify(v)); } catch (e) {} } };
 let saved, tabState, active, inp, design, zoom, ghosts;
@@ -2142,7 +2140,6 @@ Object.keys(TABS).forEach(t => {
   if (t === 'through') { i.place = 'through'; if (!i.v3) { i.rocker = clone(DEF_THROUGH.rocker); ['lenMode', 'eyeMin', 'eyeMax'].forEach(k => i[k] = DEF_THROUGH[k]); i.v3 = true; } } // the first version wrongly put this rocker on top of the arm
   tabState[t] = { inp: i, design: old.design || null };
 });
-tabState.perfect.inp = tabState.through.inp; // one set of numbers for both
 active = saved.active in TABS ? saved.active : 'through';
 inp = tabState[active].inp; design = tabState[active].design; zoom = saved.zoom !== false; ghosts = saved.ghosts !== false;
 }
@@ -2229,7 +2226,7 @@ function fieldHTML(f, obj, scope) {
   return `<div class="field${on ? ' locked' : ''}"><span class="lab lockrow"><span>${f.label}${f.hint ? `<small>${f.hint}</small>` : ''}</span>${lock}</span>${rows}</div>`;
 }
 function renderForms() {
-  $('forms').innerHTML = FORMS.filter(s => !(active === 'perfect' && s.title === 'Limits')).map(s => `<details class="card"${s.open ? ' open' : ''}><summary>${s.title}</summary><div class="in">${s.fields.filter(f => !f.when || f.when()).map(f => fieldHTML(f, inp, 'inp')).join('')}<div id="rk-note-${s.title.replace(/\W/g, '')}"></div></div></details>`).join('');
+  $('forms').innerHTML = FORMS.map(s => `<details class="card"${s.open ? ' open' : ''}><summary>${s.title}</summary><div class="in">${s.fields.filter(f => !f.when || f.when()).map(f => fieldHTML(f, inp, 'inp')).join('')}<div id="rk-note-${s.title.replace(/\W/g, '')}"></div></div></details>`).join('');
   $('printForm').innerHTML = PRINT.map(f => fieldHTML(f, inp, 'inp')).join('');
 }
 function renderTune() { $('tune').innerHTML = design ? TUNE.map(f => fieldHTML(f, design, 'des')).join('') : '<p class="small">Design the linkage first.</p>'; }
@@ -2302,14 +2299,14 @@ function search(p) {
   if (err && p.angMode === 'fixed' && p.rSMode !== 'fixed') err += ' Setting the shock angle to Find it for me usually sorts this.';
   return { picks, err, why };
 }
-const searchTab = p => search(active === 'perfect' ? unlimited(p) : p);
 function runGen() {
-  const r = searchTab(inp);
+  const r = search(inp);
   gen = { opts: r.picks, error: r.err, why: r.why }; whyOut = null; whyRun++;
   const picks = r.picks;
   if (picks.length) { design = toDesign(picks[0].q, picks[0].ctx); design.pick = 0; }
   else design = null;
   save(); renderTune(); analyseDesign(); draw();
+  if (offTarget()) runWhy();
 }
 function analyseDesign() { an = design ? analyse(benchG(design)) : null; }
 
@@ -2357,7 +2354,7 @@ const WHY_TEXT = {
   place: 'the dogbone eye would sit above the rocker pivot instead of under the arm', noAssemble: 'the dogbone can\u2019t reach the rocker somewhere in the travel',
   dogAngle: 'the dogbone side gets too close to over centre', shockAngle: 'the shock side gets too close to over centre',
   lengthens: 'the shock would get longer as the wheel rises', deadSpot: 'a dead spot: the ratio spikes somewhere in the travel',
-  noBump: 'it runs out of movement before the shock uses its stroke', behind: 'a rocker eye would go behind its pivot, towards the axle', notTooth: 'it wouldn\u2019t be a shark\u2019s tooth shape (the shock eye has to stand up over the pivot and dogbone eye)',
+  noBump: 'it runs out of movement before the shock uses its stroke', behind: 'a rocker eye would go behind its pivot, towards the axle',
   shockBehind: 'the shock\u2019s bottom eye lands behind the rocker pivot',
   reach: 'the shock can\u2019t reach a rocker that size from the shock top', rSbig: 'the shock\u2019s bottom eye lands further from the rocker pivot than your biggest rocker',
   rSsmall: 'the shock\u2019s bottom eye lands too close to the rocker pivot', placeS: 'the shock\u2019s bottom eye lands above the rocker pivot',
@@ -2367,12 +2364,10 @@ const PRE = ['reach', 'rSbig', 'rSsmall', 'placeS', 'throughLow', 'shockStart', 
 // Things worth trying: ease each limit, nudge each input. Each one is a full search, so they run one at a time.
 function whatIfs() {
   const v = [], r = inp.rocker, upDown = y => `${Math.abs(y)} mm ${y < 0 ? 'below' : 'above'} the arm`;
-  if (active !== 'perfect') { // the Perfect rocker tab has no limits to ease
   v.push(['Allow a bigger rocker', `${Math.round(inp.maxRocker * 1.5)} mm`, { maxRocker: Math.round(inp.maxRocker * 1.5) }]);
   v.push(['Allow a wider dogbone range', `${Math.max(20, inp.dogMin - 30)} to ${inp.dogMax + 80} mm`, { dogMin: Math.max(20, inp.dogMin - 30), dogMax: inp.dogMax + 80 }]);
   v.push(['Allow it closer to over centre', `${inp.minTA - 10}\u00b0`, { minTA: inp.minTA - 10 }]);
   if (inp.place === 'through') v.push(['Let the shock eye sit lower', inp.throughClear - 15 < 0 ? `${15 - inp.throughClear} mm below the centreline` : `${inp.throughClear - 15} mm above the centreline`, { throughClear: inp.throughClear - 15 }]);
-  }
   v.push(['Rocker pivot further back along the arm', `${r[0] + 30} mm along`, { rocker: [r[0] + 30, r[1]] }]);
   v.push(['Rocker pivot further forward', `${r[0] - 30} mm along`, { rocker: [r[0] - 30, r[1]] }]);
   v.push(['Rocker pivot further below the arm', upDown(r[1] - 15), { rocker: [r[0], r[1] - 15] }]);
@@ -2385,7 +2380,8 @@ function whatIfs() {
   if (inp.angMode === 'fixed' && inp.rSMode !== 'fixed') v.push(['Let it find the shock angle', '0 to 45\u00b0', { angMode: 'find', angMin: 0, angMax: 45 }]);
   if (inp.rSMode === 'fixed') v.push(['Let it find the pivot to shock eye length', '', { rSMode: 'find' }]);
   if (inp.rDMode === 'fixed') v.push(['Let it find the pivot to dogbone eye length', '', { rDMode: 'find' }]);
-  return v;
+  // Padlocked numbers stay as they are
+  return v.filter(([, , c]) => !Object.keys(c).some(k => (inp.locks || []).includes(k)));
 }
 function whyReasons(w) {
   if (!w) return '';
@@ -2399,33 +2395,48 @@ function whyReasons(w) {
   return h;
 }
 const offTarget = () => !gen || !gen.opts.length || (() => { const q = gen.opts[0].q; return !travelOK(q.travel, inp.travel) || Math.abs(q.prog - inp.prog) > 5; })();
+const hits = q => travelOK(q.travel, inp.travel) && Math.abs(q.prog - inp.prog) <= 5;
 function drawWhy() {
   const el = $('why'); if (!el) return;
   if (!gen || (design && design.hand) || !offTarget()) { el.innerHTML = ''; return; }
-  if (!whyOut) { el.innerHTML = `<button type="button" id="rk-whyBtn">What\u2019s stopping it?</button>`; return; }
-  let h = `<div class="why"><h3>What\u2019s stopping it</h3>${whyReasons(gen.why)}`;
+  if (!whyOut) { el.innerHTML = `<button type="button" id="rk-whyBtn">What can I change to get what I asked for?</button>`; return; }
+  const base = gen.opts.length ? gen.opts[0].q.cost : Infinity;
+  let h = `<div class="why"><h3>What you can change to get what you asked for</h3>`;
+  const ok = whyOut.rows.filter(r => r.q).sort((a, b) => (hits(b.q) - hits(a.q)) || a.q.cost - b.q.cost), better = ok.filter(r => r.q.cost < base * 0.9);
+  if (better.length) h += `<p>${better.some(r => hits(r.q)) ? 'These get you there' : base === Infinity ? 'These give a working linkage' : 'These get it closer'}, best first. Tap Try it to put the change in:</p><ul>${better.slice(0, 6).map(r =>
+    `<li><b>${r.name}</b>${r.val ? ` (${r.val})` : ''}: ${fmt(r.q.travel, 0)} mm travel, ${fmt(r.q.prog, 0)}% rising rate${hits(r.q) ? ' <span class="good">does it</span>' : ''}<button type="button" data-rktry="${whyOut.rows.indexOf(r)}">Try it</button></li>`).join('')}</ul>`;
+  else if (!whyOut.running) h += `<p>None of the changes it tried, alone or two at a time, gets closer. Your travel and rising rate may not go together with this shock and pivot spot: try asking for a different rising rate, or a different stroke.</p>`;
   if (whyOut.running) h += `<p class="small">Trying changes, ${whyOut.done} of ${whyOut.total}\u2026</p>`;
-  const ok = whyOut.rows.filter(r => r.q).sort((a, b) => a.q.cost - b.q.cost), base = gen.opts.length ? gen.opts[0].q.cost : Infinity;
-  const better = ok.filter(r => r.q.cost < base * 0.9);
-  if (better.length) h += `<p>${base === Infinity ? 'Changes that give a working linkage' : 'Changes that get it closer'}, one at a time:</p><ul>${better.slice(0, 5).map(r => { const hit = travelOK(r.q.travel, inp.travel) && Math.abs(r.q.prog - inp.prog) <= 5;
-    return `<li><b>${r.name}</b>${r.val ? ` (${r.val})` : ''}: ${fmt(r.q.travel, 0)} mm travel, ${fmt(r.q.prog, 0)}% rising rate${hit ? ' <span class="good">does it</span>' : ''}</li>`; }).join('')}</ul>`;
-  else if (!whyOut.running) h += `<p>None of the single changes it tried gets closer. It may need two things changed at once, most likely the rocker pivot's position along the arm together with the stroke.</p>`;
+  h += `<details><summary class="small">Why it can\u2019t do it as it is</summary>${whyReasons(gen.why)}</details>`;
   el.innerHTML = h + '</div>';
 }
 function runWhy() {
-  const list = whatIfs(), id = ++whyRun;
+  const list = whatIfs(), id = ++whyRun, base = gen && gen.opts.length ? gen.opts[0].q.cost : Infinity;
   whyOut = { rows: [], done: 0, total: list.length, running: true }; drawWhy();
   const step = i => {
     if (id !== whyRun) return; // the numbers changed, so this run is stale
+    if (i === list.length && !whyOut.paired) {
+      // No single change does it: try the best few two at a time
+      whyOut.paired = true;
+      if (!whyOut.rows.some(r => r.q && hits(r.q))) {
+        const top = whyOut.rows.filter(r => r.q && r.q.cost < base).sort((a, b) => a.q.cost - b.q.cost).slice(0, 4);
+        for (let a = 0; a < top.length; a++) for (let b = a + 1; b < top.length; b++) {
+          const A = top[a], B = top[b]; if (Object.keys(A.change).some(k => k in B.change)) continue;
+          list.push([`${A.name} and ${B.name.charAt(0).toLowerCase() + B.name.slice(1)}`, [A.val, B.val].filter(Boolean).join(', '), Object.assign({}, A.change, B.change)]);
+        }
+        whyOut.total = list.length;
+      }
+    }
     if (i >= list.length) { whyOut.running = false; drawWhy(); return; }
     const [name, val, change] = list[i], p = Object.assign(clone(inp), change);
-    let q = null; try { const r = searchTab(p); if (r.picks.length) { q = r.picks[0].q; q.cost = costOf(q, inp); } } catch (e) {}
-    whyOut.rows.push({ name, val, q }); whyOut.done = i + 1; drawWhy();
+    let q = null; try { const r = search(p); if (r.picks.length) { q = r.picks[0].q; q.cost = costOf(q, inp); } } catch (e) {}
+    whyOut.rows.push({ name, val, change, q }); whyOut.done = i + 1; drawWhy();
     setTimeout(() => step(i + 1), 0);
   };
   setTimeout(() => step(0), 30);
 }
-root.addEventListener('click', e => { if (e.target.closest('#rk-whyBtn')) runWhy(); });
+root.addEventListener('click', e => { if (e.target.closest('#rk-whyBtn')) runWhy();
+  const t = e.target.closest('[data-rktry]'); if (t && whyOut) { const r = whyOut.rows[+t.dataset.rktry]; if (r) { Object.assign(inp, clone(r.change)); renderForms(); runGen(); } } });
 function bounds(pts) { const xs = pts.map(p => p[0]), ys = pts.map(p => p[1]); return [Math.min(...xs), Math.max(...xs), Math.min(...ys), Math.max(...ys)]; }
 function drawView() {
   const res = an && an.res, p = poseAt(posK), sh = (a, b) => `M${a[0]},${-a[1]} L${b[0]},${-b[1]}`;
@@ -2706,7 +2717,7 @@ $('pos').oninput = e => { posK = e.target.value / 1000; drawView(); drawChart();
 $('zoomBtn').onclick = () => { zoom = !zoom; save(); draw(); };
 $('ghostBtn').onclick = () => { ghosts = !ghosts; save(); draw(); };
 $('genBtn').onclick = () => { clearTimeout(timer); runGen(); };
-const resetTab = () => { if (!confirm(`Put every number on the ${TABS[active].name} tab back to its default?${active === 'through' || active === 'perfect' ? ' The Through the arm and Perfect rocker tabs share their numbers, so both change.' : ''} Padlocked numbers get reset too. The rest of the bench isn't touched.`)) return; inp = clone(TABS[active].def); design = null; if (active === 'through' || active === 'perfect') tabState.through.inp = tabState.perfect.inp = inp; renderForms(); runGen(); };
+const resetTab = () => { if (!confirm(`Put every number on the ${TABS[active].name} tab back to its default? Padlocked numbers on this tab get reset too. The rest of the bench isn't touched.`)) return; inp = clone(TABS[active].def); design = null; renderForms(); runGen(); };
 function drawTabs() {
   $('tabs').hidden = Object.keys(TABS).length < 2;
   $('tabs').innerHTML = Object.entries(TABS).map(([k, t]) => `<button type="button" role="tab" data-rtab="${k}" aria-pressed="${k === active}" aria-selected="${k === active}"><b>${t.name}</b><span>${t.sub}</span></button>`).join('');
