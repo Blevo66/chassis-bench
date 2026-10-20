@@ -2044,7 +2044,10 @@ function quick(ctx, rD, phi, step) {
       if (Math.max(maxLR, (w - prevW) / (prevL - L)) > 1.6 * travel / p.stroke) return no('deadSpot');
       pts.push([p.stroke, travel]);
       const at = c => { for (let i = 1; i < pts.length; i++) if (pts[i][0] >= c) { const a = pts[i-1], b = pts[i]; return a[1] + (c - a[0]) / (b[0] - a[0]) * (b[1] - a[1]); } return travel; };
-      const f = p.stroke * 0.03, rTop = at(f) / f, rBot = (travel - at(p.stroke - f)) / f;
+      // Where the rising rate starts: the shock position with the wheel at rrFrom (0 is the top)
+      const dz = Math.min(Math.max(0, p.rrFrom || 0), travel * 0.8);
+      let c0 = 0; for (let i = 1; i < pts.length; i++) if (pts[i][1] >= dz) { const a = pts[i-1], b = pts[i]; c0 = a[0] + (dz - a[1]) / (b[1] - a[1] || 1) * (b[0] - a[0]); break; }
+      const f = p.stroke * 0.03, rTop = (at(c0 + f) - at(c0)) / f, rBot = (travel - at(p.stroke - f)) / f;
       return { rD, rS: ctx.rS, eyes: dist(D0, ctx.S0), phi, dog, incl: ((incl / D2R + 540) % 360) - 180, travel, rTop, rBot, prog: (rTop / rBot - 1) * 100, minTA, minTS, D0 };
     }
     maxLR = Math.max(maxLR, (w - prevW) / (prevL - L));
@@ -2113,7 +2116,7 @@ const DEF = {
   armLen: 630, topAng: 15, rocker: [180, -20], shockTop: [-80, 300], dogMount: [38, -66],
   lenMode: 'fixed', eye: 450, eyeMin: 380, eyeMax: 480, stroke: 75, shockAng: 24,
   angMode: 'fixed', angMin: 15, angMax: 40,
-  travel: 280, prog: 40, maxRocker: 120, dogMin: 60, dogMax: 260, place: 'under', throughClear: 0, minTA: 40, ahead: true,
+  travel: 280, prog: 40, rrFrom: 0, maxRocker: 120, dogMin: 60, dogMax: 260, place: 'under', throughClear: 0, minTA: 40, ahead: true,
   offset: 10, pivotHole: 22, pivotBoss: 36, pivotWidth: 30, eyeHole: 12, eyeBoss: 28, eyeWidth: 22, plate: 10,
   dogHole: 12, dogBoss: 26, dogThick: 16, locks: [],
   rDMode: 'find', rDFix: 50, rSMode: 'find', rSFix: 80,
@@ -2172,7 +2175,8 @@ const FORMS = [
     { k: 'angMax', label: 'Most lean to try', unit: '°', when: () => inp.rSMode !== 'fixed' && inp.angMode === 'find' } ] },
   { title: 'What you want', open: true, fields: [
     { k: 'travel', label: 'Most rear wheel travel', unit: 'mm', hint: 'The most you want. It gets as close as it can without going over.' },
-    { k: 'prog', label: 'Rising rate', unit: '%', hint: 'How much stiffer the end of the travel is than the start. 0 is linear; modern motocross bikes are roughly 30 to 50.' } ] },
+    { k: 'prog', label: 'Rising rate', unit: '%', hint: 'How much stiffer the end of the travel is than the start. 0 is linear; modern motocross bikes are roughly 30 to 50.' },
+    { k: 'rrFrom', label: 'Measure the rising rate from', unit: 'mm', hint: 'Wheel travel to skip at the top before the rising rate is measured, so the first bit doesn\u2019t count. Your rider sag is a good choice. 0 measures the whole travel. It still won\u2019t let the shock go near over centre up there.' } ] },
   { title: 'Rocker arms', open: true, fields: [
     { k: 'rSMode', label: 'Rocker pivot to shock eye', choice: [['find', 'Find it for me'], ['fixed', 'I know it']], hint: 'If you set this, it works out the shock angle to suit, so the shock angle boxes are hidden.' },
     { k: 'rSFix', label: 'Pivot to shock eye', unit: 'mm', when: () => inp.rSMode === 'fixed' },
@@ -2328,7 +2332,7 @@ function drawMsg() {
   if (an && an.warn) m.push(...an.warn.map(t => t.replace(/\d+\.\d{2,}/g, v => (+v).toFixed(1))));
   if (design && an && an.res) {
     // Check the linkage it actually drew, whatever made it: the generator, a hand tweak or a flip
-    const r = an.res, top = r[0].lr, bot = r[r.length - 1].lr, mean = an.travel / an.stroke, peak = Math.max(...r.map(p => p.lr));
+    const r = an.res, top = fromPose(r).lr, bot = r[r.length - 1].lr, mean = an.travel / an.stroke, peak = Math.max(...r.map(p => p.lr));
     const prog = (top / bot - 1) * 100, bad = an.travel > inp.travel + 30 || an.travel < inp.travel - 60 || Math.abs(prog - inp.prog) > 30;
     if (peak > 1.6 * mean) m.push(`<b>The ratio shoots up to ${peak.toFixed(1)} near the top of the travel.</b> The shock is nearly in line with the rocker there, so the back would be very soft at first and then very hard. Don't trust the spring and sag numbers for this one.`);
     const sTA = minShockTrans(r);
@@ -2505,6 +2509,7 @@ function drawChart() {
   for (let v = 0; v <= tmax; v += 50) s += `<line class="gridl" x1="${X(v)}" x2="${X(v)}" y1="${mt}" y2="${ch - mb}"/><text class="m" x="${X(v)}" y="${ch - mb + 18}" font-size="12" text-anchor="middle">${v}</text>`;
   for (let v = Math.ceil(lo * 2) / 2; v <= hi + 1e-9; v += 0.5) s += `<line class="gridl" x1="${ml}" x2="${cw - mr}" y1="${Y(v)}" y2="${Y(v)}"/><text class="m" x="${ml - 6}" y="${Y(v) + 4}" font-size="12" text-anchor="end">${v.toFixed(1)}</text>`;
   s += `<text class="m" x="${cw - mr}" y="${ch - 4}" font-size="12" text-anchor="end">wheel travel, mm</text>`;
+  if (inp.rrFrom > 0) s += `<rect x="${ml}" y="${mt}" width="${Math.max(0, X(Math.min(inp.rrFrom, tmax)) - ml)}" height="${ch - mt - mb}" fill="currentColor" opacity=".07"/><text class="m" x="${ml + 6}" y="${mt + 16}" font-size="12">not counted</text>`;
   s += `<path class="curve" d="${res.map((p, i) => `${i ? 'L' : 'M'}${X(p.wheel).toFixed(1)},${Y(p.lr).toFixed(1)}`).join(' ')}"/>`;
   const p = poseAt(posK); if (p) s += `<circle class="mark" cx="${X(p.wheel)}" cy="${Y(p.lr)}" r="5"/><text x="${X(p.wheel) + 8}" y="${Y(p.lr) - 8}" font-size="13">${p.lr.toFixed(2)}</text>`;
   $('chart').innerHTML = s + '</svg>';
@@ -2552,15 +2557,17 @@ function drawSag() {
   const p = poseAt(posK); if (p) s += `<circle class="mark" cx="${X(p.wheel)}" cy="${Y(wr(p))}" r="5"/><text x="${X(p.wheel) + 8}" y="${Y(wr(p)) - 8}" font-size="13">${wr(p).toFixed(1)}</text>`;
   $('sagChart').innerHTML = s + '</svg>';
 }
+// The pose the rising rate is measured from, after skipping the first rrFrom mm
+const fromPose = res => res.find(q => q.wheel >= (inp.rrFrom || 0)) || res[0];
 const shockAngle = q => Math.atan2(q.S[0] - inp.shockTop[0], inp.shockTop[1] - q.S[1]) / D2R;
 const minShockTrans = res => Math.min(...res.map(q => { const R = q.R, S = q.S, T = inp.shockTop; const s = Math.abs(((R[0]-S[0])*(T[1]-S[1]) - (R[1]-S[1])*(T[0]-S[0])) / (dist(R, S) * dist(T, S))); return Math.asin(Math.min(1, s)) / D2R; }));
 const minTrans = res => Math.min(...res.map(q => { const R = q.R, D = q.D, F = inp.dogMount; const s = Math.abs(((R[0]-D[0])*(F[1]-D[1]) - (R[1]-D[1])*(F[0]-D[0])) / (dist(R, D) * dist(F, D))); return Math.asin(Math.min(1, s)) / D2R; }));
 function drawStats() {
   const res = an && an.res;
   if (!res || !design) { $('stats').innerHTML = ''; return; }
-  const a = res[0], b = res[res.length - 1], st = [
+  const a = res[0], b = res[res.length - 1], a2 = fromPose(res), st = [
     [`${fmt(an.travel, 0)} mm`, 'wheel travel'], [`${a.lr.toFixed(2)} → ${b.lr.toFixed(2)}`, 'ratio, top to bottom'],
-    [`${fmt((a.lr / b.lr - 1) * 100, 0)}%`, 'rising rate'], [`${fmt(design.dog, 1)} mm`, 'dogbone'],
+    [`${fmt((a2.lr / b.lr - 1) * 100, 0)}%`, inp.rrFrom > 0 ? `rising rate, from ${fmt(inp.rrFrom, 0)} mm` : 'rising rate'], [`${fmt(design.dog, 1)} mm`, 'dogbone'],
     [`${fmt(design.rD, 1)} / ${fmt(design.rS, 1)}`, 'rocker: pivot to dogbone / shock eye'], [`${fmt(dist(a.D, a.S), 1)} mm`, 'rocker: eye to eye'],
     [`${fmt(shockAngle(a), 0)}° → ${fmt(shockAngle(b), 0)}°`, 'shock angle, top to bottom'], [`${fmt(minTrans(res), 0)}°`, 'tightest dogbone to rocker angle'], [`${fmt(minShockTrans(res), 0)}°`, 'tightest shock to rocker angle']];
   $('stats').innerHTML = st.map(([v, t]) => `<div class="stat"><b>${v}</b><span>${t}</span></div>`).join('');
