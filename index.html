@@ -1003,7 +1003,7 @@ body { padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-are
     </div>
     <div class="hdr-tools">
       <button type="button" class="primary" id="measureBtn">Measuring mode</button>
-      <span class="note">Version 25 Oct 20:15</span>
+      <span class="note">Version 25 Oct 22:30</span>
       <span class="note" id="saveNote" aria-live="polite"></span>
       <button type="button" id="exportBtn">Back up</button>
       <button type="button" id="importBtn">Restore</button>
@@ -2091,7 +2091,7 @@ function generate(p, maxSeeds = 10) {
   if (p.place === 'under' && armY(ctx.S0, ctx.th0) > p.rocker[1] + 5) { out.why = { placeS: 1 }; out.error = `With the shock at that angle and length its bottom eye sits above the rocker pivot, so the rocker can't hang under the arm. Try a longer shock or a different angle, or use the Through the arm tab.`; return out; }
   if (p.layout === 'frame' && inLugZone(ctx.S0, ctx.th0, p)) { out.why = { shockZone: 1 }; out.error = `With the shock at that angle and length its bottom eye lands in the swingarm just in front of the lug, where you said there's no room. Try a shorter shock or a different angle.`; return out; }
   if (p.layout !== 'frame' && p.ahead && armX(ctx.S0, ctx.th0) > p.rocker[0]) { out.why = { shockBehind: 1 }; out.error = `With the shock at that angle and length its bottom eye lands ${fmtN(armX(ctx.S0, ctx.th0) - p.rocker[0])} mm behind the rocker pivot, towards the axle, and you want both eyes in front of it. Try a different shock angle or length, or move the rocker pivot further back along the arm.`; return out; }
-  if (p.place === 'through' && armY(ctx.S0, ctx.th0) < p.throughClear) { out.why = { throughLow: 1 }; out.error = `With the shock at that angle and length its bottom eye lands ${fmtN(-armY(ctx.S0, ctx.th0) + p.throughClear)} mm too low to sit above the arm's centreline. Try a shorter shock or a different angle.`; return out; }
+  if (p.place === 'through' && armY(ctx.S0, ctx.th0) < p.throughClear) { out.why = { throughLow: 1 }; out.error = `With the shock at that angle and length its bottom eye lands ${fmtN(-armY(ctx.S0, ctx.th0) + p.throughClear)} mm lower than you allow (${fmtN(Math.abs(p.throughClear))} mm ${p.throughClear < 0 ? 'below' : 'above'} the arm's centreline). Try a shorter shock or a different angle.`; return out; }
   { const T = p.shockTop, R = ctx.R0w, S = ctx.S0, a = Math.asin(Math.min(1, Math.abs(((R[0]-S[0])*(T[1]-S[1]) - (R[1]-S[1])*(T[0]-S[0])) / (ctx.rS * p.eye)))) / D2R;
     if (a < p.minTA) { out.why = { shockStart: 1 }; out.error = `With the shock at that angle and length, its line passes only ${a.toFixed(0)}° from the rocker at full extension, so the shock side of the rocker starts close to over centre (you allowed ${p.minTA}°). Change the shock angle or length, or the rocker's pivot to shock eye length.`; return out; } }
   const rMin = (p.pivotBoss + p.eyeBoss) / 2 + 2, cands = [];
@@ -2147,7 +2147,7 @@ const DEF = {
 };
 // Through the arm, old Pro-Link style: rocker pivot and dogbone eye under the arm, with the rocker pointing up through it like a shark's tooth so the shock's bottom eye sits above the arm's centreline.
 // Shock angle left for it to find, since the bench's angle is for the CRF style rocker under the arm.
-const DEF_THROUGH = Object.assign(clone(DEF), { eye: 400, lenMode: 'find', eyeMin: 340, eyeMax: 440, angMode: 'find', angMin: 15, angMax: 40, place: 'through' });
+const DEF_THROUGH = Object.assign(clone(DEF), { eye: 400, lenMode: 'find', eyeMin: 340, eyeMax: 440, angMode: 'find', angMin: 15, angMax: 40, place: 'through', throughClear: -50 });
 // Rocker on the frame, Uni-Trak style (Joel, 25 Oct): the rocker pivots on the XL's lower mount, the shock's bottom eye bolts to it, and a dogbone runs to the CRF arm's lug.
 // Starts from Joel's measurements of 25 Oct and the 370 mm shock that suits them. The rocker and its eyes are all on the frame's 10 mm left line, so the rocker is flat.
 const DEF_FRAME_TAB = Object.assign(clone(DEF), { layout: 'frame', place: 'frame', ahead: false, armLen: 580, topAng: 22, rocker: [200, -50], dogMount: [22, -29], shockTop: [-55, 292],
@@ -2155,8 +2155,8 @@ const DEF_FRAME_TAB = Object.assign(clone(DEF), { layout: 'frame', place: 'frame
 // Joel dropped the Under the arm (CRF style) tab on 19 Oct; the through-the-arm shark's tooth is the plan
 const TABS = { frame: { name: 'Rocker on the frame', sub: 'Rocker on the lower mount, dogbone to the arm', def: DEF_FRAME_TAB,
     note: 'The rocker pivots on the frame\u2019s lower mount, the shock\u2019s bottom eye bolts to the rocker, and the dogbone runs back to the lug under the swingarm. The rocker sits on the frame\u2019s 10 mm left line with the shock, so it\u2019s flat; the dogbone needs a 10 mm step or a spacer on the lug bolt to reach the centred lug.' },
-  through: { name: 'Through the arm', sub: 'Shark\u2019s tooth rocker, shock eye above the centreline', def: DEF_THROUGH,
-    note: 'The rocker pivots under the swingarm with the dogbone, and points up through the arm like a shark\u2019s tooth, so the shock\u2019s bottom eye sits above the arm\u2019s centreline like an early Pro-Link. Check the shock and rocker clear the arm\u2019s cross-member.' } };
+  through: { name: 'Through the arm', sub: 'Shark\u2019s tooth rocker, shock eye up in the arm', def: DEF_THROUGH,
+    note: 'The rocker pivots under the swingarm with the dogbone, and points up through the arm like a shark\u2019s tooth, so the shock\u2019s bottom eye sits up in the arm like an early Pro-Link. It can sit above or below the arm\u2019s centreline: set how low in Limits. Check the shock and rocker clear the arm\u2019s cross-member.' } };
 const root = document.getElementById('rk'), $ = id => document.getElementById('rk-' + id);
 const store = { get() { try { return JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { return null; } }, set(v) { try { localStorage.setItem(KEY, JSON.stringify(v)); } catch (e) {} } };
 let saved, tabState, active, inp, design, zoom, ghosts;
@@ -2171,7 +2171,7 @@ Object.keys(TABS).forEach(t => {
   if (!i.v2) { if (i.minTA === 30) i.minTA = DEF.minTA; if (i.underArm === false) i.place = 'any'; delete i.underArm; i.v2 = true; } // 30° let it get too close to over centre
   delete i.link; delete i.linkTab; if (!Array.isArray(i.locks)) i.locks = [];
   if (t === 'frame') { i.layout = 'frame'; i.place = 'frame'; i.ahead = false; }
-  if (t === 'through') { i.layout = 'arm'; i.place = 'through'; if (!i.v3) { i.rocker = clone(DEF_THROUGH.rocker); ['lenMode', 'eyeMin', 'eyeMax'].forEach(k => i[k] = DEF_THROUGH[k]); i.v3 = true; } } // the first version wrongly put this rocker on top of the arm
+  if (t === 'through') { i.layout = 'arm'; i.place = 'through'; if (!i.v3) { i.rocker = clone(DEF_THROUGH.rocker); ['lenMode', 'eyeMin', 'eyeMax'].forEach(k => i[k] = DEF_THROUGH[k]); i.v3 = true; } if (!i.v4) { if (i.throughClear === 0 && !i.locks.includes('throughClear')) i.throughClear = DEF_THROUGH.throughClear; i.v4 = true; } } // 25 Oct: Joel wants the shock's bottom bolt allowed up to 50 mm below the centreline // the first version wrongly put this rocker on top of the arm
   tabState[t] = { inp: i, design: old.design || null };
 });
 active = saved.active in TABS ? saved.active : 'frame';
@@ -2233,7 +2233,7 @@ const FORMS = [
     { k: 'ahead', label: 'Both rocker eyes in front of its pivot', choice: [[true, 'Yes, towards the swingarm pivot'], [false, 'Anywhere']], hint: 'Keeps the shock and dogbone eyes forward of the rocker pivot all through the travel, never back towards the axle.', when: () => !isFrame() },
     { k: 'place', label: 'Rocker hangs under the arm', choice: [['under', 'Yes, keep the eyes below its pivot'], ['any', 'Anywhere']], when: () => inp.place !== 'through' && !isFrame() },
     { k: 'lugClear', label: 'Keep clear in front of the arm lug', unit: 'mm', hint: 'The swingarm\u2019s body is there, so no part of the rocker may go into this much of the arm in front of the lug. 0 lets it go anywhere.', when: () => isFrame() },
-    { k: 'throughClear', label: 'Shock eye above the arm centreline by at least', unit: 'mm', when: () => inp.place === 'through' } ] }
+    { k: 'throughClear', label: 'Lowest the shock\u2019s bottom bolt can sit, from the arm centreline', unit: 'mm', sign: ['Above', 'Below'], hint: 'Below lets the bolt sit under the pivot-to-axle line, down through the arm. Check the arm\u2019s cross-member clears it.', when: () => inp.place === 'through' } ] }
 ];
 const PRINT = [
   { k: 'offset', label: 'Shock and dogbone line, sideways from the pivot boss', unit: 'mm', sign: ['Left', 'Right'], hint: 'Your shock top and lower dogbone mount are about 10 mm left of centre.' },
@@ -2406,7 +2406,7 @@ const WHY_TEXT = {
   shockBehind: 'the shock\u2019s bottom eye lands behind the rocker pivot',
   reach: 'the shock can\u2019t reach a rocker that size from the shock top', rSbig: 'the shock\u2019s bottom eye lands further from the rocker pivot than your biggest rocker',
   rSsmall: 'the shock\u2019s bottom eye lands too close to the rocker pivot', placeS: 'the shock\u2019s bottom eye lands above the rocker pivot',
-  throughLow: 'the shock\u2019s bottom eye lands too low to clear the arm\u2019s centreline',
+  throughLow: 'the shock\u2019s bottom eye lands lower than you allow against the arm\u2019s centreline',
   lugZone: 'part of the rocker would go into the swingarm in front of the lug', shockZone: 'the shock\u2019s bottom eye lands in the swingarm in front of the lug', shockStart: 'the shock starts nearly in line with the rocker (over centre)'
 };
 const PRE = ['reach', 'rSbig', 'rSsmall', 'placeS', 'throughLow', 'shockStart', 'shockBehind', 'shockZone'];
