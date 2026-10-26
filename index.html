@@ -1002,7 +1002,7 @@ body { padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-are
     </div>
     <div class="hdr-tools">
       <button type="button" class="primary" id="measureBtn">Measuring mode</button>
-      <span class="note">Version 20 Oct 07:10</span>
+      <span class="note">Version 26 Oct 22:10</span>
       <span class="note" id="saveNote" aria-live="polite"></span>
       <button type="button" id="exportBtn">Back up</button>
       <button type="button" id="importBtn">Restore</button>
@@ -1020,6 +1020,11 @@ body { padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-are
   <div class="banner sent" id="rkSent" hidden><span id="rkSentText"></span><button type="button" id="rkBack">Back to the designer</button></div>
 
 
+
+  <div class="tabs" role="tablist" aria-label="Set-ups" id="benchTabs" style="margin-bottom:12px">
+    <button type="button" role="tab" data-tab="build" aria-selected="true"><b>Build</b><span>Rocker on the arm, from the designer</span></button>
+    <button type="button" role="tab" data-tab="t7" aria-selected="false"><b>T7 rocker on frame</b><span>T&eacute;n&eacute;r&eacute; 700 shock, 370 mm, 98 mm stroke</span></button>
+  </div>
 
   <div class="main">
     <form class="sheet" id="sheet" autocomplete="off">
@@ -1065,15 +1070,15 @@ body { padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-are
           <div class="link-grid">
             <div class="row one"><label for="armAngle">Arm angle the points were measured at <span class="u">° below frame level</span></label><input type="number" id="armAngle" step="0.5"></div>
             <div class="axes"><span>.</span><span>X / along</span><span>Y / above</span></div>
-            <div class="row"><label>Rocker pivot <span class="u">arm</span></label><input type="number" id="rockerArm0" aria-label="Rocker pivot along"><input type="number" id="rockerArm1" aria-label="Rocker pivot above"></div>
-            <div class="row"><label>Dogbone mount, bottom of frame</label><input type="number" id="frameLink0" aria-label="Dogbone mount X"><input type="number" id="frameLink1" aria-label="Dogbone mount Y"></div>
+            <div class="row"><label id="lblArmPt">Rocker pivot <span class="u">arm</span></label><input type="number" id="rockerArm0" aria-label="Rocker pivot along"><input type="number" id="rockerArm1" aria-label="Rocker pivot above"></div>
+            <div class="row"><label id="lblFramePt">Dogbone mount, bottom of frame</label><input type="number" id="frameLink0" aria-label="Dogbone mount X"><input type="number" id="frameLink1" aria-label="Dogbone mount Y"></div>
             <div class="row"><label>Shock top mount <span class="u">frame</span></label><input type="number" id="shockTop0" aria-label="Shock top X"><input type="number" id="shockTop1" aria-label="Shock top Y"></div>
             <div class="row one"><label for="dog">Dogbone eye to eye <span class="u">mm</span></label><input type="number" id="dog" step="0.5"></div>
             <div class="row one"><label for="rD">Rocker: pivot to dogbone eye <span class="u">mm</span></label><input type="number" id="rD" step="0.5"></div>
             <div class="row one"><label for="rS">Rocker: pivot to shock eye <span class="u">mm</span></label><input type="number" id="rS" step="0.5"></div>
             <div class="row one"><label for="incl">Rocker: angle between eyes <span class="u">°</span></label><input type="number" id="incl" step="1"></div>
             <label class="check"><input type="checkbox" id="branch"> Flip the rocker assembly</label>
-            <p class="hint">Rocker pivot is measured along the arm and above it. The dogbone mount and shock top are frame points from the pivot. This is a side view only: on your frame the shock top and dogbone mount both sit about 10 mm left of centre (measured 13 Oct), so the rocker bracket on whichever arm you fit needs the same 10 mm left offset.</p>
+            <p class="hint" id="linkHint">Rocker pivot is measured along the arm and above it. The dogbone mount and shock top are frame points from the pivot. This is a side view only: on your frame the shock top and dogbone mount both sit about 10 mm left of centre (measured 13 Oct), so the rocker bracket on whichever arm you fit needs the same 10 mm left offset.</p>
           </div>
       </fieldset>
     </form>
@@ -1330,13 +1335,26 @@ const clone = o => JSON.parse(JSON.stringify(o));
 // with a custom dogbone forward to the XL's own lower mount. Rocker spot, dogbone and shock are fitted guesses (277 mm travel, ratio 4.4 to 3.1) until designed or measured.
 const OLD_BUILD_LINK = clone(LINK);
 Object.assign(DEF_TABS.build, { rockerArm: [180, -20], dog: 145, rD: 48.5, rS: 77, incl: -63, eye: 450, stroke: 75, shape: 'tri' });
-const TAB_NAMES = { build: 'Build' };
+// 26 Oct: a second tab, the rocker on the frame (Uni-Trak style) for a Tenere 700 shock: 370 mm eye to eye, 98 mm stroke (Joel's numbers).
+// The rocker pivots on the XL's lower mount and a dogbone runs back to the CRF arm's lug. Mounts are Joel's 25 Oct measurements; the rocker and
+// dogbone were solved for about 3:1 and a 30% rising rate (307 mm travel, ratio 3.9 falling to 3.0). On this tab frameLink is the rocker pivot and rockerArm is the arm lug.
+// The spring is a guess (~105-130 N/mm needed), not the T7's own rate.
+DEF_TABS.t7 = Object.assign(clone(DEF_TABS.build), { layout: 'frame', armLen: 580, armAngle: 22, rockerArm: [200, -50], frameLink: [22, -29], shockTop: [-55, 292],
+  dog: 172.5, rD: 30, rS: 100, incl: 117, eye: 370, stroke: 98, k: 120, branch: true, shape: 'tri' });
+const TAB_NAMES = { build: 'Build', t7: 'T7 rocker on frame' };
+// A new tab starts with the front end, wheels and weights from Build, so only its rear linkage differs
+const T7_OWN = ['layout', 'armLen', 'armAngle', 'rockerArm', 'frameLink', 'shockTop', 'dog', 'rD', 'rS', 'incl', 'eye', 'stroke', 'k', 'branch', 'shape'];
+function seedT7(st) {
+  if (st && st.t7) return;
+  const b = tabs.build, t = tabs.t7;
+  Object.keys(b).forEach(k => { if (!T7_OWN.includes(k) && k !== 'locks') t[k] = clone(b[k]); });
+}
 const $ = id => document.getElementById(id);
 const store = { get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} } };
 
 let frame = clone(DEF_FRAME), tabs = clone(DEF_TABS), active = 'build';
 let pos = { state: 'rider', f: 0, r: 0 };
-try { const s = JSON.parse(store.get('xl-chassis-v2') || 'null'); if (s) { frame = Object.assign(frame, s.frame); Object.keys(DEF_TABS).forEach(k => { if (s.tabs && s.tabs[k]) tabs[k] = Object.assign(tabs[k], s.tabs[k]); }); oneTab(s.tabs); } } catch (e) {}
+try { const s = JSON.parse(store.get('xl-chassis-v2') || 'null'); if (s) { frame = Object.assign(frame, s.frame); Object.keys(DEF_TABS).forEach(k => { if (s.tabs && s.tabs[k]) tabs[k] = Object.assign(tabs[k], s.tabs[k]); }); oneTab(s.tabs); seedT7(s.tabs); if (s.active in tabs) active = s.active; } } catch (e) {}
 // Saved from when there were three tabs: if Build still has the old XL-style linkage guesses, it takes the CRF style tab's linkage (the plan, and where designs were sent), padlocks kept
 function oneTab(st) {
   const c = tabs.build, o = OLD_BUILD_LINK; if (!st || !st.crf) return;
@@ -1359,8 +1377,10 @@ const forkL = c => c.forkLen - c.stack - c.slide - c.spacer;      // axle to und
 const forkT = c => Math.max(0, c.travel - c.spacer);
 const forkSag = (c, kg) => Math.min(forkT(c), Math.max(0, kg * 9.81 / (2 * c.fk) - c.fpre));
 function linkCfg(c) {
-  return { layout: 'arm', armLen: c.armLen, armAngle: c.armAngle, rockerArm: c.rockerArm, frameLink: c.frameLink, rD: c.rD, rS: c.rS, incl: c.incl, dog: c.dog,
-    branch: c.branch, topOn: 'frame', botOn: 'rocker', shockTop: c.shockTop, shockLow: [0, 0], shockArm: [0, 0], lug: [0, 0], rocker: [0, 0],
+  const onFrame = c.layout === 'frame';
+  return { layout: onFrame ? 'frame' : 'arm', armLen: c.armLen, armAngle: c.armAngle, rockerArm: c.rockerArm, frameLink: c.frameLink, rD: c.rD, rS: c.rS, incl: c.incl, dog: c.dog,
+    branch: c.branch, topOn: 'frame', botOn: 'rocker', shockTop: c.shockTop, shockLow: [0, 0], shockArm: [0, 0],
+    lug: onFrame ? c.rockerArm : [0, 0], rocker: onFrame ? c.frameLink : [0, 0],
     eye: c.eye, stroke: c.stroke, k: c.k, preload: c.preload, wUnladen: c.wUnladen, wLaden: c.wLaden };
 }
 function prepare(c) {
@@ -1386,7 +1406,7 @@ function solve(P, F, fc, rw) {
   const ground = Rv(Af)[1] - c.rf, W = p => { const q = Rv(p); return [q[0], q[1] - ground]; };
   const uw = Rv(F.u), h = W(F.H), af = W(Af), ar = W(Ar), pv = W([0, 0]);
   const t = -h[1] / uw[1], axisGround = h[0] + t * uw[0];
-  const low = [['engine', frame.engLow], ['footpeg', frame.peg], ['dogbone mount', c.frameLink], ['rocker', rp.D], ['rocker', rp.S]]
+  const low = [['engine', frame.engLow], ['footpeg', frame.peg], [c.layout === 'frame' ? 'rocker pivot' : 'dogbone mount', c.frameLink], ['rocker', rp.D], ['rocker', rp.S]]
     .filter(x => x[1]).map(([nm, p]) => [nm, W(p)[1]]).reduce((m, x) => x[1] < m[1] ? x : m, ['', 1e9]);
   let rearGap = 1e9;
   ['seatRail', 'strut', 'spine'].forEach(k => { const l = F.lines[k]; for (let i = 1; i < l.length; i++) rearGap = Math.min(rearGap, segDist(Ar, l[i-1], l[i]) - c.rr); });
@@ -1421,6 +1441,11 @@ function toForm() {
   const c = tabs[active];
   TAB_SINGLE.forEach(k => $(k).value = c[k]); TAB_PAIRS.forEach(k => { $(k+'0').value = c[k][0]; $(k+'1').value = c[k][1]; });
   $('branch').checked = !!c.branch;
+  const onFrame = c.layout === 'frame';
+  $('lblArmPt').innerHTML = onFrame ? 'Dogbone lug <span class="u">arm</span>' : 'Rocker pivot <span class="u">arm</span>';
+  $('lblFramePt').textContent = onFrame ? 'Rocker pivot, bottom of frame' : 'Dogbone mount, bottom of frame';
+  $('linkHint').hidden = onFrame;
+  document.querySelectorAll('[data-tab]').forEach(b => b.setAttribute('aria-selected', b.dataset.tab === active));
   showLocks();
 }
 function fromForm() {
@@ -1588,8 +1613,9 @@ function draw() {
     gusset(B.W(best[1]), [(fb[0]-fa[0]) / Lf, (fb[1]-fa[1]) / Lf], B.W(q), (zoom ? 1 : 0.6) * Math.max(28, best[0] * 0.6)); });
   // rocker bracket on the swingarm
   { const ad = [B.ar[0] - B.pivot[0], B.ar[1] - B.pivot[1]], al = Math.hypot(...ad), u = [ad[0] / al, ad[1] / al];
-    const along = (B.R[0] - B.pivot[0]) * u[0] + (B.R[1] - B.pivot[1]) * u[1], foot = [B.pivot[0] + u[0] * along, B.pivot[1] + u[1] * along];
-    gusset(foot, u, B.R, zoom ? 45 : 27); }
+    const Q = PA.g.layout === 'frame' ? B.other : B.R; // the rocker on the frame leaves just the dogbone lug on the arm
+    const along = (Q[0] - B.pivot[0]) * u[0] + (Q[1] - B.pivot[1]) * u[1], foot = [B.pivot[0] + u[0] * along, B.pivot[1] + u[1] * along];
+    gusset(foot, u, Q, zoom ? 45 : 27); }
   // shock: spring band, body on the top part, shaft below
   { const A2 = B.shA, B2 = B.S, L = Math.hypot(B2[0]-A2[0], B2[1]-A2[1]), mid = [A2[0] + (B2[0]-A2[0]) * .55, A2[1] + (B2[1]-A2[1]) * .55];
     line(A2, B2, { stroke: C('--accent'), 'stroke-width': 30 * ls, opacity: .2 });
@@ -1624,7 +1650,7 @@ function draw() {
   txt(B.headTube[1], `${fmt(SA.m.head, 1)}°`, 14, -4);
   txt(B.pivot, 'pivot', -48, -14);
   if (zoom) {
-    [[B.R, 'rocker pivot'], [B.D, 'dogbone eye'], [B.S, 'shock eye'], [B.other, 'dogbone mount'], [B.shA, 'shock top']].forEach(([q, t]) => {
+    [[B.R, 'rocker pivot'], [B.D, 'dogbone eye'], [B.S, 'shock eye'], [B.other, PA.g.layout === 'frame' ? 'dogbone lug' : 'dogbone mount'], [B.shA, 'shock top']].forEach(([q, t]) => {
       txt(q, t, 32, -18); });
     const dd = el('text', { x: x0 + 14 * s, y: -y1 + 22 * s, 'font-size': 14 * s, fill: C('--ink'), stroke: C('--panel'), 'stroke-width': 5 * s, 'paint-order': 'stroke', 'font-family': 'IBM Plex Mono, monospace' }, svg);
     dd.textContent = `Shock ${fmt(SA.rp.L, 1)} mm, ${fmt(PA.c.eye - SA.rp.L, 1)} compressed · ratio ${fmt(rearLR(PA, SA.rw), 2)} · arm ${fmt(SA.m.arm, 1)}° to the ground`;
@@ -1711,6 +1737,7 @@ document.querySelectorAll('#sheet fieldset > legend, .board .card:not(.view-card
   setPin(store.get('xl-chassis-pin') !== '0');
   $('pin').addEventListener('change', e => { setPin(e.target.checked); store.set('xl-chassis-pin', e.target.checked ? '1' : '0'); }); }
 // The bike's numbers go back to their starting values, padlocks included; the frame numbers stay as they are
+document.querySelectorAll('[data-tab]').forEach(b => b.addEventListener('click', () => { if (b.dataset.tab === active) return; fromForm(); active = b.dataset.tab; $('rkSent').hidden = true; toForm(); render(); }));
 $('resetTab').addEventListener('click', () => {
   if (view === 'rocker') { RK.reset(); return; }
   if (!confirm(`Put every number on the ${TAB_NAMES[active]} tab back to its default? Padlocked numbers on this tab get reset too. The frame numbers aren't touched.`)) return;
@@ -1906,6 +1933,7 @@ function measApply() {
   ['pivotHead', 'rho', 'engLow', 'peg'].forEach(k => put(frame, k, r[k]));
   const c = tabs.build;
   ['shockTop', 'frameLink', 'armAngle'].forEach(k => put(c, k, r[k]));
+  ['shockTop', 'frameLink'].forEach(k => put(tabs.t7, k, r[k])); // the same frame points: on the T7 tab the lower mount carries the rocker
   if (both) ['rockerArm', 'rD', 'rS', 'incl', 'dog', 'eye', 'stroke'].forEach(k => put(c, k, r[k]));
   // Tubes showing above the top yoke is what the bench calls slide-up, once the top yoke's own height is counted in the stack
   put(c, 'forkLen', r.forkLen); put(c, 'stack', r.stack); put(c, 'slide', r.slideUp);
@@ -1948,7 +1976,7 @@ function applySaved(s) {
   if (!s) return;
   frame = Object.assign(clone(DEF_FRAME), s.frame || {});
   Object.keys(DEF_TABS).forEach(k => { tabs[k] = Object.assign(clone(DEF_TABS[k]), (s.tabs || {})[k] || {}); });
-  oneTab(s.tabs);
+  oneTab(s.tabs); seedT7(s.tabs);
   if (s.active in tabs) active = s.active;
 }
 function cloudSave() { saveNote('Saved on this phone · ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })); }
