@@ -976,6 +976,8 @@ body { padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-are
 #rk svg .eye { fill: var(--panel); stroke: var(--ink); stroke-width: 3; }
 #rk svg .fix { fill: var(--ink); }
 #rk svg .ghost { fill: none; stroke: var(--muted); stroke-width: 2.5; stroke-dasharray: 8 6; }
+#rk svg .fwd { fill: none; stroke: var(--accent); }
+#rk svg text.fwd { fill: var(--accent); stroke: none; }
 #rk svg .gridl { stroke: var(--line); stroke-width: 1; }
 #rk svg .curve { stroke: var(--accent); stroke-width: 2.5; fill: none; }
 #rk svg .mark { fill: var(--accent); }
@@ -1003,7 +1005,7 @@ body { padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-are
     </div>
     <div class="hdr-tools">
       <button type="button" class="primary" id="measureBtn">Measuring mode</button>
-      <span class="note">Version 25 Oct 22:40</span>
+      <span class="note">Version 29 Oct 12:00</span>
       <span class="note" id="saveNote" aria-live="polite"></span>
       <button type="button" id="exportBtn">Back up</button>
       <button type="button" id="importBtn">Restore</button>
@@ -1294,6 +1296,10 @@ function analyse(g) {
     p.lr = (b.wheel - a.wheel) / (b.comp - a.comp);
     p.wr = g.k / (p.lr * p.lr);
   });
+  // Joel, 29 Oct: with the rocker on the frame, nothing on it may swing further forward than the frame's lower mount it pivots on (fwdMax mm in front of it, behind if negative)
+  if (g.layout === 'frame' && g.fwdOn !== false) { const lim = g.rocker[0] - (g.fwdMax || 0); let worst = null;
+    res.forEach(p => [['dogbone', p.D], ['shock', p.S]].forEach(([nm, q]) => { if (q && lim - q[0] > 0.5 && (!worst || lim - q[0] > worst[1])) worst = [nm, lim - q[0], p.wheel]; }));
+    if (worst) warn.push(`The rocker\u2019s ${worst[0]} eye swings ${worst[1].toFixed(0)} mm further forward than ${g.fwdMax ? 'you allow from ' : ''}the lower rocker mount on the frame (worst ${worst[2] < 1 ? 'with the shock fully extended' : `at ${worst[2].toFixed(0)} mm of wheel travel`}). Nothing on the rocker can go further forward than that mount.`); }
   if (res.some(p => !(p.lr > 0))) warn.push('Part of the travel has the shock extending as the wheel rises. The linkage is probably over centre there.');
   return { res, ref: p0, warn, travel: res[res.length-1].wheel, stroke: res[res.length-1].comp };
 }
@@ -2017,6 +2023,8 @@ function setupCtx(p) {
   return { p, th0, R0w, S0, rS, angS, Lext: p.eye, Lbump: p.eye - p.stroke, F0: fr ? rot(p.rocker, th0) : p.dogMount };
 }
 const armY = (pt, th) => rot(pt, -th)[1], armX = (pt, th) => rot(pt, -th)[0];
+// Joel, 29 Oct: with the rocker on the frame, neither rocker eye may swing further forward than the frame's lower mount (fwdMax mm in front of it; behind if negative)
+const fwdLim = p => p.dogMount[0] - (p.fwdMax || 0), tooFwd = (q, p) => p.layout === 'frame' && p.fwdOn !== false && q[0] < fwdLim(p) - 0.05;
 // With the rocker on the frame nothing may go in the swingarm's body just in front of its lug: lugClear mm forward, from the lug up past the centreline
 const inLugZone = (q, th, p) => { if (!(p.lugClear > 0)) return false; const a = rot(q, -th); return a[0] > p.rocker[0] - p.lugClear && a[0] < p.rocker[0] - 2 && a[1] > p.rocker[1] - 10 && a[1] < 25; };
 const edgeInLugZone = (a, b, th, p) => { for (let t = 0.1; t < 0.95; t += 0.1) if (inLugZone([a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t], th, p)) return true; return false; };
@@ -2033,6 +2041,7 @@ function quick(ctx, rD, phi, step) {
   if (dog < p.dogMin) return no('dogShort'); if (dog > p.dogMax) return no('dogLong');
   if (dist(D0, ctx.S0) < p.eyeBoss + 2) return no('eyesClose');
   if (dist(D0, ctx.S0) > p.maxRocker || rD > p.maxRocker) return no('tooBig');
+  if (tooFwd(D0, p)) return no('forward');
   // Under the arm and through the arm both keep the dogbone eye down by the pivot, under the arm; through the arm points the shock eye up through it (a shark's tooth)
   if ((p.place === 'under' || p.place === 'through') && armY(D0, ctx.th0) > p.rocker[1] + 5) return no('place');
   // Both eyes stay forward of the rocker pivot, towards the swingarm pivot, not back towards the axle
@@ -2056,6 +2065,7 @@ function quick(ctx, rD, phi, step) {
     if (L >= prevL) return no('lengthens');
     if (!fr && p.ahead && (armX(D, th) > p.rocker[0] || armX(S, th) > p.rocker[0])) return no('behind'); // shock must keep compressing
     if (fr && armY(S, th) < p.throughClear) return no('throughLow'); // the shock bolt sits on the frame, so the arm rises past it
+    if (tooFwd(D, p) || tooFwd(S, p)) return no('forward'); // nothing further forward than the lower rocker mount
     if (fr && (inLugZone(D, th, p) || inLugZone(S, th, p) || edgeInLugZone(R, D, th, p) || edgeInLugZone(R, S, th, p) || edgeInLugZone(D, S, th, p))) return no('lugZone');
     const s2 = shockS(R, S, L);
     if (s2 < minS) return no('shockAngle');
@@ -2091,6 +2101,7 @@ function generate(p, maxSeeds = 10) {
   if (ctx.rS < (p.pivotBoss + p.eyeBoss) / 2 + 2) { out.why = { rSsmall: 1 }; out.error = `With the shock at that angle its bottom eye lands ${ctx.rS.toFixed(0)} mm from the rocker pivot, too close for the two bosses to fit. Change the shock angle or length.`; return out; }
   if (p.place === 'under' && armY(ctx.S0, ctx.th0) > p.rocker[1] + 5) { out.why = { placeS: 1 }; out.error = `With the shock at that angle and length its bottom eye sits above the rocker pivot, so the rocker can't hang under the arm. Try a longer shock or a different angle, or use the Through the arm tab.`; return out; }
   if (p.layout === 'frame' && armY(ctx.S0, ctx.th0) < p.throughClear) { out.why = { throughLow: 1 }; out.error = `With the shock at that angle and length its bottom eye lands ${fmtN(-armY(ctx.S0, ctx.th0) + p.throughClear)} mm lower than you allow (${fmtN(Math.abs(p.throughClear))} mm ${p.throughClear < 0 ? 'below' : 'above'} the arm's centreline).`; return out; }
+  if (tooFwd(ctx.S0, p)) { out.why = { shockFwd: 1 }; out.error = `With the shock at that angle and length its bottom eye lands ${fmtN(fwdLim(p) - ctx.S0[0])} mm further forward than the lower rocker mount allows. Try a different shock angle or length.`; return out; }
   if (p.layout === 'frame' && inLugZone(ctx.S0, ctx.th0, p)) { out.why = { shockZone: 1 }; out.error = `With the shock at that angle and length its bottom eye lands in the swingarm just in front of the lug, where you said there's no room. Try a shorter shock or a different angle.`; return out; }
   if (p.layout !== 'frame' && p.ahead && armX(ctx.S0, ctx.th0) > p.rocker[0]) { out.why = { shockBehind: 1 }; out.error = `With the shock at that angle and length its bottom eye lands ${fmtN(armX(ctx.S0, ctx.th0) - p.rocker[0])} mm behind the rocker pivot, towards the axle, and you want both eyes in front of it. Try a different shock angle or length, or move the rocker pivot further back along the arm.`; return out; }
   if (p.place === 'through' && armY(ctx.S0, ctx.th0) < p.throughClear) { out.why = { throughLow: 1 }; out.error = `With the shock at that angle and length its bottom eye lands ${fmtN(-armY(ctx.S0, ctx.th0) + p.throughClear)} mm lower than you allow (${fmtN(Math.abs(p.throughClear))} mm ${p.throughClear < 0 ? 'below' : 'above'} the arm's centreline). Try a shorter shock or a different angle.`; return out; }
@@ -2141,7 +2152,7 @@ const DEF = {
   lenMode: 'fixed', eye: 450, eyeMin: 380, eyeMax: 480, stroke: 75, shockAng: 24, extMode: 'none', ext: 25, extMax: 50,
   angMode: 'fixed', angMin: 15, angMax: 40,
   travel: 280, prog: 40, rrFrom: 0, maxRocker: 120, dogMin: 60, dogMax: 260, place: 'under', throughClear: 0, minTA: 40, ahead: true,
-  layout: 'arm', lugClear: 80,
+  layout: 'arm', lugClear: 80, fwdOn: true, fwdMax: 0,
   offset: 10, pivotHole: 22, pivotBoss: 36, pivotWidth: 30, eyeHole: 12, eyeBoss: 28, eyeWidth: 22, plate: 10,
   dogHole: 12, dogBoss: 26, dogThick: 16, locks: [],
   rDMode: 'find', rDFix: 50, rSMode: 'find', rSFix: 80,
@@ -2234,6 +2245,8 @@ const FORMS = [
     { k: 'minTA', label: 'Smallest angle at the rocker eyes', unit: '°', hint: 'Between the dogbone and the rocker, and between the shock and the rocker. Keeps both sides away from going over centre. 40° is the least it allows by default, and it aims for 55° or more.' },
     { k: 'ahead', label: 'Both rocker eyes in front of its pivot', choice: [[true, 'Yes, towards the swingarm pivot'], [false, 'Anywhere']], hint: 'Keeps the shock and dogbone eyes forward of the rocker pivot all through the travel, never back towards the axle.', when: () => !isFrame() },
     { k: 'place', label: 'Rocker hangs under the arm', choice: [['under', 'Yes, keep the eyes below its pivot'], ['any', 'Anywhere']], when: () => inp.place !== 'through' && !isFrame() },
+    { k: 'fwdOn', label: 'Nothing further forward than the lower rocker mount', choice: [[true, 'Yes, keep the eyes behind it'], [false, 'Anywhere']], hint: 'Neither rocker eye (shock or dogbone) may swing in front of the frame\u2019s lower mount, the bolt the rocker pivots on, anywhere in the travel. It goes by the eye bolt centres.', when: () => isFrame() },
+    { k: 'fwdMax', label: 'How far in front of the lower mount an eye may go', unit: 'mm', sign: ['In front', 'Behind'], hint: '0 is level with the mount\u2019s bolt. The metal round each eye sticks out about half an eye boss further, so set it that much Behind to keep the metal behind the bolt too.', when: () => isFrame() && inp.fwdOn !== false },
     { k: 'lugClear', label: 'Keep clear in front of the arm lug', unit: 'mm', hint: 'The swingarm\u2019s body is there, so no part of the rocker may go into this much of the arm in front of the lug. 0 lets it go anywhere.', when: () => isFrame() },
     { k: 'throughClear', label: 'Lowest the shock\u2019s bottom bolt can sit, from the arm centreline', unit: 'mm', sign: ['Above', 'Below'], hint: () => isFrame() ? 'Below lets the bolt sit under the pivot-to-axle line, down through the arm. The bolt is on the frame, so the arm rises past it: this is checked all through the travel. The space you keep clear in front of the lug still applies.' : 'Below lets the bolt sit under the pivot-to-axle line, down through the arm. Check the arm\u2019s cross-member clears it.', when: () => inp.place === 'through' || isFrame() } ] }
 ];
@@ -2310,7 +2323,7 @@ function scheduleGen() { clearTimeout(timer); timer = setTimeout(runGen, 450); }
 function benchG(d) {
   // Start the bench solver a hair above full extension, so it finds the top-out crossing whichever way rounding falls
   const fr = inp.layout === 'frame';
-  return { layout: fr ? 'frame' : 'arm', armLen: inp.armLen, armAngle: inp.topAng - 0.01, rockerArm: inp.rocker, frameLink: inp.dogMount, rD: d.rD, rS: d.rS, incl: d.incl, dog: d.dog,
+  return { layout: fr ? 'frame' : 'arm', fwdOn: inp.fwdOn, fwdMax: inp.fwdMax, armLen: inp.armLen, armAngle: inp.topAng - 0.01, rockerArm: inp.rocker, frameLink: inp.dogMount, rD: d.rD, rS: d.rS, incl: d.incl, dog: d.dog,
     branch: !!d.branch, topOn: 'frame', botOn: 'rocker', shockTop: inp.shockTop, shockLow: [0, 0], shockArm: [0, 0], lug: fr ? inp.rocker : [0, 0], rocker: fr ? inp.dogMount : [0, 0], eye: d.eye, stroke: inp.stroke, k: 1 };
 }
 function toDesign(q, ctx) {
@@ -2409,9 +2422,10 @@ const WHY_TEXT = {
   reach: 'the shock can\u2019t reach a rocker that size from the shock top', rSbig: 'the shock\u2019s bottom eye lands further from the rocker pivot than your biggest rocker',
   rSsmall: 'the shock\u2019s bottom eye lands too close to the rocker pivot', placeS: 'the shock\u2019s bottom eye lands above the rocker pivot',
   throughLow: 'the shock\u2019s bottom eye lands lower than you allow against the arm\u2019s centreline',
-  lugZone: 'part of the rocker would go into the swingarm in front of the lug', shockZone: 'the shock\u2019s bottom eye lands in the swingarm in front of the lug', shockStart: 'the shock starts nearly in line with the rocker (over centre)'
+  lugZone: 'part of the rocker would go into the swingarm in front of the lug', shockZone: 'the shock\u2019s bottom eye lands in the swingarm in front of the lug', shockStart: 'the shock starts nearly in line with the rocker (over centre)',
+  forward: 'a rocker eye would swing further forward than the lower rocker mount', shockFwd: 'the shock\u2019s bottom eye lands further forward than the lower rocker mount'
 };
-const PRE = ['reach', 'rSbig', 'rSsmall', 'placeS', 'throughLow', 'shockStart', 'shockBehind', 'shockZone'];
+const PRE = ['shockFwd', 'reach', 'rSbig', 'rSsmall', 'placeS', 'throughLow', 'shockStart', 'shockBehind', 'shockZone'];
 // Things worth trying: ease each limit, nudge each input. Each one is a full search, so they run one at a time.
 function whatIfs() {
   const v = [], r = inp.rocker, upDown = y => `${Math.abs(y)} mm ${y < 0 ? 'below' : 'above'} the arm`;
@@ -2433,6 +2447,7 @@ function whatIfs() {
   if (inp.rSMode === 'fixed') v.push(['Let it find the pivot to shock eye length', '', { rSMode: 'find' }]);
   if (inp.rDMode === 'fixed') v.push(['Let it find the pivot to dogbone eye length', '', { rDMode: 'find' }]);
   if (isFrame()) v.push(['Let the rocker into more of the arm in front of the lug', `${Math.max(0, inp.lugClear - 40)} mm kept clear`, { lugClear: Math.max(0, inp.lugClear - 40) }]);
+  if (isFrame() && inp.fwdOn !== false) { const n = (inp.fwdMax || 0) + 15; v.push(['Let the rocker eyes go further forward', `${Math.abs(n)} mm ${n < 0 ? 'behind' : 'in front of'} the lower mount`, { fwdMax: n }]); }
   // Padlocked numbers stay as they are. With the rocker on the frame the lug and the lower mount are both fixed, so it doesn't suggest moving them.
   return v.filter(([, , c]) => !Object.keys(c).some(k => (inp.locks || []).includes(k)) && !(isFrame() && 'rocker' in c));
 }
@@ -2519,6 +2534,8 @@ function drawView() {
   });
   const lugBase = rot([inp.rocker[0], 0], th), R = rot(inp.rocker, th); // the arm's lug: the rocker pivot, or the dogbone's end when the rocker is on the frame
   s += `<path class="arm" style="${sw(45)}" d="${sh([0, 0], axle)}"/><path class="lug" style="${sw(24)}" d="${sh(lugBase, R)}"/>`;
+  if (fr && inp.fwdOn !== false) { const x = fwdLim(inp); // nothing on the rocker may go left of this line
+    s += `<path class="fwd" style="${sw(1.5 * sc)};stroke-dasharray:${6 * sc} ${4 * sc}" d="M${x},${-(y0 + h)} L${x},${-y0}"/><text class="fwd" x="${x + 4 * sc}" y="${-y0 - 8 * sc}" font-size="${fs}">furthest forward</text>`; }
   if (p) {
     const u = [p.S[0] - inp.shockTop[0], p.S[1] - inp.shockTop[1]], L = Math.hypot(u[0], u[1]), ext = design.ext || 0, body = Math.min(L - ext - 40, (design.eye - ext) * 0.6);
     const along = d => [inp.shockTop[0] + u[0] / L * d, inp.shockTop[1] + u[1] / L * d], bEnd = along(body), own = along(L - ext);
