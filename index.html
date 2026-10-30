@@ -1014,7 +1014,7 @@ body { padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-are
     </div>
     <div class="hdr-tools">
       <button type="button" class="primary" id="measureBtn">Measuring mode</button>
-      <span class="note">Version 29 Oct 14:30</span>
+      <span class="note">Version 30 Oct 13:30</span>
       <span class="note" id="saveNote" aria-live="polite"></span>
       <button type="button" id="exportBtn">Back up</button>
       <button type="button" id="importBtn">Restore</button>
@@ -1724,7 +1724,7 @@ function renderPresets() {
   box.hidden = !on; if (!on) { box.innerHTML = ''; return; }
   const same = p => XR_KEYS.every(k => Math.abs(c[k] - p[k]) < 0.05), cur = Object.values(XR_SETS).find(same);
   box.innerHTML = Object.entries(XR_SETS).map(([k, p]) => `<button type="button" data-set="${k}" aria-pressed="${same(p)}"><b>${p.name}</b>${p.sub}</button>`).join('')
-    + `<p class="hint" style="flex-basis:100%">${cur ? cur.note : 'These are your own rocker numbers, not one of the three. Tap one to put it back.'}</p>`;
+    + `<p class="hint" style="flex-basis:100%">${cur ? cur.note : 'These are your own rocker numbers, not one of these. Tap one to put it back.'}</p>`;
 }
 $('presets').addEventListener('click', e => {
   const b = e.target.closest('[data-set]'); if (!b) return;
