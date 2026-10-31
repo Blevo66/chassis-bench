@@ -19,18 +19,18 @@ spring off, not for riding.
 
 ## How the profile was cut
 
-Starts as the hull of the three bosses, then removes everything the arm sweeps through relative to the rocker from full
-droop (shock 380, arm 24.2° down) to full bump (shock 285, arm 2.9° up), plus 4 mm. The arm shape is Joel's CRF250 arm
+Starts as the hull of the three bosses with curved front and bottom edges, then removes everything the arm sweeps through relative to the rocker from full
+droop (shock 380, arm 24.2° down) to full bump (shock 285, arm 2.9° up), plus clearance. The cut is then rounded and smoothed (v2, 31 Oct: Joel asked for a rounder, smoother look), and the top and bottom edges of the rocker have a 3 mm round (2 mm on the dogbone). The arm shape is Joel's CRF250 arm
 model sliced every 2 mm across x = -12 to +27 mm (the rocker plate, the dogbone bar and the shock clevis zone), lined up
 on the bench's lug at 200 / -50. In that band the arm is only the cross-member box and the lug: the legs are outboard and
 there is no pivot tube in the middle, so the front of the rocker is free.
 
 Checked through the whole travel:
-- Rocker to arm (model slice): **4 mm at the tightest, at full droop**, where the shock arm of the rocker passes the front top corner of the cross-member. That's the first thing to look at when it's bolted up.
+- Rocker to arm (model slice): **5 mm at the tightest, at full droop**, where the shock arm of the rocker passes the front top corner of the cross-member. That's the first thing to look at when it's bolted up.
 - The bench's own cross-member outline is a bit fatter at that corner (it's a silhouette across the full width) and shows touching there. If the real arm is fatter than the model in the middle, file that corner of the print.
 - Dogbone bar to the arm: 16 mm.
-- Rocker to the bottom of the shock: 2 mm, but against a **placeholder** clevis body (starts 20 mm up the shock from the bolt, 40 mm wide).
-- The rocker's shock arm runs through a ~20 mm corridor between the cross-member and the shock body, so the neck is ~14 mm wide. Fine in plastic for a mock-up; in laser-cut steel it's fine too, but this is the spot that sets the real part.
+- Rocker to the bottom of the shock: 11 mm, against the clevis body taken as starting 30 mm up the shock from the bolt (Joel: about 30-35 mm) and 40 mm wide (width still a guess).
+- The rocker's shock arm runs through a ~29 mm corridor between the cross-member and the shock body, so the neck is about 20 mm wide. This is the spot that sets the real part.
 
 ## Assembly (left side view: pivot front-bottom, dogbone rear-bottom, shock eye up)
 
@@ -47,7 +47,7 @@ Checked through the whole travel:
 | Rocker dogbone hole | 10.4 mm | Drill out to suit. |
 | Shock bolt hole | 10.4 mm | M10 (measured). |
 | Lug end of dogbone, packers | 12.4 mm | Arm model's lug hole is 12.8, so probably M12. Check. |
-| Shock clevis body | 20 mm up from the bolt, 40 wide | Measure: bolt centre to underside of the clevis bridge, and the body width. |
+| Shock clevis body | 30 mm up from the bolt (Joel's estimate), 40 wide | Width still a guess. |
 
 ## Files
 

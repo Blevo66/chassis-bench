@@ -20,10 +20,15 @@ T_PLATE   = 16.0   # rocker plate thickness = tongue into the XR shock clevis. P
 T_DOG     = 12.0   # dogbone bar thickness (bolts beside the rocker's right face, lines up with the arm lug centre)
 HOLE      = 10.4   # all bolt holes, M10 clearance. Shock bolt is M10 (Joel). Pivot and dogbone bolts PLACEHOLDER: drill out to suit
 R_PIV, R_DOG, R_SHK = 17.0, 13.0, 12.5   # boss radii (shock end kept inside the clevis ears' 12-15 mm radius)
-CLEAR     = 4.0    # target gap to the arm all through the travel
+CLEAR     = 7.5    # target gap to the arm all through the travel
 CLEAR_SHK = 2.0    # target gap to the (placeholder) shock body
-FILLET    = 3.0    # corner rounding on the cut
-CLEVIS_BRIDGE = 20.0  # PLACEHOLDER: shock bolt centre to the underside of the clevis bridge, along the shock
+FILLET    = 4.0    # final corner rounding
+R_OPEN    = 11.0   # outside corner radius
+R_CLOSE   = 20.0   # inside blend radius (bosses into the web)
+SCALLOP   = 15.0   # depth of the curved front edge (bottom edge gets 60%)
+SMOOTH    = 8.0    # outline smoothing (mm, gaussian); the gap report checks the result
+EDGE_R    = 3.0    # rounded top and bottom edges on the 3D part
+CLEVIS_BRIDGE = 30.0  # shock bolt centre to the underside of the clevis bridge (Joel 31 Oct: about 30-35 mm), along the shock
 CLEVIS_HALF   = 20.0  # PLACEHOLDER: half width of the shock body above the bridge (side view)
 SPACER_W  = 12.0   # each pivot spacer: (40 mm frame mount - 16 plate) / 2
 DOG_LEN   = G['dog']
@@ -52,13 +57,51 @@ shk_sw = unary_union([world_to_rocker(shock_end(p), p) for p in poses])
 
 bosses = unary_union([Point(0, 0).buffer(R_PIV, 64), Point(*Dl).buffer(R_DOG, 64), Point(*Sl).buffer(R_SHK, 64)])
 hull = bosses.convex_hull
-body = hull.difference(arm_sw.buffer(CLEAR, 64)).difference(shk_sw.buffer(CLEAR_SHK, 64))
-body = unary_union([body, bosses])
-if isinstance(body, MultiPolygon):
-    body = max(body.geoms, key=lambda g: g.intersects(Point(0, 0)) * 1e9 + g.area)
-# round off the sharp corners left by the cut, keeping the bosses whole
-body = unary_union([body.buffer(-FILLET, 64).buffer(FILLET, 64), bosses])
+# smooth what the arm and shock sweep through (fill their notches), then round the corners of the space left over
+# convex hulls only ever add to what's kept clear; the shrink-then-grow rounds their corners into long smooth curves
+# (on these obtuse corners that eats under 0.5 mm of the clearance, and the gap report below checks the real gap)
+arm_f = arm_sw.convex_hull.buffer(-20, 128).buffer(20 + CLEAR, 128)
+shk_f = shk_sw.convex_hull.buffer(-15, 128).buffer(15 + CLEAR_SHK, 128)
+allowed = hull.buffer(40, 64).difference(arm_f).difference(shk_f)
+allowed = allowed.buffer(-6, 128).buffer(6, 128)
+
+def scallop(shape, a, b, depth, ra=None):
+    """Cut a gentle concave arc into the edge between bosses a and b (outward side), depth mm at the middle."""
+    a, b = np.array(a), np.array(b); m = (a + b)/2; L = np.linalg.norm(b - a); u = (b - a)/L; n = np.array([u[1], -u[0]])
+    c = Point(*shape.centroid.coords[0]); 
+    if np.dot(np.array(c.coords[0]) - m, n) > 0: n = -n          # n points away from the body
+    edge = max(np.dot(np.array(q) - m, n) for q in shape.exterior.coords)   # the hull edge's offset from the centre line
+    half = L/2 - 6; rad = (half**2 + depth**2)/(2*depth)
+    ctr = m + n*(edge - depth + rad)
+    return shape.difference(Point(*ctr).buffer(rad, 256))
+
+def keep_main(g):
+    if isinstance(g, MultiPolygon): g = max(g.geoms, key=lambda q: q.intersects(Point(0, 0))*1e9 + q.area)
+    return g
+
+body = scallop(hull, (0, 0), tuple(Sl), SCALLOP)          # front edge, pivot to shock
+body = scallop(body, (0, 0), tuple(Dl), SCALLOP*0.6)      # bottom edge, pivot to dogbone
+body = keep_main(unary_union([body.intersection(allowed), bosses]))
+# smooth: round the outside corners (opening), blend the bosses into the web (closing), stay inside the allowed space
+for _ in range(3):
+    body = unary_union([body.buffer(-R_OPEN, 128).buffer(R_OPEN, 128), bosses])
+    body = body.buffer(R_CLOSE, 128).buffer(-R_CLOSE, 128)
+    body = keep_main(unary_union([body.intersection(allowed), bosses]))
+body = keep_main(unary_union([body.buffer(-FILLET, 128).buffer(FILLET, 128), bosses]))
+body = keep_main(unary_union([body.buffer(R_CLOSE, 128).buffer(-R_CLOSE, 128).intersection(allowed), bosses]))
+def smooth_outline(poly, sigma=6.0, step=0.5):
+    """Gaussian-smooth the outline (resampled every step mm): takes the kinks out of the cut."""
+    ring = LineString(poly.exterior.coords); L = ring.length
+    pts = np.array([ring.interpolate(t).coords[0] for t in np.arange(0, L, step)])
+    n = int(4*sigma/step); k = np.exp(-0.5*((np.arange(-n, n + 1)*step)/sigma)**2); k /= k.sum()
+    pad = np.vstack([pts[-n:], pts, pts[:n]])
+    sm = np.c_[np.convolve(pad[:, 0], k, 'valid'), np.convolve(pad[:, 1], k, 'valid')]
+    return Polygon(sm).buffer(0)
+body = smooth_outline(body, SMOOTH)
+body = keep_main(unary_union([body, bosses]).buffer(4, 128).buffer(-4, 128))
+body = body.simplify(0.05)
 assert body.geom_type == 'Polygon', body.geom_type
+assert all(body.contains(Point(*q)) for q in [(0, 0), tuple(Dl), tuple(Sl)]), 'lost a boss'
 
 def gap_report():
     out = []
@@ -82,11 +125,23 @@ def holes(pts):
     return unary_union([Point(*q).buffer(HOLE/2, 64) for q in pts])
 # lay the rocker out with the pivot-to-shock line roughly along X for the bed
 rocker2d = body.difference(holes([(0, 0), tuple(Dl), tuple(Sl)]))
-rocker = m3.Manifold.extrude(cs(rocker2d), T_PLATE)
+def rounded_slab(poly2d, T, r, steps=8):
+    """Extrude with the top and bottom edges rounded to radius r (stacked thin slices, holes grow to match)."""
+    out = m3.Manifold.extrude(cs(poly2d.buffer(0)), T - 2*r).translate((0, 0, r))
+    for k in range(steps):
+        z0, z1 = r*k/steps, r*(k + 1)/steps
+        inset = r - math.sqrt(max(0.0, r*r - (r - z1)**2))        # inset at the slice's top face (bottom fillet)
+        sl = poly2d.buffer(-inset, 64)
+        if sl.is_empty: continue
+        for g in (sl.geoms if hasattr(sl, 'geoms') else [sl]):
+            out += m3.Manifold.extrude(cs(g), z1 - z0).translate((0, 0, z0))
+            out += m3.Manifold.extrude(cs(g), z1 - z0).translate((0, 0, T - z1))
+    return out
+rocker = rounded_slab(rocker2d, T_PLATE, EDGE_R)
 
 dog2d = unary_union([Point(0, 0).buffer(R_DOG, 64), Point(DOG_LEN, 0).buffer(R_DOG, 64), Polygon([(0, -9), (DOG_LEN, -9), (DOG_LEN, 9), (0, 9)])])
 dog2d = dog2d.difference(holes([(0, 0)])).difference(Point(DOG_LEN, 0).buffer(LUG_HOLE/2, 64))
-dog = m3.Manifold.extrude(cs(dog2d), T_DOG)
+dog = rounded_slab(dog2d, T_DOG, 2.0)
 
 sp2d = Point(0, 0).buffer(15, 64).difference(Point(0, 0).buffer(HOLE/2, 64))
 spacer = m3.Manifold.extrude(cs(sp2d), SPACER_W)
