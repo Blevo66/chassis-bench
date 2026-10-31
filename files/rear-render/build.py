@@ -95,8 +95,10 @@ def arm_parts(beta):
 scan = trimesh.load('/mnt/project-files/frame-scan/fusion/xl125r-frame-scan-full.stl')
 v = scan.vertices.copy(); x = v[:, 0]
 v[:, 1] -= 0.13*np.clip(-60 - x, 0, None)*np.clip((v[:, 2] - 60)/120, 0, 1)
-if False:   # (removed 31 Oct, Joel: frame went bendy) move the scan's head tube onto the bench's (bottom 516 fwd / 365 up vs the scan's ~499 / 435), blended in from x 150 to 430
-    wgt = np.clip((x - 150)/280, 0, 1); wgt = wgt*wgt*(3 - 2*wgt)
+if BENCH:   # Joel 31 Oct: the bench's head tube is right (measured 632 pivot to head). The scan's front is ~70 mm out, so ease it
+    # onto the bench's head tube (bottom 516 fwd / 365 up vs the scan's ~499 / 435) with a correction spread smoothly along the whole
+    # front of the frame (from the shock top mount, x 55, to the head), so no tube gets a visible bend. Everything behind the shock top is untouched.
+    wgt = np.clip((x - 55)/461, 0, 1); wgt = wgt*wgt*(3 - 2*wgt)
     v[:, 0] += 17*wgt; v[:, 2] += -70*wgt
 scan.vertices = v
 def pack(m, digits=1):
