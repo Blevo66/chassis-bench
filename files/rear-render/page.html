@@ -12,7 +12,7 @@ function front(opt){
   // bottom yoke), slide 0, spacer 50, offset 47 total, fork 935, front sag 74. Head tube placed on the frame scan's head tube.
   const rho=(opt.rho??27.5)*Math.PI/180;
   const u=[Math.sin(rho),-Math.cos(rho)], f=[Math.cos(rho),Math.sin(rho)];
-  const HEAD=128, bot=[516,365]; const top=[bot[0]-HEAD*u[0],bot[1]-HEAD*u[1]];  // bench head tube: bottom 516 fwd / 365 up, 150 raw x 0.853 long
+  const top=[455-25*f[0],575-25*f[1]], HEAD=145;  // head tube top centre off the frame scan (unbent)
   const offset=opt.offset??47, yokeOff=20, axleFwd=offset-yokeOff, halfSpan=105;
   const stack=215, slide=opt.slide??0, spacer=opt.spacer??50, sag=opt.fsag??74;
   const botYokeZ=-(HEAD+15+36), Hz=botYokeZ;           // local Z (up the axis) of the bottom yoke underside
