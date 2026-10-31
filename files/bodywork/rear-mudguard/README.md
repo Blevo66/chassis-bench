@@ -1,13 +1,13 @@
-# Rear mudguard v1 (mock-up): retro modern, printed in 3 parts
+# Rear mudguard v2 (mock-up): retro Honda, printed in 3 parts
 
-A slim, modern-MX-style tail with a squared-off 80s Honda look: a flat crowned top, sharp 45° chamfered shoulders and straight side skirts. It's printed in 3 parts that are pinned and glued together.
+80s Honda XR/CR style. It runs straight under the seat, then arcs round the wheel (centred on the axle at full bump) and ends in a drooping, rolled tail. The section has a domed top, rolled shoulders, a small centre spine, and skirts that are straight at the tabs and splay slightly behind. (v1 was a flat, modern-MX tail. Joel wanted it more retro, and it's still in the git history.) It's printed in 3 parts that are pinned and glued together.
 
 ## Downloads (raw links, work on the phone)
 
 Print-ready (each stands on its front face, no supports needed):
-- [Part 1, front (under the seat, carries the tab mounts)](https://raw.githubusercontent.com/Blevo66/chassis-bench/claude/project-thread-aprb8e/files/bodywork/rear-mudguard/print-part1-stand-on-end.stl): 53 x 146 x 199 mm
-- [Part 2, middle](https://raw.githubusercontent.com/Blevo66/chassis-bench/claude/project-thread-aprb8e/files/bodywork/rear-mudguard/print-part2-stand-on-end.stl): 49 x 184 x 190 mm
-- [Part 3, tail (with 2 plate-hanger holes)](https://raw.githubusercontent.com/Blevo66/chassis-bench/claude/project-thread-aprb8e/files/bodywork/rear-mudguard/print-part3-stand-on-end.stl): 33 x 184 x 190 mm
+- [Part 1, front (under the seat, carries the tab mounts)](https://raw.githubusercontent.com/Blevo66/chassis-bench/claude/project-thread-aprb8e/files/bodywork/rear-mudguard/print-part1-stand-on-end.stl): 89 x 146 x 182 mm
+- [Part 2, middle](https://raw.githubusercontent.com/Blevo66/chassis-bench/claude/project-thread-aprb8e/files/bodywork/rear-mudguard/print-part2-stand-on-end.stl): 126 x 176 x 243 mm
+- [Part 3, tail (with 2 plate-hanger holes)](https://raw.githubusercontent.com/Blevo66/chassis-bench/claude/project-thread-aprb8e/files/bodywork/rear-mudguard/print-part3-stand-on-end.stl): 120 x 176 x 244 mm
 
 For Fusion (bike position, same coordinates as the frame scan, so insert at the origin): [whole guard](https://raw.githubusercontent.com/Blevo66/chassis-bench/claude/project-thread-aprb8e/files/bodywork/rear-mudguard/rear-mudguard-assembled.stl)
 
@@ -36,8 +36,8 @@ Plots: [side view with frame scan and tyre](https://raw.githubusercontent.com/Bl
 ## Clearance (checked through the whole travel)
 
 - The tyre was modelled as 340 mm radius and 120 mm wide (18" 110/100 knobby), with the CRF250 arm at 580 mm, from full droop (24.2° down) to full bump (2.9° up), as on the bench XR tab.
-- The top centre clears the tread by **25 mm at full bump**, tightest about 565 mm behind the pivot.
-- The tightest point overall is **12.7 mm**, between the bottom inside edge of the skirt (just behind the rails) and the tyre shoulder at full bump.
+- The arc runs about 25 mm over the tread at full bump, all the way round.
+- The tightest point is **17.7 mm**, at the inside skirt edge near the tabs against the tyre shoulder, at full bump.
 
 ## Rerun with real numbers
 

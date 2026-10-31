@@ -25,8 +25,17 @@ TYRE_R, TYRE_HW, TYRE_CORNER = 340.0, 60.0, 25.0
 ARM, DROOP, BUMP = 580.0, -24.2, 2.9
 
 # top-centre line of the guard (X, Z), smoothed with a spline
-CTRL = [(-200, 312), (-270, 327.4), (-340, 343), (-420, 367), (-500, 386), (-600, 400),
-        (-700, 405), (-765, 414)]
+# Retro Honda line: straight under the seat, then an arc round the wheel (centred on the axle at full
+# bump), ending in a drooping tail like the 80s XR/CR guards.
+ARC_R = 388.0
+def _ctrl():
+    pts = [(-200.0, 312.0), (-270.0, 327.5), (-340.0, 343.0)]
+    c = AXLE_BUMP
+    a0 = np.degrees(np.arctan2(343 - c[1], -340 - c[0])) - 8
+    for a in np.linspace(a0, 128, 9):
+        pts.append((c[0] + ARC_R * np.cos(np.radians(a)), c[1] + ARC_R * np.sin(np.radians(a))))
+    return pts
+CTRL = _ctrl()
 
 
 def spline(ctrl, n=400):
@@ -72,25 +81,32 @@ def smooth(a, b, x):
 
 def half_width(X):
     return TAB_GAP / 2 + (92 - TAB_GAP / 2) * smooth(-410, -520, -X) if False else \
-        TAB_GAP / 2 + (92 - TAB_GAP / 2) * smooth(410, 520, -X)
+        TAB_GAP / 2 + (84 - TAB_GAP / 2) * smooth(410, 520, -X)
 
 
 def skirt(X):
     d = 30 + 12 * smooth(200, 300, -X)            # deepen to 42 at the tabs
     d -= 17 * smooth(380, 480, -X)                # 25 behind the rails
-    d -= 7 * smooth(600, 740, -X)                 # 18 at the tail
+    d += 3 * smooth(600, 760, -X)                 # deeper rolled tail
     return d
 
 
-CROWN, CHAMF = 6.0, 12.0
+CROWN, CHAMF, SHOULDER, SPINE = 14.0, 14.0, 14.0, 3.0
 
 
-def outer_profile(X, n_top=24):
-    W = half_width(X); D = skirt(X)
-    ys = np.linspace(-(W - CHAMF), W - CHAMF, n_top)
-    top = [(y, CROWN * (1 - (y / (W - CHAMF)) ** 2)) for y in ys]
-    mid = -(CHAMF + (D - CHAMF) * 0.5)
-    return np.array([(-W, -D), (-W, mid), (-W, -CHAMF)] + top + [(W, -CHAMF), (W, mid), (W, -D)])
+def outer_profile(X, n_top=40):
+    """Rounder 80s section: domed top, rolled shoulders, slightly splayed skirts, small centre spine."""
+    W = half_width(X); D = skirt(X); r = SHOULDER
+    ys = np.linspace(-(W - r), W - r, n_top)
+    def top_h(y):
+        h = CROWN * (1 - (y / (W - r)) ** 2)
+        return h + SPINE * np.exp(-(y / 9.0) ** 4)
+    top = [(y, top_h(y)) for y in ys]
+    sh = [((W - r) + r * np.cos(a), -r + r * np.sin(a)) for a in np.radians([60, 30, 0])]
+    splay = 4.0 * smooth(400, 480, -X)   # straight skirts at the tabs, splayed behind
+    right = sh + [(W + splay * 0.5, -(r + (D - r) * 0.5)), (W + splay, -D)]
+    left = [(-y, h) for y, h in right][::-1]
+    return np.array(left + top + right)
 
 
 def offset_inward(prof, t):
