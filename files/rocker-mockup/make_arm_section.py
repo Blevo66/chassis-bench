@@ -1,6 +1,8 @@
 import trimesh, numpy as np, json
 from shapely.geometry import Polygon
 from shapely.ops import unary_union
+# arm_armcoords.stl: the CRF250 arm from rear-end/assembly/linkage-B-sag-in-frame.stl, turned 11.65 deg about X so the
+# pivot-to-axle line is level (pivot at 0,0; X + = left, Y up, Z rearwards)
 a2=trimesh.load('arm_armcoords.stl')
 polys=[]
 for x0 in np.arange(-12,28,2):
@@ -12,4 +14,4 @@ for x0 in np.arange(-12,28,2):
 u=unary_union(polys).simplify(0.3)
 geoms=list(u.geoms) if hasattr(u,'geoms') else [u]
 for g in geoms: print(g.bounds, g.area, len(g.interiors))
-json.dump([[list(map(lambda v:round(v,1),c)) for c in g.exterior.coords] for g in geoms], open('/home/claude/chassis-bench/files/rocker-mockup/arm_section_rocker_band.json','w'))
+json.dump([[list(map(lambda v:round(v,1),c)) for c in g.exterior.coords] for g in geoms], open('arm_section_rocker_band.json','w'))

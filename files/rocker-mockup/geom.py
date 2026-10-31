@@ -11,10 +11,7 @@ def circles(c0,r0,c1,r1):
     return [(m[0]-h*ey,m[1]+h*ex),(m[0]+h*ey,m[1]-h*ex)]
 G = dict(armLen=580, armAngle=21.9, lug=(200,-50), R=(22,-29), shockTop=(-55,292), rD=111, rS=152.7, incl=65, dog=82, eye=380, stroke=95)
 ARM_SHIFT=(4,1)
-src=open('/tmp/claude-0/-home-claude-chassis-bench/4906d7fa-0700-5129-88f1-c51707ec55ce/scratchpad/yj.html').read()
-m=re.search(r"const CRF250_ARM = (\{.*?\});", src).group(1)
-m=re.sub(r"(\w+):", r'"\1":', m)
-ARM=json.loads(m)
+ARM=json.load(open('crf250_arm_bench_outline.json'))  # CRF250_ARM from the bench's index.html
 def pose(th, prevD=None, g=G):
     R=g['R']; other=rot(g['lug'],th)
     s=circles(R,g['rD'],other,g['dog'])
