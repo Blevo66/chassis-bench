@@ -12,7 +12,10 @@ def circ(c0, r0, c1, r1):
 # ---------- arm (Joel's CRF250R STEP) ----------
 PIV_M = np.array([188.5, 83.65, -54.0])   # model pivot bore centre
 def arm_local(v): return np.c_[v[:, 0] - PIV_M[0], -(v[:, 1] - PIV_M[1]), -(v[:, 2] - PIV_M[2])]   # model is upside down: turn 180 about X
-LUG = arm_local(np.array([[-20.4, 0, 1.9]]))[0][[0, 2]]  # lug hole in (X, Z), arm level
+LUG_MODEL = arm_local(np.array([[-20.4, 0, 1.9]]))[0][[0, 2]]  # lug hole in (X, Z), arm level: (-208.9, -55.9)
+BENCH = True   # Joel 31 Oct: render from the Chassis Bench numbers -> lug at the bench's 200 along / 50 below, arm model shifted to suit
+LUG = np.array([-200.0, -50.0]) if BENCH else LUG_MODEL
+ARM_SHIFT = LUG - LUG_MODEL
 # ---------- linkage (Joel's v2 rocker hole centres, 82 dogbone, XR 380/95) ----------
 R = np.array([-22.0, -29.0]); T = np.array([55.0, 292.0])
 PIV_SK, DOG_SK, SHK_SK = np.array([0, 0.]), np.array([-57.3, -93.9]), np.array([-151.7, 17.6])
@@ -83,7 +86,7 @@ def arm_parts(beta):
     for name, ids in (('arm', [82]), ('armbits', [74, 75, 76, 77, 80, 81]), ('slider', [83]), ('pivotbits', [78, 79])):
         ms = []
         for i in ids:
-            t = trimesh.load(f'{W}parts/{i:03d}.stl'); v = arm_local(t.vertices)
+            t = trimesh.load(f'{W}parts/{i:03d}.stl'); v = arm_local(t.vertices); v[:, 0] += ARM_SHIFT[0]; v[:, 2] += ARM_SHIFT[1]
             xz = np.c_[v[:, 0]*math.cos(beta) - v[:, 2]*math.sin(beta), v[:, 0]*math.sin(beta) + v[:, 2]*math.cos(beta)]
             ms.append(trimesh.Trimesh(np.c_[xz[:, 0], v[:, 1], xz[:, 1]], t.faces))
         m = trimesh.util.concatenate(ms); out[name] = m
@@ -92,12 +95,15 @@ def arm_parts(beta):
 scan = trimesh.load('/mnt/project-files/frame-scan/fusion/xl125r-frame-scan-full.stl')
 v = scan.vertices.copy(); x = v[:, 0]
 v[:, 1] -= 0.13*np.clip(-60 - x, 0, None)*np.clip((v[:, 2] - 60)/120, 0, 1)
+if BENCH:   # move the scan's head tube onto the bench's (bottom 516 fwd / 365 up vs the scan's ~499 / 435), blended in from x 150 to 430
+    wgt = np.clip((x - 150)/280, 0, 1); wgt = wgt*wgt*(3 - 2*wgt)
+    v[:, 0] += 17*wgt; v[:, 2] += -70*wgt
 scan.vertices = v
 def pack(m, digits=1):
     m = m.copy(); m.merge_vertices(); m = trimesh.graph.smooth_shade(m, angle=np.radians(35))
     return dict(v=np.round(m.vertices, digits).ravel().tolist(), i=m.faces.ravel().astype(int).tolist())
 scene = dict(scan=pack(scan), arm={k: pack(m) for k, m in arm_parts(0.0).items()}, poses={})
-keys = [('sag', at_travel(95)), ('droop', droop), ('bump', bump)]
+keys = [('sag', at_travel(79)), ('droop', droop), ('bump', bump)]
 NF = int(sys.argv[1]) if len(sys.argv) > 1 else 0
 for k in range(NF):   # animation frames, droop -> bump -> droop (cosine eased)
     w = bump['wt']*(1 - math.cos(2*math.pi*k/NF))/2
