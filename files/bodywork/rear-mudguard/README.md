@@ -11,7 +11,9 @@ Print-ready (each stands on its front face, no supports needed):
 
 For Fusion (bike position, same coordinates as the frame scan, so insert at the origin): [whole guard](https://raw.githubusercontent.com/Blevo66/chassis-bench/claude/project-thread-aprb8e/files/bodywork/rear-mudguard/rear-mudguard-assembled.stl)
 
-Pictures: [side view with frame scan and tyre](https://raw.githubusercontent.com/Blevo66/chassis-bench/claude/project-thread-aprb8e/files/bodywork/rear-mudguard/rear-mudguard-side.png), [3D view](https://raw.githubusercontent.com/Blevo66/chassis-bench/claude/project-thread-aprb8e/files/bodywork/rear-mudguard/rear-mudguard-3d.png)
+Renders: [three-quarter rear, at sag](https://raw.githubusercontent.com/Blevo66/chassis-bench/claude/project-thread-aprb8e/files/bodywork/rear-mudguard/render-rear-three-quarter.png), [side, at full bump](https://raw.githubusercontent.com/Blevo66/chassis-bench/claude/project-thread-aprb8e/files/bodywork/rear-mudguard/render-side-full-bump.png), [the 3 parts coloured](https://raw.githubusercontent.com/Blevo66/chassis-bench/claude/project-thread-aprb8e/files/bodywork/rear-mudguard/render-parts.png). The frame in the renders is the phone scan, with its skewed back end straightened onto the centreline; the swingarm is a stand-in.
+
+Plots: [side view with frame scan and tyre](https://raw.githubusercontent.com/Blevo66/chassis-bench/claude/project-thread-aprb8e/files/bodywork/rear-mudguard/rear-mudguard-side.png), [3D view](https://raw.githubusercontent.com/Blevo66/chassis-bench/claude/project-thread-aprb8e/files/bodywork/rear-mudguard/rear-mudguard-3d.png)
 
 ## Fitting
 
