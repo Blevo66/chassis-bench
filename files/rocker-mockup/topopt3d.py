@@ -13,7 +13,7 @@ from geom import G, sweep, rot
 
 STL = sys.argv[1] if len(sys.argv) > 1 else 'joel_rocker.stl'
 H = float(sys.argv[2]) if len(sys.argv) > 2 else 2.0
-VOLFRAC, PENAL, RMIN, ITERS = 0.30, 3.0, 1.6*H, int(sys.argv[3]) if len(sys.argv) > 3 else 60
+VOLFRAC, PENAL, RMIN, ITERS = float(sys.argv[4]) if len(sys.argv) > 4 else 0.30, 3.0, (float(sys.argv[5]) if len(sys.argv) > 5 else 1.6)*H, int(sys.argv[3]) if len(sys.argv) > 3 else 60
 CLEAR, CLEAR_SHK, RING = 5.0, 3.0, 5.0
 PIV, DOG, SHK = (0.0, 0.0), (-57.3, -93.9), (-151.7, 17.6)        # Joel's hole centres
 HOLE_R = {PIV: 6.04, DOG: 5.09, SHK: 5.09}
@@ -119,3 +119,23 @@ for it in range(ITERS):
     if it > 20 and ch < 0.01: break
 rho = np.zeros((nx, ny, nz)); rho[el[:, 0], el[:, 1], el[:, 2]] = xP
 np.save('topopt3d_density.npy', rho); json.dump({'lo': lo.tolist(), 'H': H, 'shape': [nx, ny, nz]}, open('topopt3d_grid.json', 'w'))
+
+# ---- stress check: final design thresholded at 0.5, steel, "massive jump" = JUMP x the full-bump load
+JUMP = float(sys.argv[6]) if len(sys.argv) > 6 else 3.0
+Es = 200e3                                    # MPa (N/mm2); KE was built for E = 1 and scaled by H
+solidm = (xP > 0.5) | isbolt
+E2 = np.where(solidm, 1.0, 1e-6); E2[isbolt] = 10.0
+K = sp.csr_matrix((np.kron(E2*Es, KE.ravel()), (iK, jK)), shape=(ndof, ndof)); Kf = K[free][:, free].tocsr()
+ml = pyamg.smoothed_aggregation_solver(Kf, max_coarse=2000)
+nu = 0.3; lam, mu = nu/((1 + nu)*(1 - 2*nu)), 1/(2*(1 + nu))
+Cm = np.zeros((6, 6)); Cm[:3, :3] = lam; Cm[range(3), range(3)] += 2*mu; Cm[range(3, 6), range(3, 6)] = mu
+dN = np.array([[-1,1,1,-1,-1,1,1,-1],[-1,-1,1,1,-1,-1,1,1],[-1,-1,-1,-1,1,1,1,1]])/4/H   # centre of the cube
+B = np.zeros((6, 24)); B[0, 0::3] = dN[0]; B[1, 1::3] = dN[1]; B[2, 2::3] = dN[2]
+B[3, 0::3] = dN[1]; B[3, 1::3] = dN[0]; B[4, 1::3] = dN[2]; B[4, 2::3] = dN[1]; B[5, 0::3] = dN[2]; B[5, 2::3] = dN[0]
+U = np.zeros(ndof); U[free], info = cg(Kf, JUMP*F[free, 0], rtol=1e-8, maxiter=2000, M=ml.aspreconditioner())
+sg = (Es*(Cm @ B @ U[edof].T)).T
+vm = np.sqrt(0.5*((sg[:, 0]-sg[:, 1])**2 + (sg[:, 1]-sg[:, 2])**2 + (sg[:, 2]-sg[:, 0])**2) + 3*(sg[:, 3]**2 + sg[:, 4]**2 + sg[:, 5]**2))
+body = solidm & ~isbolt
+v = vm[body]
+print(f'STRESS at {JUMP:.0f}x full bump: max {v.max():.0f} MPa, 99.5% {np.percentile(v, 99.5):.0f}, 99% {np.percentile(v, 99):.0f}, 95% {np.percentile(v, 95):.0f}  (solid frac {body.sum()/act.sum():.2f})', flush=True)
+np.save('topopt3d_vm.npy', np.c_[el, vm])
