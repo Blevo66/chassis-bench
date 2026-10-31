@@ -12,7 +12,7 @@ function front(opt){
   const u=[Math.sin(ang),-Math.cos(ang)], f=[Math.cos(ang),Math.sin(ang)];
   const top=[455-25*f[0],575-25*f[1]];       // head tube top centre, 25 mm behind the front edge
   const HEAD=145, yokeOff=20, axleFwd=40, halfSpan=105;  // Joel 31 Oct: yokes 20 mm offset, axle 40 mm ahead of the tube centreline
-  const spacer=opt.spacer??50, fork=935-spacer, sag=opt.fsag??75, slide=0;  // Joel: 935 top of fork to axle fully extended; 50 mm internal spacer (31 Oct)
+  const spacer=opt.spacer??100, fork=935-spacer, sag=opt.fsag??75, slide=0;  // Joel: 935 top of fork to axle fully extended; 50 mm internal spacer (31 Oct)
   const topYokeZ=15, botYokeZ=-(HEAD+10+36);   // local Z up the axis from the head tube top
   const tubeTopZ=topYokeZ+20+slide, len=fork-sag, axleZ=tubeTopZ-len, sliderTopZ=axleZ+360;
   const t=-axleZ, fw=yokeOff+axleFwd; const ax=[top[0]+t*u[0]+fw*f[0], top[1]+t*u[1]+fw*f[1]];
@@ -122,9 +122,10 @@ window.renderView=async function(opt){
     const bar=new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(bp),80,14.3,16,false),barM); bar.castShadow=true; SG.add(bar);
     for(const s of [1,-1]){const gr=new THREE.Mesh(new THREE.CylinderGeometry(16,16,130,24),M(0x111111,0,0.9)); gr.position.set(-40,s*340,FA.topYokeZ+105); gr.castShadow=true; SG.add(gr);}
     if(opt.wheel!==false) makeWheel(FA.axle,RF,267,46,62);
+    if(opt.label){} 
   }
   // pitch the whole bike about the swingarm pivot so both tyres sit on the ground
-  let pitch=0; if(opt.level!==false&&opt.front!==false){const ax=FA.axle[0]-P.axle[0], az=FA.axle[1]-P.axle[1], L=Math.hypot(ax,az); pitch=Math.asin((RF-RR)/L)-Math.atan2(az,ax);}
+  let pitch=0; if(opt.pitchDeg!==undefined){pitch=opt.pitchDeg*Math.PI/180;} else if(opt.level!==false&&opt.front!==false){const ax=FA.axle[0]-P.axle[0], az=FA.axle[1]-P.axle[1], L=Math.hypot(ax,az); pitch=Math.asin((RF-RR)/L)-Math.atan2(az,ax);}
   root.rotation.y=-pitch; const rr=[P.axle[0]*Math.cos(pitch)-P.axle[1]*Math.sin(pitch), P.axle[0]*Math.sin(pitch)+P.axle[1]*Math.cos(pitch)];
   {const c=Math.cos(pitch),s=Math.sin(pitch); const R2=q=>[q[0]*c-q[1]*s,q[0]*s+q[1]*c]; const fa=R2(FA.axle), ra=R2(P.axle), ht=R2(FA.top), uu=R2(FA.u);
    const gzz=ra[1]-RR; const tt=(gzz-ht[1])/uu[1]; const hitX=ht[0]+tt*uu[0]; console.log('wheelbase',(fa[0]-ra[0]).toFixed(0),'trail',(hitX-fa[0]).toFixed(0),'pivot height',(-gzz).toFixed(0));}
