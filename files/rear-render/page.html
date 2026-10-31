@@ -1,0 +1,76 @@
+<!doctype html><html><head><meta charset="utf-8"></head><body style="margin:0;background:#20242a">
+<script type="importmap">{"imports":{"three":"./node_modules/three/build/three.module.js"}}</script>
+<script type="module">
+import * as THREE from 'three';
+import {RoomEnvironment} from './node_modules/three/examples/jsm/environments/RoomEnvironment.js';
+let SCENE=null;
+async function load(){ if(!SCENE) SCENE=await (await fetch('scene.json')).json(); return SCENE; }
+function geo(o){const g=new THREE.BufferGeometry(); g.setAttribute('position',new THREE.Float32BufferAttribute(o.v,3)); g.setIndex(o.i); g.computeVertexNormals(); return g;}
+const M=(c,m,r,extra={})=>new THREE.MeshStandardMaterial(Object.assign({color:c,metalness:m,roughness:r},extra));
+window.renderView=async function(opt){
+  const D=await load(); const P=D.poses[opt.pose];
+  const W=opt.w,H=opt.h;
+  const r=new THREE.WebGLRenderer({antialias:true,preserveDrawingBuffer:true});
+  r.setSize(W,H); r.setPixelRatio(1); r.shadowMap.enabled=true; r.shadowMap.type=THREE.PCFSoftShadowMap;
+  r.toneMapping=THREE.ACESFilmicToneMapping; r.toneMappingExposure=1.0; r.outputColorSpace=THREE.SRGBColorSpace;
+  document.body.innerHTML=''; document.body.appendChild(r.domElement);
+  const sc=new THREE.Scene(); sc.background=new THREE.Color(opt.bg||0xdfe3e8);
+  const pm=new THREE.PMREMGenerator(r); sc.environment=pm.fromScene(new RoomEnvironment(),0.04).texture;
+  const cam=new THREE.PerspectiveCamera(opt.fov||30,W/H,10,20000); cam.up.set(0,0,1);
+  cam.position.set(...opt.cam); cam.lookAt(...opt.look);
+  sc.add(new THREE.HemisphereLight(0xffffff,0x606870,0.5));
+  const d=new THREE.DirectionalLight(0xffffff,2.0); d.position.set(-500,1200,1800); d.castShadow=true;
+  d.shadow.mapSize.set(4096,4096); d.shadow.bias=-0.0004; Object.assign(d.shadow.camera,{left:-1200,right:1200,top:1200,bottom:-1200,near:10,far:6000}); sc.add(d);
+  const d2=new THREE.DirectionalLight(0xffffff,1.3); d2.position.set(-600,-1400,900); sc.add(d2);
+  const add=(o,mat,parent=sc)=>{const m=new THREE.Mesh(geo(o),mat); m.castShadow=m.receiveShadow=true; parent.add(m); return m;};
+  const mats={
+    scan:M(0xb02a22,0.25,0.55), arm:M(0xc9ccd0,0.85,0.32), armbits:M(0x2a2a2a,0.3,0.6), slider:M(0x111111,0,0.8),
+    pivotbits:M(0x888888,0.8,0.4), rocker:M(0x6b7078,0.9,0.42), dogbone:M(0x2350a8,0.7,0.3), bolts:M(0xdedede,0.95,0.25)};
+  if(opt.scan!==false){ add(D.scan,mats.scan); }
+  if(opt.xray){for(const k of ['arm','armbits','slider','pivotbits']){mats[k].transparent=true; mats[k].opacity=opt.xray; mats[k].depthWrite=false;}}
+  if(opt.title){} 
+  const armG=new THREE.Group(); armG.rotation.y=-P.beta*Math.PI/180; sc.add(armG);
+  for(const [k,o] of Object.entries(D.arm)){ if(opt.hide&&opt.hide.includes(k)) continue; const m=add(o,mats[k],armG); if(opt.xray){m.castShadow=false; m.renderOrder=2;} }
+  for(const [k,o] of Object.entries(P.objs)){ if(opt.hide&&opt.hide.includes(k)) continue; const m=add(o,mats[k]); if(opt.xray&&['arm','armbits','slider','pivotbits'].includes(k)){m.castShadow=false; m.renderOrder=2;} }
+  // ---- shock: XR250R 380/95, clevis bottom
+  const S=new THREE.Vector3(P.S[0],10,P.S[1]), T=new THREE.Vector3(P.T[0],10,P.T[1]); const L=S.distanceTo(T);
+  const g=new THREE.Group(); g.position.copy(S); g.rotation.y=-Math.atan2(T.z-S.z,T.x-S.x); sc.add(g);
+  const cx=(r1,r2,len,x0,mat,seg=48)=>{const c=new THREE.CylinderGeometry(r2,r1,len,seg); c.rotateZ(-Math.PI/2); const m=new THREE.Mesh(c,mat); m.position.x=x0+len/2; m.castShadow=m.receiveShadow=true; g.add(m); return m;};
+  const blk=M(0x1c1c1e,0.4,0.45), alu=M(0xb9bcc0,0.85,0.3), chrome=M(0xf2f2f2,1,0.08), spr=M(0xf2be12,0.35,0.35), rub=M(0x101010,0,0.9);
+  // clevis: two ears + bridge
+  for(const y of [-21,21]){const e=new THREE.Mesh(new THREE.CylinderGeometry(13,13,8,40),alu); e.position.set(0,y,0); e.castShadow=true; g.add(e);
+    const b=new THREE.Mesh(new THREE.BoxGeometry(32,8,26),alu); b.position.set(16,y,0); b.castShadow=true; g.add(b);}
+  cx(22,22,26,28,alu); // clevis bridge / body
+  cx(39,39,6,66,alu); // lower spring seat (bolt to seat ~72)
+  cx(8,8,L-200,40,chrome); // shaft
+  const bodyStart=L-197; cx(23,23,177,bodyStart,blk); cx(25,25,10,bodyStart,alu); cx(16,16,14,bodyStart-14,rub);
+  cx(35,35,8,L-70,alu); cx(27,27,12,L-62,alu); // upper seat + preload ring
+  const eye=new THREE.Mesh(new THREE.CylinderGeometry(15,15,26,40),blk); eye.position.set(L,0,0); eye.castShadow=true; g.add(eye);
+  cx(14,14,20,L-30,blk);
+  // spring helix 72 -> L-70, OD ~76, wire 9
+  const s0=72, s1=L-70, Rm=33, n=7.5;
+  class Helix extends THREE.Curve{getPoint(t,o=new THREE.Vector3()){const a=t*n*2*Math.PI; return o.set(s0+4.5+t*(s1-s0-9),Rm*Math.cos(a),Rm*Math.sin(a));}}
+  const sp=new THREE.Mesh(new THREE.TubeGeometry(new Helix(),600,4.6,14,false),spr); sp.castShadow=true; g.add(sp);
+  // ---- wheel
+  if(opt.wheel!==false){
+  const ax=P.axle; const wheel=new THREE.Group(); wheel.position.set(ax[0],0,ax[1]); sc.add(wheel);
+  const Rt=335,HW=58,c=25; const pts=[new THREE.Vector2(232,-50)];
+  for(let i=0;i<=10;i++){const t=Math.PI*1.5+i/10*Math.PI/2; pts.push(new THREE.Vector2(Rt-c+c*Math.cos(t),-HW+c+c*Math.sin(t)));}
+  for(let i=0;i<=10;i++){const t=i/10*Math.PI/2; pts.push(new THREE.Vector2(Rt-c+c*Math.cos(t),HW-c+c*Math.sin(t)));}
+  pts.push(new THREE.Vector2(232,50));
+  const tyre=new THREE.Mesh(new THREE.LatheGeometry(pts,120),M(0x1b1b1b,0,0.9)); tyre.castShadow=true; wheel.add(tyre);
+  const km=M(0x151515,0,0.95);
+  for(let i=0;i<64;i++){const t=i/64*Math.PI*2; for(const y of (i%2?[-30,30]:[0,-46,46])){const k=new THREE.Mesh(new THREE.BoxGeometry(16,8,20),km); k.position.set((Rt+3)*Math.cos(t),y,(Rt+3)*Math.sin(t)); k.rotation.y=-t; k.castShadow=true; wheel.add(k);}}
+  const rim=new THREE.Mesh(new THREE.TorusGeometry(228,9,12,96),M(0xd4af37,0.85,0.3)); rim.rotation.x=Math.PI/2; wheel.add(rim);
+  const hub=new THREE.Mesh(new THREE.CylinderGeometry(50,50,100,40),M(0xaaaaaa,0.8,0.35)); hub.castShadow=true; wheel.add(hub);
+  const disc=new THREE.Mesh(new THREE.CylinderGeometry(120,120,4,64),M(0x999999,0.9,0.3)); disc.position.y=-62; wheel.add(disc);
+  const spM=M(0xcccccc,0.95,0.2);
+  for(let i=0;i<36;i++){const t=i/36*Math.PI*2; const s=new THREE.Vector3(45*Math.cos(t),(i%2?1:-1)*45,45*Math.sin(t)), e=new THREE.Vector3(222*Math.cos(t+0.35),(i%2?1:-1)*8,222*Math.sin(t+0.35)); const Ls=s.distanceTo(e); const q=new THREE.Mesh(new THREE.CylinderGeometry(2,2,Ls,6),spM); q.position.copy(s.clone().add(e).multiplyScalar(.5)); q.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),e.clone().sub(s).normalize()); wheel.add(q);}
+  const axl=new THREE.Mesh(new THREE.CylinderGeometry(10,10,300,24),mats.bolts); wheel.add(axl);
+  }
+  const gz=(opt.groundZ!==undefined)?opt.groundZ:P.axle[1]-338;
+  const gr=new THREE.Mesh(new THREE.PlaneGeometry(10000,10000),new THREE.ShadowMaterial({opacity:.22})); gr.position.z=gz; gr.receiveShadow=true; sc.add(gr);
+  r.render(sc,cam); const u=r.domElement.toDataURL('image/png'); r.dispose(); return u;
+};
+window.ready=true;
+</script></body></html>
