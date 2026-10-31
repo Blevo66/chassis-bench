@@ -1,0 +1,48 @@
+{
+ "pivot_to_dogbone": 111.0,
+ "pivot_to_shock": 152.6954910925663,
+ "dogbone_to_shock": 145.983742245498,
+ "angle_at_pivot": 65,
+ "angle_at_dogbone": 71.43845556144579,
+ "angle_at_shock": 43.56154443855421,
+ "Full droop (shock 380)": {
+  "R": [
+   -22,
+   -29
+  ],
+  "D": [
+   -80.1,
+   -123.6
+  ],
+  "S": [
+   -173.7,
+   -11.5
+  ],
+  "lug": [
+   -162.0,
+   -127.4
+  ],
+  "pivot_to_dogbone_line_deg_below_level_rearwards": 58.4,
+  "arm_deg": -24.2
+ },
+ "Full bump (shock 285)": {
+  "R": [
+   -22,
+   -29
+  ],
+  "D": [
+   -125.6,
+   -68.9
+  ],
+  "S": [
+   -131.9,
+   77.0
+  ],
+  "lug": [
+   -202.3,
+   -39.8
+  ],
+  "pivot_to_dogbone_line_deg_below_level_rearwards": 21.1,
+  "arm_deg": 2.9
+ }
+}
