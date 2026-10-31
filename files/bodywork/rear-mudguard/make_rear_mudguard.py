@@ -27,11 +27,11 @@ ARM, DROOP, BUMP = 580.0, -24.2, 2.9
 # top-centre line of the guard (X, Z), smoothed with a spline
 # Retro Honda line: straight under the seat, then an arc round the wheel (centred on the axle at full
 # bump), ending in a drooping tail like the 80s XR/CR guards.
-ARC_R = 388.0
+ARC_R = 365.0
 def _ctrl():
     pts = [(-200.0, 312.0), (-270.0, 327.5), (-340.0, 343.0)]
     c = AXLE_BUMP
-    a0 = np.degrees(np.arctan2(343 - c[1], -340 - c[0])) - 8
+    a0 = np.degrees(np.arctan2(343 - c[1], -340 - c[0])) + 12
     for a in np.linspace(a0, 128, 9):
         pts.append((c[0] + ARC_R * np.cos(np.radians(a)), c[1] + ARC_R * np.sin(np.radians(a))))
     return pts
@@ -86,7 +86,7 @@ def half_width(X):
 
 def skirt(X):
     d = 30 + 12 * smooth(200, 300, -X)            # deepen to 42 at the tabs
-    d -= 17 * smooth(380, 480, -X)                # 25 behind the rails
+    d -= 20 * smooth(350, 405, -X)                # shallow behind the tabs, clear of the tyre shoulder
     d += 3 * smooth(600, 760, -X)                 # deeper rolled tail
     return d
 

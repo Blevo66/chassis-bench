@@ -5,9 +5,9 @@
 ## Downloads (raw links, work on the phone)
 
 Print-ready (each stands on its front face, no supports needed):
-- [Part 1, front (under the seat, carries the tab mounts)](https://raw.githubusercontent.com/Blevo66/chassis-bench/claude/project-thread-aprb8e/files/bodywork/rear-mudguard/print-part1-stand-on-end.stl): 89 x 146 x 182 mm
-- [Part 2, middle](https://raw.githubusercontent.com/Blevo66/chassis-bench/claude/project-thread-aprb8e/files/bodywork/rear-mudguard/print-part2-stand-on-end.stl): 126 x 176 x 243 mm
-- [Part 3, tail (with 2 plate-hanger holes)](https://raw.githubusercontent.com/Blevo66/chassis-bench/claude/project-thread-aprb8e/files/bodywork/rear-mudguard/print-part3-stand-on-end.stl): 120 x 176 x 244 mm
+- [Part 1, front (under the seat, carries the tab mounts)](https://raw.githubusercontent.com/Blevo66/chassis-bench/claude/project-thread-aprb8e/files/bodywork/rear-mudguard/print-part1-stand-on-end.stl): 59 x 146 x 215 mm
+- [Part 2, middle](https://raw.githubusercontent.com/Blevo66/chassis-bench/claude/project-thread-aprb8e/files/bodywork/rear-mudguard/print-part2-stand-on-end.stl): 58 x 176 x 211 mm
+- [Part 3, tail (with 2 plate-hanger holes)](https://raw.githubusercontent.com/Blevo66/chassis-bench/claude/project-thread-aprb8e/files/bodywork/rear-mudguard/print-part3-stand-on-end.stl): 98 x 176 x 206 mm
 
 For Fusion (bike position, same coordinates as the frame scan, so insert at the origin): [whole guard](https://raw.githubusercontent.com/Blevo66/chassis-bench/claude/project-thread-aprb8e/files/bodywork/rear-mudguard/rear-mudguard-assembled.stl)
 
@@ -36,8 +36,8 @@ Plots: [side view with frame scan and tyre](https://raw.githubusercontent.com/Bl
 ## Clearance (checked through the whole travel)
 
 - The tyre was modelled as 340 mm radius and 120 mm wide (18" 110/100 knobby), with the CRF250 arm at 580 mm, from full droop (24.2° down) to full bump (2.9° up), as on the bench XR tab.
-- The arc runs about 25 mm over the tread at full bump, all the way round.
-- The tightest point is **17.7 mm**, at the inside skirt edge near the tabs against the tyre shoulder, at full bump.
+- The arc hugs the tyre at **about 35 mm over the tread at full bump**, all the way round (30 mm at the closest).
+- The tightest point is **17 mm**, at the inside skirt edge just behind the tabs against the tyre shoulder, at full bump.
 
 ## Rerun with real numbers
 
