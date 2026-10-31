@@ -7,6 +7,17 @@ let SCENE=null;
 async function load(){ if(!SCENE) SCENE=await (await fetch('scene.json')).json(); return SCENE; }
 function geo(o){const g=new THREE.BufferGeometry(); g.setAttribute('position',new THREE.Float32BufferAttribute(o.v,3)); g.setIndex(o.i); g.computeVertexNormals(); return g;}
 const M=(c,m,r,extra={})=>new THREE.MeshStandardMaterial(Object.assign({color:c,metalness:m,roughness:r},extra));
+function front(opt){
+  const ang=27.0*Math.PI/180;               // head tube axis in the scan frame, from the scan (front edge 455/575 to 518/450)
+  const u=[Math.sin(ang),-Math.cos(ang)], f=[Math.cos(ang),Math.sin(ang)];
+  const top=[455-25*f[0],575-25*f[1]];       // head tube top centre, 25 mm behind the front edge
+  const HEAD=145, yokeOff=20, axleFwd=40, halfSpan=105;  // Joel 31 Oct: yokes 20 mm offset, axle 40 mm ahead of the tube centreline
+  const fork=935, sag=opt.fsag??75, slide=0;  // Joel: 935 top of fork to axle, fully extended (no spacer shown)
+  const topYokeZ=15, botYokeZ=-(HEAD+10+36);   // local Z up the axis from the head tube top
+  const tubeTopZ=topYokeZ+20+slide, len=fork-sag, axleZ=tubeTopZ-len, sliderTopZ=axleZ+360;
+  const t=-axleZ, fw=yokeOff+axleFwd; const ax=[top[0]+t*u[0]+fw*f[0], top[1]+t*u[1]+fw*f[1]];
+  return {u,f,top,yokeOff,axleFwd,halfSpan,topYokeZ,botYokeZ,tubeTopZ,axleZ,sliderTopZ,axle:ax};
+}
 window.renderView=async function(opt){
   const D=await load(); const P=D.poses[opt.pose];
   const W=opt.w,H=opt.h;
@@ -22,19 +33,20 @@ window.renderView=async function(opt){
   const d=new THREE.DirectionalLight(0xffffff,2.0); d.position.set(-500,1200,1800); d.castShadow=true;
   d.shadow.mapSize.set(4096,4096); d.shadow.bias=-0.0004; Object.assign(d.shadow.camera,{left:-1200,right:1200,top:1200,bottom:-1200,near:10,far:6000}); sc.add(d);
   const d2=new THREE.DirectionalLight(0xffffff,1.3); d2.position.set(-600,-1400,900); sc.add(d2);
-  const add=(o,mat,parent=sc)=>{const m=new THREE.Mesh(geo(o),mat); m.castShadow=m.receiveShadow=true; parent.add(m); return m;};
+  const root=new THREE.Group(); sc.add(root);
+  const add=(o,mat,parent=root)=>{const m=new THREE.Mesh(geo(o),mat); m.castShadow=m.receiveShadow=true; parent.add(m); return m;};
   const mats={
     scan:M(0xb02a22,0.25,0.55), arm:M(0xc9ccd0,0.85,0.32), armbits:M(0x2a2a2a,0.3,0.6), slider:M(0x111111,0,0.8),
     pivotbits:M(0x888888,0.8,0.4), rocker:M(0x6b7078,0.9,0.42), dogbone:M(0x2350a8,0.7,0.3), bolts:M(0xdedede,0.95,0.25)};
   if(opt.scan!==false){ add(D.scan,mats.scan); }
   if(opt.xray){for(const k of ['arm','armbits','slider','pivotbits']){mats[k].transparent=true; mats[k].opacity=opt.xray; mats[k].depthWrite=false;}}
   if(opt.title){} 
-  const armG=new THREE.Group(); armG.rotation.y=-P.beta*Math.PI/180; sc.add(armG);
+  const armG=new THREE.Group(); armG.rotation.y=-P.beta*Math.PI/180; root.add(armG);
   for(const [k,o] of Object.entries(D.arm)){ if(opt.hide&&opt.hide.includes(k)) continue; const m=add(o,mats[k],armG); if(opt.xray){m.castShadow=false; m.renderOrder=2;} }
   for(const [k,o] of Object.entries(P.objs)){ if(opt.hide&&opt.hide.includes(k)) continue; const m=add(o,mats[k]); if(opt.xray&&['arm','armbits','slider','pivotbits'].includes(k)){m.castShadow=false; m.renderOrder=2;} }
   // ---- shock: XR250R 380/95, clevis bottom
   const S=new THREE.Vector3(P.S[0],10,P.S[1]), T=new THREE.Vector3(P.T[0],10,P.T[1]); const L=S.distanceTo(T);
-  const g=new THREE.Group(); g.position.copy(S); g.rotation.y=-Math.atan2(T.z-S.z,T.x-S.x); sc.add(g);
+  const g=new THREE.Group(); g.position.copy(S); g.rotation.y=-Math.atan2(T.z-S.z,T.x-S.x); root.add(g);
   const cx=(r1,r2,len,x0,mat,seg=48)=>{const c=new THREE.CylinderGeometry(r2,r1,len,seg); c.rotateZ(-Math.PI/2); const m=new THREE.Mesh(c,mat); m.position.x=x0+len/2; m.castShadow=m.receiveShadow=true; g.add(m); return m;};
   const blk=M(0x1c1c1e,0.4,0.45), alu=M(0xb9bcc0,0.85,0.3), chrome=M(0xf2f2f2,1,0.08), spr=M(0xf2be12,0.35,0.35), rub=M(0x101010,0,0.9);
   // clevis: two ears + bridge
@@ -51,24 +63,73 @@ window.renderView=async function(opt){
   const s0=72, s1=L-70, Rm=33, n=7.5;
   class Helix extends THREE.Curve{getPoint(t,o=new THREE.Vector3()){const a=t*n*2*Math.PI; return o.set(s0+4.5+t*(s1-s0-9),Rm*Math.cos(a),Rm*Math.sin(a));}}
   const sp=new THREE.Mesh(new THREE.TubeGeometry(new Helix(),600,4.6,14,false),spr); sp.castShadow=true; g.add(sp);
-  // ---- wheel
-  if(opt.wheel!==false){
-  const ax=P.axle; const wheel=new THREE.Group(); wheel.position.set(ax[0],0,ax[1]); sc.add(wheel);
-  const Rt=335,HW=58,c=25; const pts=[new THREE.Vector2(232,-50)];
-  for(let i=0;i<=10;i++){const t=Math.PI*1.5+i/10*Math.PI/2; pts.push(new THREE.Vector2(Rt-c+c*Math.cos(t),-HW+c+c*Math.sin(t)));}
-  for(let i=0;i<=10;i++){const t=i/10*Math.PI/2; pts.push(new THREE.Vector2(Rt-c+c*Math.cos(t),HW-c+c*Math.sin(t)));}
-  pts.push(new THREE.Vector2(232,50));
-  const tyre=new THREE.Mesh(new THREE.LatheGeometry(pts,120),M(0x1b1b1b,0,0.9)); tyre.castShadow=true; wheel.add(tyre);
-  const km=M(0x151515,0,0.95);
-  for(let i=0;i<64;i++){const t=i/64*Math.PI*2; for(const y of (i%2?[-30,30]:[0,-46,46])){const k=new THREE.Mesh(new THREE.BoxGeometry(16,8,20),km); k.position.set((Rt+3)*Math.cos(t),y,(Rt+3)*Math.sin(t)); k.rotation.y=-t; k.castShadow=true; wheel.add(k);}}
-  const rim=new THREE.Mesh(new THREE.TorusGeometry(228,9,12,96),M(0xd4af37,0.85,0.3)); rim.rotation.x=Math.PI/2; wheel.add(rim);
-  const hub=new THREE.Mesh(new THREE.CylinderGeometry(50,50,100,40),M(0xaaaaaa,0.8,0.35)); hub.castShadow=true; wheel.add(hub);
-  const disc=new THREE.Mesh(new THREE.CylinderGeometry(120,120,4,64),M(0x999999,0.9,0.3)); disc.position.y=-62; wheel.add(disc);
-  const spM=M(0xcccccc,0.95,0.2);
-  for(let i=0;i<36;i++){const t=i/36*Math.PI*2; const s=new THREE.Vector3(45*Math.cos(t),(i%2?1:-1)*45,45*Math.sin(t)), e=new THREE.Vector3(222*Math.cos(t+0.35),(i%2?1:-1)*8,222*Math.sin(t+0.35)); const Ls=s.distanceTo(e); const q=new THREE.Mesh(new THREE.CylinderGeometry(2,2,Ls,6),spM); q.position.copy(s.clone().add(e).multiplyScalar(.5)); q.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),e.clone().sub(s).normalize()); wheel.add(q);}
-  const axl=new THREE.Mesh(new THREE.CylinderGeometry(10,10,300,24),mats.bolts); wheel.add(axl);
+  // ---- wheels
+  function makeWheel(pos,Rt,rimR,HW,discY){
+    const wheel=new THREE.Group(); wheel.position.set(pos[0],0,pos[1]); root.add(wheel);
+    const c=Math.min(25,HW-5); const pts=[new THREE.Vector2(rimR+4,-HW+8)];
+    for(let i=0;i<=10;i++){const t=Math.PI*1.5+i/10*Math.PI/2; pts.push(new THREE.Vector2(Rt-c+c*Math.cos(t),-HW+c+c*Math.sin(t)));}
+    for(let i=0;i<=10;i++){const t=i/10*Math.PI/2; pts.push(new THREE.Vector2(Rt-c+c*Math.cos(t),HW-c+c*Math.sin(t)));}
+    pts.push(new THREE.Vector2(rimR+4,HW-8));
+    const tyre=new THREE.Mesh(new THREE.LatheGeometry(pts,120),M(0x1b1b1b,0,0.9)); tyre.castShadow=true; wheel.add(tyre);
+    const km=M(0x151515,0,0.95); const nk=Math.round(Rt/5.3);
+    for(let i=0;i<nk;i++){const t=i/nk*Math.PI*2; for(const y of (i%2?[-HW*0.52,HW*0.52]:[0,-HW*0.8,HW*0.8])){const k=new THREE.Mesh(new THREE.BoxGeometry(15,8,18),km); k.position.set((Rt+3)*Math.cos(t),y,(Rt+3)*Math.sin(t)); k.rotation.y=-t; k.castShadow=true; wheel.add(k);}}
+    const rim=new THREE.Mesh(new THREE.TorusGeometry(rimR,9,12,96),M(0xd4af37,0.85,0.3)); rim.rotation.x=Math.PI/2; wheel.add(rim);
+    const hub=new THREE.Mesh(new THREE.CylinderGeometry(42,42,100,40),M(0xaaaaaa,0.8,0.35)); hub.castShadow=true; wheel.add(hub);
+    const disc=new THREE.Mesh(new THREE.CylinderGeometry(Rt>340?120:110,Rt>340?120:110,4,64),M(0x999999,0.9,0.3)); disc.position.y=discY; wheel.add(disc);
+    const spM=M(0xcccccc,0.95,0.2);
+    for(let i=0;i<36;i++){const t=i/36*Math.PI*2; const s=new THREE.Vector3(40*Math.cos(t),(i%2?1:-1)*45,40*Math.sin(t)), e=new THREE.Vector3((rimR-6)*Math.cos(t+0.35),(i%2?1:-1)*8,(rimR-6)*Math.sin(t+0.35)); const Ls=s.distanceTo(e); const q=new THREE.Mesh(new THREE.CylinderGeometry(2,2,Ls,6),spM); q.position.copy(s.clone().add(e).multiplyScalar(.5)); q.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),e.clone().sub(s).normalize()); wheel.add(q);}
+    const axl=new THREE.Mesh(new THREE.CylinderGeometry(10,10,Rt>340?200:300,24),mats.bolts); wheel.add(axl);
+    return wheel;
   }
-  const gz=(opt.groundZ!==undefined)?opt.groundZ:P.axle[1]-338;
+  const RR=323, RF=346;
+  if(opt.wheel!==false) makeWheel(P.axle,RR,229,52,-62);
+  // ---- front end: CR250R forks in CR yokes (Chassis Bench Build tab numbers: 935 fork, 100 spacer, slid up 50, 47 total offset)
+  const FA=front(opt);
+  if(opt.front!==false){
+    const F=new THREE.Group(); root.add(F);
+    const u=FA.u, n=FA.f; // u = down the steering axis, f = forward, both in XZ
+    const basis=new THREE.Matrix4().makeBasis(new THREE.Vector3(n[0],0,n[1]),new THREE.Vector3(0,1,0),new THREE.Vector3(-u[0],0,-u[1])); // local X fwd, Y left, Z up the axis
+    const at=(t,fw)=>new THREE.Vector3(FA.top[0]+t*u[0]+fw*n[0],0,FA.top[1]+t*u[1]+fw*n[1]);
+    const SG=new THREE.Group(); SG.quaternion.setFromRotationMatrix(basis); SG.position.copy(at(0,0)); F.add(SG); // steering frame, origin at head tube top
+    const cylZ=(r1,r2,z0,z1,x,y,mat,seg=40)=>{const g=new THREE.CylinderGeometry(r2,r1,z1-z0,seg); g.rotateX(Math.PI/2); const m=new THREE.Mesh(g,mat); m.position.set(x,y,(z0+z1)/2); m.castShadow=m.receiveShadow=true; SG.add(m); return m;};
+    const yokeM=M(0x9aa0a6,0.85,0.35), chromeM=M(0xe6e8ea,0.9,0.12), slM=M(0xb4b8bd,0.8,0.35), capM=M(0x8a8f96,0.9,0.3);
+    const YO=FA.yokeOff, HALF=FA.halfSpan;
+    function yoke(z0,th){const sh=new THREE.Shape(); const pts=[];
+      for(let i=0;i<=24;i++){const a=-Math.PI/2+i/24*Math.PI; pts.push([YO+34*Math.cos(a)+6, -HALF+34*Math.sin(a)*-1]);}
+      const P2=[]; const N=64;
+      // hull of three circles: two tube clamps and the stem boss
+      const C=[[YO,HALF,34],[YO,-HALF,34],[0,0,30]]; const ang=[]; for(let i=0;i<N;i++) ang.push(i/N*2*Math.PI);
+      const cand=[]; C.forEach(c=>ang.forEach(a=>cand.push([c[0]+c[2]*Math.cos(a),c[1]+c[2]*Math.sin(a)])));
+      cand.sort((p,q)=>p[0]-q[0]||p[1]-q[1]); const cr=(o,a,b)=>(a[0]-o[0])*(b[1]-o[1])-(a[1]-o[1])*(b[0]-o[0]);
+      const lo=[],hi=[]; for(const p of cand){while(lo.length>=2&&cr(lo[lo.length-2],lo[lo.length-1],p)<=0)lo.pop(); lo.push(p);} for(const p of cand.slice().reverse()){while(hi.length>=2&&cr(hi[hi.length-2],hi[hi.length-1],p)<=0)hi.pop(); hi.push(p);}
+      const hull=lo.slice(0,-1).concat(hi.slice(0,-1)); sh.moveTo(...hull[0]); hull.slice(1).forEach(p=>sh.lineTo(...p));
+      for(const c of C.slice(0,2)){const h=new THREE.Path(); h.absarc(c[0],c[1],21.5,0,Math.PI*2,true); sh.holes.push(h);}
+      const g=new THREE.ExtrudeGeometry(sh,{depth:th,bevelEnabled:true,bevelThickness:2,bevelSize:2,bevelSegments:2,curveSegments:32}); g.translate(0,0,z0);
+      const m=new THREE.Mesh(g,yokeM); m.castShadow=m.receiveShadow=true; SG.add(m);}
+    yoke(FA.topYokeZ,20); yoke(FA.botYokeZ,36);
+    cylZ(13,13,FA.botYokeZ-4,FA.topYokeZ+28,0,0,capM,24); // stem + nut
+    for(const y of [HALF,-HALF]){
+      cylZ(21.5,21.5,FA.sliderTopZ-5,FA.tubeTopZ,YO,y,chromeM);
+      cylZ(22.5,22.5,FA.tubeTopZ,FA.tubeTopZ+8,YO,y,capM); // cap
+      cylZ(28,28,FA.axleZ-100,FA.sliderTopZ,YO,y,slM); // slider, 100 mm below the axle (Joel)
+      cylZ(30,30,FA.sliderTopZ-22,FA.sliderTopZ,YO,y,M(0x111111,0.1,0.7)); // dust seal
+      const lug=new THREE.Mesh(new THREE.BoxGeometry(FA.axleFwd+30,38,70),slM); lug.position.set(YO+FA.axleFwd/2+5,y,FA.axleZ); lug.castShadow=true; SG.add(lug);
+    }
+    // bars (stand-in): 28.6 mm taper bar on clamps
+    const barM=M(0x222222,0.6,0.35);
+    for(const y of [55,-55]) cylZ(18,18,FA.topYokeZ+20,FA.topYokeZ+60,-5,y,capM,24);
+    const bp=[[0,-400,30],[0,-300,30],[-5,-220,10],[-5,-60,0],[-5,60,0],[-5,220,10],[0,300,30],[0,400,30]].map(q=>new THREE.Vector3(q[0]-40,q[1],FA.topYokeZ+75+q[2]));
+    const bar=new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(bp),80,14.3,16,false),barM); bar.castShadow=true; SG.add(bar);
+    for(const s of [1,-1]){const gr=new THREE.Mesh(new THREE.CylinderGeometry(16,16,130,24),M(0x111111,0,0.9)); gr.position.set(-40,s*340,FA.topYokeZ+105); gr.castShadow=true; SG.add(gr);}
+    if(opt.wheel!==false) makeWheel(FA.axle,RF,267,46,62);
+  }
+  // pitch the whole bike about the swingarm pivot so both tyres sit on the ground
+  let pitch=0; if(opt.level!==false&&opt.front!==false){const ax=FA.axle[0]-P.axle[0], az=FA.axle[1]-P.axle[1], L=Math.hypot(ax,az); pitch=Math.asin((RF-RR)/L)-Math.atan2(az,ax);}
+  root.rotation.y=-pitch; const rr=[P.axle[0]*Math.cos(pitch)-P.axle[1]*Math.sin(pitch), P.axle[0]*Math.sin(pitch)+P.axle[1]*Math.cos(pitch)];
+  {const c=Math.cos(pitch),s=Math.sin(pitch); const R2=q=>[q[0]*c-q[1]*s,q[0]*s+q[1]*c]; const fa=R2(FA.axle), ra=R2(P.axle), ht=R2(FA.top), uu=R2(FA.u);
+   const gzz=ra[1]-RR; const tt=(gzz-ht[1])/uu[1]; const hitX=ht[0]+tt*uu[0]; console.log('wheelbase',(fa[0]-ra[0]).toFixed(0),'trail',(hitX-fa[0]).toFixed(0),'pivot height',(-gzz).toFixed(0));}
+  console.log('pitch deg',(pitch*180/Math.PI).toFixed(2),'head angle deg',(Math.atan2(FA.u[0],-FA.u[1])*180/Math.PI - pitch*180/Math.PI).toFixed(1));
+  const gz=(opt.groundZ!==undefined)?opt.groundZ:rr[1]-RR-3;
   const gr=new THREE.Mesh(new THREE.PlaneGeometry(10000,10000),new THREE.ShadowMaterial({opacity:.22})); gr.position.z=gz; gr.receiveShadow=true; sc.add(gr);
   r.render(sc,cam); const u=r.domElement.toDataURL('image/png'); r.dispose(); return u;
 };
