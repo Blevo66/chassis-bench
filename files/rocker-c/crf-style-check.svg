@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760" font-family="Helvetica,Arial,sans-serif"><rect width="1200" height="760" fill="white"/>
+<text x="30" y="40" font-size="24" font-weight="700">CRF-style layout on your mounts (best case found)</text>
+<text x="30" y="66" font-size="15" fill="#444">Right side, front to the right, arm at 20° full droop. Rocker pivots on the swingarm lug; a link runs forward to the XL lower mount.</text>
+<line x1="760.0" y1="330.0" x2="280" y2="505" stroke="#c9ced6" stroke-width="96" stroke-linecap="round" opacity="0.8"/>
+<text x="300" y="455" font-size="14" fill="#667">swingarm (approx.)</text>
+<line x1="691" y1="450" x2="848" y2="-137" stroke="#2c6fbb" stroke-width="64" opacity="0.35" stroke-linecap="round"/>
+<line x1="691" y1="450" x2="848" y2="-137" stroke="#2c6fbb" stroke-width="3"/>
+<text x="862" y="-93" font-size="14" fill="#2c6fbb" font-weight="700">XR shock 380</text>
+<polygon points="485,452 691,450 465,496" fill="#9aa5b4" stroke="#222" stroke-width="2"/>
+<line x1="465" y1="496" x2="725" y2="376" stroke="#444" stroke-width="29" stroke-linecap="round"/>
+<circle cx="725" cy="376" r="7" fill="white" stroke="#111" stroke-width="2.5"/>
+<text x="737" y="362" font-size="14" font-weight="700">XL lower mount</text>
+<circle cx="760" cy="330" r="7" fill="white" stroke="#111" stroke-width="2.5"/>
+<text x="772" y="318" font-size="14" font-weight="700">swingarm pivot</text>
+<circle cx="485" cy="452" r="7" fill="white" stroke="#111" stroke-width="2.5"/>
+<text x="415" y="436" font-size="14" font-weight="700">lug = rocker pivot</text>
+<circle cx="691" cy="450" r="7" fill="white" stroke="#111" stroke-width="2.5"/>
+<text x="661" y="498" font-size="14" font-weight="700">shock eye</text>
+<circle cx="465" cy="496" r="7" fill="white" stroke="#111" stroke-width="2.5"/>
+<text x="435" y="536" font-size="14" font-weight="700">link eye</text>
+<circle cx="848" cy="-137" r="7" fill="white" stroke="#111" stroke-width="2.5"/>
+<text x="860" y="-137" font-size="14" font-weight="700">shock top</text>
+<circle cx="725" cy="376" r="34" fill="none" stroke="#d62728" stroke-width="4"/>
+<text x="765" y="416" font-size="15" fill="#d62728" font-weight="700">CLASH: shock body runs through the</text><text x="765" y="436" font-size="15" fill="#d62728" font-weight="700">XL lower mount and swingarm pivot</text>
+<text x="30" y="560" font-size="16" fill="#222">Numbers on paper: 324 mm travel, ratio 4.2 falling to 2.9 (about 43% rising rate).</text>
+<text x="30" y="588" font-size="16" fill="#222">To fit the shock below the arm, its bottom eye has to come right forward, almost under the swingarm pivot.</text>
+<text x="30" y="616" font-size="16" fill="#222">The shock axis then passes about 9 mm from the XL lower bolt and 22 mm from the swingarm pivot: the body and spring (about 65 mm across) would hit both.</text>
+<text x="30" y="644" font-size="16" fill="#222">With the eye further back it ends up above the arm, so the rocker would have to pass through the cross-member.</text>
+<text x="30" y="672" font-size="16" fill="#222">So on these frame mounts the CRF style does not fit. Rocker G (rocker on the XL lower mount) is still the workable layout.</text>
+</svg>
