@@ -3,30 +3,30 @@
 <rect width="1500" height="1080" fill="white"/>
 <text x="30.0" y="42.0" font-size="23" text-anchor="start" font-weight="700" fill="#111" paint-order="stroke" stroke="white" stroke-width="4">Rocker E — print version. Right side of bike, front to the right (same view as your photos)</text>
 <text x="30.0" y="70.0" font-size="15" text-anchor="start" font-weight="400" fill="#444" paint-order="stroke" stroke="white" stroke-width="4">Arm at 20° full droop, XR250R shock 380 / 95. All sizes mm. All rocker holes 10.8 (M10 + 0.8). 1:1 DXF and SVG files sit next to this drawing.</text>
-<path d="M755.41,411.27 L761.17,408.89 L776.29,410.89 L790.96,410.23 L814.86,403.09 L828.45,394.88 L840.17,384.18 L849.59,371.40 L855.92,358.15 L859.95,342.80 L860.92,326.95 L856.15,302.47 L849.32,288.15 L839.82,275.43 L828.02,264.81 L814.38,256.69 L799.72,251.44 L419.06,154.47 L412.56,156.31 L369.66,200.58 L361.15,203.80 L352.53,200.88 L311.73,161.59 L302.58,154.81 L238.79,131.46 L233.20,132.17 L220.61,141.52 L209.99,153.32 L201.87,166.96 L196.57,181.92 L194.29,197.63 L195.12,213.48 L199.03,228.87 L205.86,243.20 L215.36,255.92 L227.16,266.54 L240.80,274.65 L265.70,282.52 L273.11,282.68 L316.54,267.13 L343.31,263.78 L365.14,256.33 L373.76,255.50 L412.82,244.63 L427.24,237.43 L442.45,236.89 L466.73,231.67 L473.96,232.03 L495.99,242.89 L508.95,256.35 L514.32,275.06 L520.55,284.88 L532.96,319.37 L537.39,326.98 L538.42,347.34 L541.41,352.10 L676.43,387.19 L680.53,389.71 L682.53,394.91 L680.70,400.17 L597.56,501.75 L582.71,511.81 L574.33,523.94 L571.22,538.35 L573.87,552.85 L581.87,565.23 L593.99,573.61 L604.70,576.47 L616.95,575.87 L627.33,571.97 L636.12,565.23 L642.59,556.22 L647.71,542.80 L755.41,411.27 Z" fill="#cfd6de" stroke="#222" stroke-width="2" fill-rule="evenodd"/>
-<circle cx="780.0" cy="330.0" r="14.6" fill="white" stroke="#222" stroke-width="1.5"/>
-<circle cx="275.2" cy="201.3" r="14.6" fill="white" stroke="#222" stroke-width="1.5"/>
-<circle cx="609.0" cy="538.9" r="14.6" fill="white" stroke="#222" stroke-width="1.5"/>
-<line x1="275.2" y1="201.3" x2="297.9" y2="112.4" stroke="#888" stroke-width="1"/>
-<line x1="780.0" y1="330.0" x2="802.7" y2="241.0" stroke="#888" stroke-width="1"/>
-<line x1="295.2" y1="122.9" x2="800.0" y2="251.5" stroke="#c0392b" stroke-width="1.5" marker-start="url(#ar)" marker-end="url(#ar)"/>
-<text x="551.6" y="171.5" font-size="16" font-weight="700" fill="#c0392b" text-anchor="middle" dominant-baseline="middle" transform="rotate(14.3 551.6 171.5)" paint-order="stroke" stroke="white" stroke-width="5">192.9</text>
-<line x1="780.0" y1="330.0" x2="842.7" y2="381.3" stroke="#888" stroke-width="1"/>
-<line x1="609.0" y1="538.9" x2="671.7" y2="590.2" stroke="#888" stroke-width="1"/>
-<line x1="834.3" y1="374.5" x2="663.3" y2="583.4" stroke="#c0392b" stroke-width="1.5" marker-start="url(#ar)" marker-end="url(#ar)"/>
-<text x="761.4" y="489.2" font-size="16" font-weight="700" fill="#c0392b" text-anchor="middle" dominant-baseline="middle" transform="rotate(-50.7 761.4 489.2)" paint-order="stroke" stroke="white" stroke-width="5">100.0</text>
-<line x1="609.0" y1="538.9" x2="555.2" y2="592.1" stroke="#888" stroke-width="1"/>
-<line x1="275.2" y1="201.3" x2="221.4" y2="254.5" stroke="#888" stroke-width="1"/>
-<line x1="562.9" y1="584.5" x2="229.1" y2="246.9" stroke="#c0392b" stroke-width="1.5" marker-start="url(#ar)" marker-end="url(#ar)"/>
-<text x="384.5" y="427.1" font-size="16" font-weight="700" fill="#c0392b" text-anchor="middle" dominant-baseline="middle" transform="rotate(45.3 384.5 427.1)" paint-order="stroke" stroke="white" stroke-width="5">175.8</text>
-<path d="M719.9,314.7 A62,62 0 0 0 740.7,378.0" fill="none" stroke="#2c6fbb" stroke-width="2"/>
-<text x="865.5" y="307.9" font-size="17" text-anchor="middle" font-weight="700" fill="#2c6fbb" paint-order="stroke" stroke="white" stroke-width="4">65.0°</text>
-<text x="810.0" y="324.0" font-size="15" text-anchor="start" font-weight="700" fill="#111" paint-order="stroke" stroke="white" stroke-width="4">Pivot (XL lower mount, M10)</text>
-<text x="265.2" y="153.3" font-size="15" text-anchor="end" font-weight="700" fill="#111" paint-order="stroke" stroke="white" stroke-width="4">Shock eye</text>
-<text x="649.0" y="546.9" font-size="15" text-anchor="start" font-weight="700" fill="#111" paint-order="stroke" stroke="white" stroke-width="4">Dogbone eye</text>
-<text x="365.2" y="271.3" font-size="13" text-anchor="start" font-weight="400" fill="#777" paint-order="stroke" stroke="white" stroke-width="4">notch: swingarm cross-member</text>
-<text x="365.2" y="289.3" font-size="13" text-anchor="start" font-weight="400" fill="#777" paint-order="stroke" stroke="white" stroke-width="4">sweeps past here (5 mm gap)</text>
-<text x="425.2" y="171.3" font-size="13" text-anchor="start" font-weight="400" fill="#777" paint-order="stroke" stroke="white" stroke-width="4">dip: shock clevis passes here</text>
+<path d="M755.41,456.27 L761.17,453.89 L776.29,455.89 L790.96,455.23 L814.86,448.09 L828.45,439.88 L840.17,429.18 L849.59,416.40 L855.92,403.15 L859.95,387.80 L860.92,371.95 L856.15,347.47 L849.32,333.15 L839.82,320.43 L828.02,309.81 L814.38,301.69 L799.72,296.44 L419.06,199.47 L412.56,201.31 L369.66,245.58 L361.15,248.80 L352.53,245.88 L311.73,206.59 L302.58,199.81 L238.79,176.46 L233.20,177.17 L220.61,186.52 L209.99,198.32 L201.87,211.96 L196.57,226.92 L194.29,242.63 L195.12,258.48 L199.03,273.87 L205.86,288.20 L215.36,300.92 L227.16,311.54 L240.80,319.65 L265.70,327.52 L273.11,327.68 L316.54,312.13 L343.31,308.78 L365.14,301.33 L373.76,300.50 L412.82,289.63 L427.24,282.43 L442.45,281.89 L466.73,276.67 L473.96,277.03 L495.99,287.89 L508.95,301.35 L514.32,320.06 L520.55,329.88 L532.96,364.37 L537.39,371.98 L538.42,392.34 L541.41,397.10 L676.43,432.19 L680.53,434.71 L682.53,439.91 L680.70,445.17 L597.56,546.75 L582.71,556.81 L574.33,568.94 L571.22,583.35 L573.87,597.85 L581.87,610.23 L593.99,618.61 L604.70,621.47 L616.95,620.87 L627.33,616.97 L636.12,610.23 L642.59,601.22 L647.71,587.80 L755.41,456.27 Z" fill="#cfd6de" stroke="#222" stroke-width="2" fill-rule="evenodd"/>
+<circle cx="780.0" cy="375.0" r="14.6" fill="white" stroke="#222" stroke-width="1.5"/>
+<circle cx="275.2" cy="246.3" r="14.6" fill="white" stroke="#222" stroke-width="1.5"/>
+<circle cx="609.0" cy="583.9" r="14.6" fill="white" stroke="#222" stroke-width="1.5"/>
+<line x1="275.2" y1="246.3" x2="316.5" y2="84.1" stroke="#888" stroke-width="1"/>
+<line x1="780.0" y1="375.0" x2="821.3" y2="212.8" stroke="#888" stroke-width="1"/>
+<line x1="313.9" y1="94.6" x2="818.7" y2="223.3" stroke="#c0392b" stroke-width="1.5" marker-start="url(#ar)" marker-end="url(#ar)"/>
+<text x="570.3" y="143.2" font-size="16" font-weight="700" fill="#c0392b" text-anchor="middle" dominant-baseline="middle" transform="rotate(14.3 570.3 143.2)" paint-order="stroke" stroke="white" stroke-width="5">192.9</text>
+<line x1="780.0" y1="375.0" x2="842.7" y2="426.3" stroke="#888" stroke-width="1"/>
+<line x1="609.0" y1="583.9" x2="671.7" y2="635.2" stroke="#888" stroke-width="1"/>
+<line x1="834.3" y1="419.5" x2="663.3" y2="628.4" stroke="#c0392b" stroke-width="1.5" marker-start="url(#ar)" marker-end="url(#ar)"/>
+<text x="761.4" y="534.2" font-size="16" font-weight="700" fill="#c0392b" text-anchor="middle" dominant-baseline="middle" transform="rotate(-50.7 761.4 534.2)" paint-order="stroke" stroke="white" stroke-width="5">100.0</text>
+<line x1="609.0" y1="583.9" x2="555.2" y2="637.1" stroke="#888" stroke-width="1"/>
+<line x1="275.2" y1="246.3" x2="221.4" y2="299.5" stroke="#888" stroke-width="1"/>
+<line x1="562.9" y1="629.5" x2="229.1" y2="291.9" stroke="#c0392b" stroke-width="1.5" marker-start="url(#ar)" marker-end="url(#ar)"/>
+<text x="384.5" y="472.1" font-size="16" font-weight="700" fill="#c0392b" text-anchor="middle" dominant-baseline="middle" transform="rotate(45.3 384.5 472.1)" paint-order="stroke" stroke="white" stroke-width="5">175.8</text>
+<path d="M719.9,359.7 A62,62 0 0 0 740.7,423.0" fill="none" stroke="#2c6fbb" stroke-width="2"/>
+<text x="865.5" y="352.9" font-size="17" text-anchor="middle" font-weight="700" fill="#2c6fbb" paint-order="stroke" stroke="white" stroke-width="4">65.0°</text>
+<text x="810.0" y="369.0" font-size="15" text-anchor="start" font-weight="700" fill="#111" paint-order="stroke" stroke="white" stroke-width="4">Pivot (XL lower mount, M10)</text>
+<text x="265.2" y="198.3" font-size="15" text-anchor="end" font-weight="700" fill="#111" paint-order="stroke" stroke="white" stroke-width="4">Shock eye</text>
+<text x="649.0" y="591.9" font-size="15" text-anchor="start" font-weight="700" fill="#111" paint-order="stroke" stroke="white" stroke-width="4">Dogbone eye</text>
+<text x="365.2" y="316.3" font-size="13" text-anchor="start" font-weight="400" fill="#777" paint-order="stroke" stroke="white" stroke-width="4">notch: swingarm cross-member</text>
+<text x="365.2" y="334.3" font-size="13" text-anchor="start" font-weight="400" fill="#777" paint-order="stroke" stroke="white" stroke-width="4">sweeps past here (5 mm gap)</text>
+<text x="350.2" y="252.3" font-size="13" text-anchor="start" font-weight="400" fill="#777" paint-order="stroke" stroke="white" stroke-width="4">↑ dip: clevis clears here</text>
 <text x="1080.0" y="130.0" font-size="17" text-anchor="start" font-weight="700" fill="#111" paint-order="stroke" stroke="white" stroke-width="4">In place at full droop</text>
 <line x1="1400.0" y1="300.0" x2="1118.1" y2="402.6" stroke="#999" stroke-width="2" stroke-dasharray="7 5"/>
 <line x1="1150.0" y1="300.0" x2="1460.0" y2="300.0" stroke="#ccc"/>
