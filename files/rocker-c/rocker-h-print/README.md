@@ -22,3 +22,8 @@ Mock-up only: fine to sit the bike on its wheels, not to ride or sit on.
 Joel confirmed the CRF250 arm CAD lug is right (209 along / 56 below the pivot-axle line). Same rocker H, but the dogbone is now 132 mm: 219 mm travel, 15% rising rate, ratio 2.47 -> 2.15.
 - dogbone-132-10mm.stl (for the 30 mm slotted rocker) or dogbone-132-12mm.stl (16 mm rocker).
 - With the 10 mm dogbone at the lug: spacer-lug-left-5.5mm.stl and spacer-lug-right-25.5mm.stl.
+
+## Smooth version (2026-11-06)
+- rocker-h-smooth-30mm-slotted.stl: same three hole positions as rocker H, curved outline with no clearance cutouts. Uses the same 132 dogbone (10 mm), 5 mm pivot spacers and 5.5 / 25.5 lug spacers.
+- Drawing ../rocker-h-smooth-drawing.png, 1:1 DXF ../rocker-h-smooth.dxf.
+- Model clearances through full travel: swingarm 5.5 mm at full droop opening to 18 mm at full bump, shock clevis body ~3 mm (clevis size is a guess, check it), frame scan 6 mm+.
