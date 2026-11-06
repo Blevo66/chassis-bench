@@ -34,3 +34,8 @@ Flat 4 mm plates on the smooth shape reach ~1,400 MPa at full bump (too weak). S
 - ../rocker-h-strong-plate.dxf: side plate, cut 2. 6 mm S355 (body ~180 MPa at full bump, ~360 at twice that) or 4 mm Strenx 700. 16 mm OD spacer tubes welded between plates at shock eye and pivot; 5 mm edge strip wrapped round top/bottom, stopping 25 mm short of the dogbone eye.
 - ../rocker-h-strong-stress.png, ../rocker-h-strong-drawing.png, ../rocker-h-strong-3d-*.gif
 - Clearance through travel: arm 4.7 mm at droop to 13 at bump, shock clevis ~4 (guessed clevis), frame scan 7+.
+
+## Alloy version (2026-11-06)
+- ../rocker-h-alloy.step and ../rocker-h-alloy.stl: 7075-T6 billet, 30 mm thick, same outline as the strong version, 8 mm rim, pocketed 11 mm deep both sides (8 mm centre web), full-thickness bosses, 11 mm dogbone slot. ~0.79 kg.
+- Stress at full bump on the stock spring: ~185 MPa in the body (7075 yields ~500), ~370 at twice that load.
+- Holes are drawn 10.8; for alloy, bore them for pressed-in steel bushes or needle bearings so bolts never run in the aluminium.
