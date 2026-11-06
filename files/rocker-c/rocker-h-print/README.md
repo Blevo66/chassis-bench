@@ -17,3 +17,8 @@ Mock-up only: fine to sit the bike on its wheels, not to ride or sit on.
 - rocker-h-30mm-slotted.stl: 30 mm wide with an 11 mm slot at the dogbone eye (dogbone goes in the slot, double shear). Fits the XR clevis with ~2 mm each side.
 - spacer-pivot-5mm-x2.stl: print 2, centres the 30 mm rocker in the 40 mm XL mount.
 - dogbone-134-10mm.stl (and 130/138): 10 mm thick to fit the 11 mm slot.
+
+## CAD lug update (2026-11-06)
+Joel confirmed the CRF250 arm CAD lug is right (209 along / 56 below the pivot-axle line). Same rocker H, but the dogbone is now 132 mm: 219 mm travel, 15% rising rate, ratio 2.47 -> 2.15.
+- dogbone-132-10mm.stl (for the 30 mm slotted rocker) or dogbone-132-12mm.stl (16 mm rocker).
+- With the 10 mm dogbone at the lug: spacer-lug-left-5.5mm.stl and spacer-lug-right-25.5mm.stl.
