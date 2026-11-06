@@ -27,3 +27,10 @@ Joel confirmed the CRF250 arm CAD lug is right (209 along / 56 below the pivot-a
 - rocker-h-smooth-30mm-slotted.stl: same three hole positions as rocker H, curved outline with no clearance cutouts. Uses the same 132 dogbone (10 mm), 5 mm pivot spacers and 5.5 / 25.5 lug spacers.
 - Drawing ../rocker-h-smooth-drawing.png, 1:1 DXF ../rocker-h-smooth.dxf.
 - Model clearances through full travel: swingarm 5.5 mm at full droop opening to 18 mm at full bump, shock clevis body ~3 mm (clevis size is a guess, check it), frame scan 6 mm+.
+
+## Strong version (2026-11-06, after stress check)
+Flat 4 mm plates on the smooth shape reach ~1,400 MPa at full bump (too weak). Strong version: same holes, gusset filling the L, deeper under the shock clevis.
+- rocker-h-strong-30mm-slotted.stl: solid print for test fitting.
+- ../rocker-h-strong-plate.dxf: side plate, cut 2. 6 mm S355 (body ~180 MPa at full bump, ~360 at twice that) or 4 mm Strenx 700. 16 mm OD spacer tubes welded between plates at shock eye and pivot; 5 mm edge strip wrapped round top/bottom, stopping 25 mm short of the dogbone eye.
+- ../rocker-h-strong-stress.png, ../rocker-h-strong-drawing.png, ../rocker-h-strong-3d-*.gif
+- Clearance through travel: arm 4.7 mm at droop to 13 at bump, shock clevis ~4 (guessed clevis), frame scan 7+.
