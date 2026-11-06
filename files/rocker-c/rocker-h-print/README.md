@@ -16,4 +16,4 @@ Mock-up only: fine to sit the bike on its wheels, not to ride or sit on.
 ## 30 mm version (2026-11-06)
 - rocker-h-30mm-slotted.stl: 30 mm wide with an 11 mm slot at the dogbone eye (dogbone goes in the slot, double shear). Fits the XR clevis with ~2 mm each side.
 - spacer-pivot-5mm-x2.stl: print 2, centres the 30 mm rocker in the 40 mm XL mount.
-- The dogbone then needs a 10 mm thick rocker end: print the 12 mm dogbone and sand, or ask for a 10 mm one.
+- dogbone-134-10mm.stl (and 130/138): 10 mm thick to fit the 11 mm slot.
