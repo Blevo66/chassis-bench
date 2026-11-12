@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760" font-family="Helvetica,Arial,sans-serif"><rect width="1200" height="760" fill="white"/>
+<text x="30" y="40" font-size="24" font-weight="700">Your T linkage, best case on your mounts</text>
+<text x="30" y="66" font-size="15" fill="#444">Right side, front to the right, arm at 20° full droop. Top bar: shock eye to XL lower mount. Stem: from the cross down to the swingarm lug.</text>
+<line x1="820" y1="340" x2="302" y2="528" stroke="#c9ced6" stroke-width="104" stroke-linecap="round" opacity="0.85"/>
+<text x="342" y="478" font-size="14" fill="#667">swingarm (approx.)</text>
+<line x1="423" y1="295" x2="924" y2="-225" stroke="#2c6fbb" stroke-width="76" opacity="0.3" stroke-linecap="round"/>
+<line x1="423" y1="295" x2="778" y2="385" stroke="#222" stroke-width="38" stroke-linecap="round"/>
+<line x1="530" y1="322" x2="493" y2="475" stroke="#555" stroke-width="30" stroke-linecap="round"/>
+<circle cx="778" cy="385" r="7" fill="white" stroke="#111" stroke-width="2.5"/>
+<text x="792" y="415" font-size="14" font-weight="700">XL lower mount</text>
+<circle cx="820" cy="330" r="7" fill="white" stroke="#111" stroke-width="2.5"/>
+<text x="834" y="316" font-size="14" font-weight="700">swingarm pivot</text>
+<circle cx="493" cy="475" r="7" fill="white" stroke="#111" stroke-width="2.5"/>
+<text x="507" y="509" font-size="14" font-weight="700">lug</text>
+<circle cx="423" cy="295" r="7" fill="white" stroke="#111" stroke-width="2.5"/>
+<text x="383" y="271" font-size="14" font-weight="700">shock eye</text>
+<circle cx="530" cy="322" r="7" fill="white" stroke="#111" stroke-width="2.5"/>
+<text x="540" y="296" font-size="14" font-weight="700">T cross pivot</text>
+<ellipse cx="511" cy="399" rx="40" ry="70" fill="none" stroke="#d62728" stroke-width="4"/>
+<text x="30" y="200" font-size="15" fill="#d62728" font-weight="700">Problem 1: the stem goes straight through the swingarm box</text>
+<text x="30" y="560" font-size="16" fill="#222">Numbers on paper: 294 mm travel, but the ratio goes from 2.94 UP to 3.26 through the stroke.</text>
+<text x="30" y="588" font-size="16" fill="#222">Problem 2: that is falling rate (about 10% softer at the bottom), so it would bottom out hard. Every T I tried did this (10–30%).</text>
+<text x="30" y="616" font-size="16" fill="#222">Kinking the arms moves the cross, but every version with the cross up on the bar came out falling rate.</text>
+<text x="30" y="644" font-size="16" fill="#222">The ones that stiffen up have the dogbone eye well below the pivot, with the shock eye above: that is rocker G.</text>
+</svg>
