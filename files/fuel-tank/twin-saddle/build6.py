@@ -1,6 +1,6 @@
 """v4 low-poly build: mesh, panels (ring strips + caps + baffle), DXF, mock-up STLs, info."""
 import numpy as np, trimesh, json, os, sys, ezdxf, shapely.geometry as sg, shapely.ops as so
-import tank, tri, tri2, tri3, copy, shapely
+import tank, tri, tri3, copy, shapely
 OUT=sys.argv[1]; os.makedirs(OUT,exist_ok=True)
 P=copy.deepcopy(tank.P); P['rear']['yo']=140.; P['rear']['c']=14.; P['front']['c']=22.
 T=float(os.environ.get('T','1.2')); NAR=int(os.environ.get('NAR','9'))
