@@ -3,17 +3,17 @@ import numpy as np, trimesh, json, os, sys, ezdxf, shapely.geometry as sg, shape
 import tank, tri, tri3, copy, shapely
 OUT=sys.argv[1]; os.makedirs(OUT,exist_ok=True)
 P=copy.deepcopy(tank.P); P['rear']['yo']=140.; P['rear']['c']=14.; P['front']['c']=22.
-T=float(os.environ.get('T','1.2')); NAR=int(os.environ.get('NAR','9'))
-XS=(20,80,150,265,345); FT=(0.6,12.)
-info={'sheet_mm':T,'version':'v6 big triangles, flat top deck with filler pad, 80 mm rear face','parts':{}}
+T=float(os.environ.get('T','1.2')); NAR=int(os.environ.get('NAR','6'))
+XS=tuple(int(v) for v in os.environ.get('XS','20,140,260,345').split(',')); FT=(float(os.environ.get('FTS','0.6')),float(os.environ.get('FTO','12'))); PADBAND=int(os.environ.get('PADBAND','1'))
+info={'sheet_mm':T,'version':'v8 bigger triangles (folds up to 200 mm), flat filler deck, 80 mm rear face','parts':{}}
 meshes={}
 for side,nm in ((1,'left'),(-1,'right')):
-    m,V,panels,rings=tri3.build(P,side,NAR,xs=XS,front_tip=FT)
+    m,V,panels,rings=tri3.build(P,side,NAR,xs=XS,front_tip=FT,split_cone=True)
     meshes[nm]=(m,V,panels,rings)
 m,V,panels,rings=meshes['left']
 bands=[b for _,b in panels]
 info['stations_x']=list(XS); info['points_round']=NAR
-fe,al=tri3.fold_edges(V,panels); info['longest_fold_line_mm']=round(fe,1); info['note_edges']='edges over 150 mm are only the flat deck diagonal and the flat rear face, which are not folds'
+fe,al=tri3.fold_edges(V,panels); info['longest_fold_line_mm']=round(fe,1); info['note_edges']='limit for fold lines raised to 200 mm (Joel, 16 Nov); the flat deck diagonal and the rear face are not folds'
 info['triangles_per_half']=sum(len(b) for b in bands)
 info['litres_per_half']=round(m.volume/1e6,2); info['litres_total_gross']=round(2*m.volume/1e6,2)
 fn=m.face_normals
@@ -38,7 +38,7 @@ def save_dxf(name,poly,folds=(),holes=(),note='',pad=None):
     doc.saveas(f'{OUT}/flat-{name}.dxf')
 flats={}
 # filler pad on the flat deck of strip-3 (x 150-265)
-Q=np.array([rings[2][0],rings[2][1],rings[3][1],rings[3][0]])
+Q=np.array([rings[PADBAND][0],rings[PADBAND][1],rings[PADBAND+1][1],rings[PADBAND+1][0]])
 nq=np.cross(Q[1]-Q[0],Q[3]-Q[0]); nq/=np.linalg.norm(nq); uq=(Q[1]-Q[0])/np.linalg.norm(Q[1]-Q[0]); wq=np.cross(nq,uq)
 dpoly=sg.Polygon([((q-Q[0])@uq,(q-Q[0])@wq) for q in Q]); mic=shapely.maximum_inscribed_circle(dpoly)
 c2=np.array(mic.coords[0]); pad3=Q[0]+c2[0]*uq+c2[1]*wq
@@ -68,14 +68,14 @@ for bi,(pname,band) in enumerate(panels):
     from shapely import affinity
     u=affinity.rotate(u,ang,origin=(0,0),use_radians=True); fk=[(R@a,R@b,an,kd) for a,b,an,kd in fk]
     padmark=None
-    if pname=='strip-3':
+    if pname==f'strip-{PADBAND+1}':
         for f3,t2 in zip(band,tris2):
             A3=V[list(f3)]; 
             M=np.column_stack([A3[1]-A3[0],A3[2]-A3[0]]); lam,res,_,_=np.linalg.lstsq(M,pad3-A3[0],rcond=None)
             if lam.min()>=-1e-6 and lam.sum()<=1+1e-6 and np.linalg.norm(M@lam-(pad3-A3[0]))<0.5:
                 t2=np.array(t2); padmark=R@(t2[0]+lam[0]*(t2[1]-t2[0])+lam[1]*(t2[2]-t2[0])); break
     name=pname
-    note='short point at the front' if pname=='front-cone' else f'ring strip between x={XS[bi-1]} and x={XS[bi]} from pivot'
+    note='front point, '+pname.split('-')[-1]+' piece' if pname.startswith('front-cone') else f'ring strip between x={XS[bi-1]} and x={XS[bi]} from pivot'
     save_dxf(name,u,fk,note=note+'; closes on itself at the inner top edge',pad=padmark)
     flats[name]=(u,fk) if padmark is None else (u,fk,[],padmark)
     info['parts'][name]={'flat_size_mm':[round(v) for v in (u.bounds[2]-u.bounds[0],u.bounds[3]-u.bounds[1])],'folds':len(fk),

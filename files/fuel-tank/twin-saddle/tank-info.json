@@ -1,207 +1,167 @@
 {
  "sheet_mm": 1.2,
- "version": "v6 big triangles, flat top deck with filler pad, 80 mm rear face",
+ "version": "v8 bigger triangles (folds up to 200 mm), flat filler deck, 80 mm rear face",
  "parts": {
   "rear-face": {
    "flat_size_mm": [
     69,
-    80
+    78
    ],
-   "area_mm2": 3985
+   "area_mm2": 3684
   },
   "strip-1": {
    "flat_size_mm": [
-    297,
-    176
+    419,
+    225
    ],
-   "folds": 17,
+   "folds": 11,
    "fold_angles_deg": [
     0.0,
-    47.9,
-    13.1,
-    12.1,
-    24.1,
-    25.5,
-    65.6,
-    37.9,
-    72.0,
-    28.6,
-    12.4,
-    5.4,
-    3.7,
-    28.2,
-    11.3,
-    2.1,
-    0.0
+    59.7,
+    9.7,
+    30.3,
+    85.5,
+    70.4,
+    115.0,
+    26.5,
+    15.0,
+    27.8,
+    1.1
    ],
-   "overlap_mm2": 0.0,
-   "area_mm2": 24258
+   "overlap_mm2": -0.0,
+   "area_mm2": 53460
   },
   "strip-2": {
    "flat_size_mm": [
-    486,
-    229
+    705,
+    275
    ],
-   "folds": 17,
+   "folds": 11,
    "fold_angles_deg": [
     0.0,
-    61.9,
-    3.5,
-    12.9,
-    0.0,
-    2.0,
-    36.3,
-    25.9,
-    99.7,
-    51.7,
-    28.0,
-    8.8,
-    7.6,
-    17.5,
-    26.0,
-    2.0,
-    0.0
+    69.6,
+    1.8,
+    8.0,
+    108.5,
+    81.3,
+    124.0,
+    12.7,
+    3.2,
+    22.4,
+    9.1
    ],
-   "overlap_mm2": -0.1,
-   "area_mm2": 40503
+   "overlap_mm2": 0.0,
+   "area_mm2": 87018
   },
   "strip-3": {
    "flat_size_mm": [
-    725,
-    304
+    761,
+    184
    ],
-   "folds": 17,
+   "folds": 11,
    "fold_angles_deg": [
     0.0,
-    61.9,
-    9.1,
-    8.7,
-    0.0,
-    2.3,
-    60.6,
-    51.0,
-    103.6,
-    53.6,
-    6.8,
-    27.8,
-    10.3,
-    17.0,
-    19.6,
-    8.4,
-    0.0
+    71.2,
+    5.0,
+    7.2,
+    36.1,
+    99.5,
+    58.7,
+    27.2,
+    6.2,
+    30.0,
+    10.4
    ],
    "overlap_mm2": -0.0,
-   "area_mm2": 88649
+   "area_mm2": 64651
   },
-  "strip-4": {
-   "flat_size_mm": [
-    734,
-    248
-   ],
-   "folds": 17,
-   "fold_angles_deg": [
-    0.0,
-    70.3,
-    5.0,
-    12.1,
-    0.0,
-    0.0,
-    50.3,
-    44.1,
-    106.4,
-    49.0,
-    3.4,
-    15.3,
-    29.7,
-    12.2,
-    23.2,
-    9.2,
-    0.0
-   ],
-   "overlap_mm2": 0.0,
-   "area_mm2": 62893
-  },
-  "front-cone": {
+  "front-cone-top": {
    "flat_size_mm": [
     269,
-    100
+    82
    ],
-   "folds": 8,
+   "folds": 2,
    "fold_angles_deg": [
-    12.8,
-    3.8,
-    0.0,
-    12.8,
-    54.7,
-    24.2,
-    8.8,
-    20.9
+    14.6,
+    8.9
    ],
-   "overlap_mm2": -0.1,
-   "area_mm2": 17129
+   "overlap_mm2": 0.0,
+   "area_mm2": 12035
+  },
+  "front-cone-bottom": {
+   "flat_size_mm": [
+    270,
+    28
+   ],
+   "folds": 2,
+   "fold_angles_deg": [
+    67.6,
+    25.4
+   ],
+   "overlap_mm2": 0.0,
+   "area_mm2": 3201
   },
   "baffle": {
    "flat_size_mm": [
-    132,
-    269
+    131,
+    244
    ],
-   "holes": 7
+   "holes": 5
   }
  },
  "stations_x": [
   20,
-  80,
-  150,
-  265,
+  140,
+  260,
   345
  ],
- "points_round": 9,
- "longest_fold_line_mm": 148.4,
- "note_edges": "edges over 150 mm are only the flat deck diagonal and the flat rear face, which are not folds",
- "triangles_per_half": 88,
- "litres_per_half": 6.74,
- "litres_total_gross": 13.49,
+ "points_round": 6,
+ "longest_fold_line_mm": 167.7,
+ "note_edges": "limit for fold lines raised to 200 mm (Joel, 16 Nov); the flat deck diagonal and the rear face are not folds",
+ "triangles_per_half": 46,
+ "litres_per_half": 6.1,
+ "litres_total_gross": 12.21,
  "filler_pad": {
   "centre_xyz_left": [
-   208,
-   102,
-   507
+   201,
+   103,
+   505
   ],
-  "deck_inscribed_dia_mm": 120,
+  "deck_inscribed_dia_mm": 122,
   "cap_space_dia_mm": 100
  },
- "steel_kg_per_half": 2.45,
- "steel_kg_both": 4.89,
+ "steel_kg_per_half": 2.3,
+ "steel_kg_both": 4.61,
  "mockup_print_sizes_mm": {
   "left-rear": [
-   241,
-   225,
-   162
-  ],
-  "left-front-upper": [
-   195,
-   152,
-   174
-  ],
-  "left-front-lower": [
-   173,
-   96,
-   154
-  ],
-  "right-rear": [
-   248,
+   247,
    204,
    162
   ],
+  "left-front-upper": [
+   194,
+   151,
+   174
+  ],
+  "left-front-lower": [
+   172,
+   110,
+   130
+  ],
+  "right-rear": [
+   243,
+   153,
+   162
+  ],
   "right-front-upper": [
-   195,
-   152,
+   194,
+   151,
    174
   ],
   "right-front-lower": [
-   173,
-   96,
-   154
+   172,
+   110,
+   130
   ]
  },
  "params": {

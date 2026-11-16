@@ -40,7 +40,7 @@ def loft(Ra,Rb,ia,ib):
         else: tris.append((a0,b0,a1)); i+=1
     return tris
 
-def build(P,side=1,N=9,xs=(20,80,140,260,345),rear_h=80.,front_tip=(0.8,15.)):
+def build(P,side=1,N=9,xs=(20,80,140,260,345),rear_h=80.,front_tip=(0.8,15.),split_cone=False):
     xr,xf=P['x_rear'],P['x_front']; rings=[]
     for k,x in enumerate(xs):
         t=(x-xr)/(xf-xr); sc=1.0
@@ -61,7 +61,11 @@ def build(P,side=1,N=9,xs=(20,80,140,260,345),rear_h=80.,front_tip=(0.8,15.)):
     # front point
     last=rings[-1]; c=last.mean(0); c[0]+=front_tip[1]; V=np.vstack([V,c]); ai=len(V)-1
     il=list(range(off[-2],off[-1]))
-    panels.append(('front-cone',[(ai,il[k],il[(k+1)%len(il)]) for k in range(len(il))]))
+    fan=[(ai,il[k],il[(k+1)%len(il)]) for k in range(len(il))]
+    if split_cone:
+        h=len(fan)//2; panels.append(('front-cone-top',fan[:h])); panels.append(('front-cone-bottom',fan[h:]))
+    else:
+        panels.append(('front-cone',fan))
     faces=[f for _,b in panels for f in b]
     m=trimesh.Trimesh(V,faces,process=False); trimesh.repair.fix_normals(m)
     return m,V,panels,rings
