@@ -9,7 +9,7 @@ def lerp(a,b,t): return {k:a[k]+(b[k]-a[k])*t for k in a}
 
 def big(p):
     return max(p.geoms,key=lambda g:g.area) if p.geom_type=='MultiPolygon' else p
-def fillet(pts,r_out,r_in,frac=0.45,nseg=12):
+def fillet(pts,r_out,r_in,frac=0.45,nseg=12,keep=()):
     pts=np.asarray(pts,float); n=len(pts); out=[]
     ccw=sg.Polygon(pts).exterior.is_ccw
     for i in range(n):
@@ -17,7 +17,7 @@ def fillet(pts,r_out,r_in,frac=0.45,nseg=12):
         a=p0-p1; b=p2-p1; la,lb=np.linalg.norm(a),np.linalg.norm(b)
         if la<1e-6 or lb<1e-6: continue
         a/=la; b/=lb; th=np.arccos(np.clip(np.dot(a,b),-1,1))
-        if th>np.radians(178): out.append(p1); continue
+        if th>np.radians(178) or i in keep: out.append(p1); continue
         cross=(p1-p0)[0]*(p2-p1)[1]-(p1-p0)[1]*(p2-p1)[0]
         convex=(cross>0)==ccw
         r=r_out if convex else r_in

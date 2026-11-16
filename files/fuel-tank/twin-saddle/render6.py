@@ -31,15 +31,17 @@ ax[2].set_aspect('equal'); ax[2].grid(alpha=.3); ax[2].set_title('Front view')
 plt.tight_layout(); plt.savefig(f'{OUT}/tank-on-frame-views.png',dpi=75)
 # flats
 flats=pickle.load(open(f'{OUT}/.flats.pkl','rb'))
-names=['rear-cone','strip-1','strip-2','strip-3','strip-4','front-cone','baffle']
+names=['rear-face','strip-1','strip-2','strip-3','strip-4','front-cone','baffle']
 fig=plt.figure(figsize=(22,12)); gs=fig.add_gridspec(2,4)
-pos={'rear-cone':gs[1,0],'strip-1':gs[0,0],'strip-2':gs[0,1],'strip-3':gs[0,2:],'strip-4':gs[1,1:3],'front-cone':gs[1,3],'baffle':None}
+pos={'rear-face':gs[1,0],'strip-1':gs[0,0],'strip-2':gs[0,1],'strip-3':gs[0,2:],'strip-4':gs[1,1:3],'front-cone':gs[1,3],'baffle':None}
 for n in names:
     if pos[n] is None: continue
     a=fig.add_subplot(pos[n]); f=flats[n]; poly=f[0]; x,y=poly.exterior.xy; a.plot(x,y,'r',lw=1.2)
     for fl in f[1]:
         if fl[2]<3: continue
         a.plot([fl[0][0],fl[1][0]],[fl[0][1],fl[1][1]],'b--' if fl[3]=='out' else 'g--',lw=.7)
+    if len(f)>3:
+        t=np.linspace(0,2*np.pi,60); a.plot(f[3][0]+50*np.cos(t),f[3][1]+50*np.sin(t),'m',lw=1.5); a.text(f[3][0],f[3][1],'filler pad',color='m',ha='center')
     if len(f)>2:
         for (c,r) in f[2]: t=np.linspace(0,2*np.pi,40); a.plot(c[0]+r*np.cos(t),c[1]+r*np.sin(t),'r',lw=1)
     a.set_aspect('equal'); a.grid(alpha=.3); a.set_title(f'{n}  (blue = fold out, green = fold IN)' if f[1] else n)
