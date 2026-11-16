@@ -1,20 +1,20 @@
 """v4 low-poly build: mesh, panels (ring strips + caps + baffle), DXF, mock-up STLs, info."""
 import numpy as np, trimesh, json, os, sys, ezdxf, shapely.geometry as sg, shapely.ops as so
-import tank, tri, tri3, copy, shapely
+import tank, tri, tri3, tri5, copy, shapely
 OUT=sys.argv[1]; os.makedirs(OUT,exist_ok=True)
 P=copy.deepcopy(tank.P); P['rear']['yo']=140.; P['rear']['c']=14.; P['front']['c']=22.
 T=float(os.environ.get('T','1.2')); NAR=int(os.environ.get('NAR','6'))
 XS=tuple(int(v) for v in os.environ.get('XS','20,140,260,345').split(',')); FT=(float(os.environ.get('FTS','0.6')),float(os.environ.get('FTO','12'))); PADBAND=int(os.environ.get('PADBAND','1'))
-info={'sheet_mm':T,'version':'v8 bigger triangles (folds up to 200 mm), flat filler deck, 80 mm rear face','parts':{}}
+info={'sheet_mm':T,'version':'v9 bigger irregular facets, flat pod bottoms, flat filler deck, 80 mm rear face','parts':{}}
 meshes={}
 for side,nm in ((1,'left'),(-1,'right')):
-    m,V,panels,rings=tri3.build(P,side,NAR,xs=XS,front_tip=FT,split_cone=True)
+    m,V,panels,rings=tri5.build(P,side,xs=XS,Lmax=float(os.environ.get('LMAX','200')),front_tip=FT)
     meshes[nm]=(m,V,panels,rings)
 m,V,panels,rings=meshes['left']
 bands=[b for _,b in panels]
 info['stations_x']=list(XS); info['points_round']=NAR
 fe,al=tri3.fold_edges(V,panels); info['longest_fold_line_mm']=round(fe,1); info['note_edges']='limit for fold lines raised to 200 mm (Joel, 16 Nov); the flat deck diagonal and the rear face are not folds'
-info['triangles_per_half']=sum(len(b) for b in bands)
+info['triangles_per_half']=sum(len(b) for b in bands); info['flat_faces_per_half']=len(m.facets)+len([f for f in range(len(m.faces)) if f not in set(np.concatenate(m.facets)) ]) if len(m.facets) else len(m.faces)
 info['litres_per_half']=round(m.volume/1e6,2); info['litres_total_gross']=round(2*m.volume/1e6,2)
 fn=m.face_normals
 def fold_kind(f1i,f2,sh):

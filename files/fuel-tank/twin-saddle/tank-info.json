@@ -1,112 +1,132 @@
 {
  "sheet_mm": 1.2,
- "version": "v8 bigger triangles (folds up to 200 mm), flat filler deck, 80 mm rear face",
+ "version": "v9 bigger irregular facets, flat pod bottoms, flat filler deck, 80 mm rear face",
  "parts": {
   "rear-face": {
    "flat_size_mm": [
     69,
-    78
+    80
    ],
-   "area_mm2": 3684
+   "area_mm2": 4174
   },
   "strip-1": {
    "flat_size_mm": [
-    419,
-    225
+    430,
+    246
    ],
-   "folds": 11,
+   "folds": 15,
    "fold_angles_deg": [
     0.0,
-    59.7,
-    9.7,
-    30.3,
-    85.5,
-    70.4,
-    115.0,
-    26.5,
-    15.0,
-    27.8,
-    1.1
+    31.4,
+    0.0,
+    42.3,
+    0.0,
+    43.5,
+    0.0,
+    35.5,
+    86.9,
+    89.3,
+    90.8,
+    46.0,
+    0.0,
+    44.9,
+    0.0
    ],
    "overlap_mm2": -0.0,
-   "area_mm2": 53460
+   "area_mm2": 57771
   },
   "strip-2": {
    "flat_size_mm": [
-    705,
-    275
+    694,
+    350
    ],
-   "folds": 11,
+   "folds": 16,
    "fold_angles_deg": [
     0.0,
-    69.6,
-    1.8,
-    8.0,
-    108.5,
-    81.3,
-    124.0,
-    12.7,
-    3.2,
-    22.4,
-    9.1
+    33.2,
+    0.0,
+    43.9,
+    0.0,
+    0.0,
+    45.7,
+    0.0,
+    38.0,
+    84.6,
+    94.8,
+    86.6,
+    45.2,
+    0.0,
+    45.0,
+    0.0
    ],
-   "overlap_mm2": 0.0,
-   "area_mm2": 87018
+   "overlap_mm2": -0.0,
+   "area_mm2": 96980
   },
   "strip-3": {
    "flat_size_mm": [
-    761,
-    184
+    784,
+    245
    ],
-   "folds": 11,
+   "folds": 18,
    "fold_angles_deg": [
     0.0,
-    71.2,
-    5.0,
-    7.2,
-    36.1,
-    99.5,
-    58.7,
-    27.2,
-    6.2,
-    30.0,
-    10.4
+    31.0,
+    0.0,
+    46.6,
+    0.0,
+    0.0,
+    0.0,
+    44.7,
+    0.0,
+    43.2,
+    0.0,
+    86.7,
+    0.0,
+    0.0,
+    44.6,
+    0.0,
+    46.4,
+    0.0
    ],
    "overlap_mm2": -0.0,
-   "area_mm2": 64651
+   "area_mm2": 70597
   },
   "front-cone-top": {
    "flat_size_mm": [
-    269,
-    82
+    277,
+    88
    ],
-   "folds": 2,
+   "folds": 4,
    "fold_angles_deg": [
-    14.6,
-    8.9
+    3.8,
+    13.5,
+    0.0,
+    13.4
    ],
    "overlap_mm2": 0.0,
-   "area_mm2": 12035
+   "area_mm2": 12421
   },
   "front-cone-bottom": {
    "flat_size_mm": [
-    270,
-    28
+    278,
+    41
    ],
-   "folds": 2,
+   "folds": 4,
    "fold_angles_deg": [
-    67.6,
-    25.4
+    51.2,
+    0.0,
+    33.5,
+    37.3
    ],
-   "overlap_mm2": 0.0,
-   "area_mm2": 3201
+   "overlap_mm2": -0.0,
+   "area_mm2": 6009
   },
   "baffle": {
    "flat_size_mm": [
-    131,
-    244
+    132,
+    276
    ],
-   "holes": 5
+   "holes": 6
   }
  },
  "stations_x": [
@@ -116,11 +136,12 @@
   345
  ],
  "points_round": 6,
- "longest_fold_line_mm": 167.7,
+ "longest_fold_line_mm": 194.3,
  "note_edges": "limit for fold lines raised to 200 mm (Joel, 16 Nov); the flat deck diagonal and the rear face are not folds",
- "triangles_per_half": 46,
- "litres_per_half": 6.1,
- "litres_total_gross": 12.21,
+ "triangles_per_half": 68,
+ "flat_faces_per_half": 37,
+ "litres_per_half": 6.99,
+ "litres_total_gross": 13.97,
  "filler_pad": {
   "centre_xyz_left": [
    201,
@@ -130,12 +151,12 @@
   "deck_inscribed_dia_mm": 122,
   "cap_space_dia_mm": 100
  },
- "steel_kg_per_half": 2.3,
- "steel_kg_both": 4.61,
+ "steel_kg_per_half": 2.55,
+ "steel_kg_both": 5.11,
  "mockup_print_sizes_mm": {
   "left-rear": [
-   247,
-   204,
+   242,
+   237,
    162
   ],
   "left-front-upper": [
@@ -144,13 +165,13 @@
    174
   ],
   "left-front-lower": [
-   172,
-   110,
-   130
+   174,
+   88,
+   162
   ],
   "right-rear": [
-   243,
-   153,
+   246,
+   228,
    162
   ],
   "right-front-upper": [
@@ -159,9 +180,9 @@
    174
   ],
   "right-front-lower": [
-   172,
-   110,
-   130
+   174,
+   88,
+   162
   ]
  },
  "params": {
