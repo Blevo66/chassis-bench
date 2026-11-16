@@ -31,7 +31,7 @@ fig=plt.figure(figsize=(12,9)); a=fig.add_subplot(111,projection='3d')
 for m in (L,R):
     a.add_collection3d(Poly3DCollection(m.triangles,facecolor='#c8ced4',edgecolor='#555',lw=.3,alpha=.95))
 a.scatter(fv[::3,0],fv[::3,1],fv[::3,2],s=.1,c='0.3')
-a.set_xlim(-150,500);a.set_ylim(-325,325);a.set_zlim(150,650); a.view_init(25,-60); a.set_box_aspect((650,650,500)); a.set_axis_off()
+a.set_xlim(-150,500);a.set_ylim(-325,325);a.set_zlim(150,650); a.view_init(18,-35); a.set_box_aspect((650,650,500)); a.set_axis_off()
 plt.tight_layout(); plt.savefig(f'{OUT}/tank-3d.png',dpi=80)
 # flats
 import glob

@@ -3,76 +3,100 @@
  "parts": {
   "outer_skin": {
    "flat_size_mm": [
-    387,
-    335
+    393,
+    410
    ],
-   "area_mm2": 89373,
+   "area_mm2": 104351,
    "bend_angles_deg": [
-    33.4,
-    44.8,
-    44.9
+    33.3,
+    44.2,
+    44.4
+   ],
+   "bend_kind": [
+    "outside",
+    "outside",
+    "outside"
    ]
   },
   "inner_pan": {
    "flat_size_mm": [
-    340,
-    290
+    402,
+    360
    ],
-   "area_mm2": 71423,
+   "area_mm2": 87459,
    "bend_angles_deg": [
-    44.8,
-    45.2
+    91.9,
+    45.2,
+    45.0
+   ],
+   "bend_kind": [
+    "outside",
+    "INSIDE - fold opposite way",
+    "outside"
    ]
   },
   "front_plate": {
    "flat_size_mm": [
-    123,
-    245
+    138,
+    330
    ],
-   "area_mm2": 26174,
-   "bend_angles_deg": []
+   "area_mm2": 31806,
+   "bend_angles_deg": [],
+   "bend_kind": []
   },
   "rear_plate": {
    "flat_size_mm": [
     81,
     120
    ],
-   "area_mm2": 7360,
-   "bend_angles_deg": []
+   "area_mm2": 6920,
+   "bend_angles_deg": [],
+   "bend_kind": []
   },
   "baffle": {
    "flat_size_mm": [
-    99,
-    177
+    106,
+    218
    ],
-   "area_mm2": 14740,
-   "bend_angles_deg": []
+   "area_mm2": 15996,
+   "bend_angles_deg": [],
+   "bend_kind": []
   }
  },
- "steel_kg_per_half": 1.97,
- "steel_kg_both": 3.94,
- "litres_per_half": 5.21,
- "litres_total_gross": 10.42,
+ "steel_kg_per_half": 2.32,
+ "steel_kg_both": 4.64,
+ "litres_per_half": 5.85,
+ "litres_total_gross": 11.69,
  "mockup_print_sizes_mm": {
-  "left-front": [
-   245,
-   123,
-   162
-  ],
   "left-rear": [
-   182,
-   102,
-   162
+   225,
+   179,
+   108
   ],
-  "right-front": [
-   245,
-   123,
-   162
+  "left-front-upper": [
+   160,
+   162,
+   138
+  ],
+  "left-front-lower": [
+   162,
+   137,
+   170
   ],
   "right-rear": [
-   182,
-   102,
-   162
+   225,
+   179,
+   108
+  ],
+  "right-front-upper": [
+   160,
+   162,
+   138
+  ],
+  "right-front-lower": [
+   162,
+   137,
+   170
   ]
  },
  "front_section_left_yz": [
@@ -81,28 +105,32 @@
    560.0
   ],
   [
-   126.0,
-   544.0
+   135.0,
+   542.4
   ],
   [
-   160.0,
-   510.0
+   175.0,
+   502.4
   ],
   [
-   160.0,
-   370.0
+   175.0,
+   260.0
   ],
   [
-   105.0,
-   315.0
+   145.0,
+   230.0
   ],
   [
-   72.0,
-   315.0
+   120.0,
+   230.0
+  ],
+  [
+   120.0,
+   320.0
   ],
   [
    37.0,
-   350.0
+   403.0
   ]
  ],
  "rear_section_left_yz": [
@@ -127,12 +155,16 @@
    340.0
   ],
   [
-   87.0,
+   86.0,
    340.0
   ],
   [
+   86.0,
+   350.0
+  ],
+  [
    37.0,
-   390.0
+   399.0
   ]
  ],
  "params": {
@@ -143,11 +175,13 @@
   "x_rear": 20.0,
   "front": {
    "zt": 560.0,
-   "yo": 160.0,
-   "zb": 315.0,
-   "c": 34.0,
-   "c2": 55.0,
-   "k": 35.0
+   "yo": 175.0,
+   "zb": 230.0,
+   "c": 40.0,
+   "c2": 30.0,
+   "yl": 120.0,
+   "k": 0.0,
+   "zs": 320.0
   },
   "rear": {
    "zt": 460.0,
@@ -155,8 +189,10 @@
    "zb": 340.0,
    "c": 26.0,
    "c2": 22.0,
-   "k": 50.0
+   "yl": 86.0,
+   "k": 0.0,
+   "zs": 350.0
   }
  },
- "max_width_mm": 320
+ "max_width_mm": 350
 }
