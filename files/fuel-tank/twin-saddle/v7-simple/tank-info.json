@@ -1,0 +1,207 @@
+{
+ "sheet_mm": 1.2,
+ "version": "v7 simple: big flat panels, filler deck, 80 mm rear face, pointed front",
+ "parts": {
+  "rear-face": {
+   "flat_size_mm": [
+    69,
+    80
+   ],
+   "area_mm2": 4174
+  },
+  "strip-1": {
+   "flat_size_mm": [
+    286,
+    194
+   ],
+   "folds": 15,
+   "fold_angles_deg": [
+    0.0,
+    29.3,
+    0.0,
+    40.3,
+    0.0,
+    41.1,
+    0.0,
+    33.0,
+    0.0,
+    92.5,
+    0.0,
+    46.9,
+    0.0,
+    44.2,
+    0.0
+   ],
+   "overlap_mm2": 0.0,
+   "area_mm2": 26046
+  },
+  "strip-2": {
+   "flat_size_mm": [
+    670,
+    440
+   ],
+   "folds": 15,
+   "fold_angles_deg": [
+    0.0,
+    33.2,
+    0.0,
+    43.9,
+    0.0,
+    45.7,
+    0.0,
+    38.0,
+    0.0,
+    93.8,
+    0.0,
+    45.2,
+    0.0,
+    45.0,
+    0.0
+   ],
+   "overlap_mm2": 0.0,
+   "area_mm2": 162638
+  },
+  "strip-3": {
+   "flat_size_mm": [
+    461,
+    396
+   ],
+   "folds": 15,
+   "fold_angles_deg": [
+    0.0,
+    23.0,
+    0.0,
+    45.0,
+    0.0,
+    43.3,
+    0.0,
+    32.3,
+    0.0,
+    81.4,
+    0.0,
+    44.0,
+    0.0,
+    48.3,
+    0.0
+   ],
+   "overlap_mm2": -0.0,
+   "area_mm2": 52724
+  },
+  "front-cone-top": {
+   "flat_size_mm": [
+    254,
+    80
+   ],
+   "folds": 3,
+   "fold_angles_deg": [
+    4.9,
+    15.2,
+    15.4
+   ],
+   "overlap_mm2": 0.0,
+   "area_mm2": 10761
+  },
+  "front-cone-bottom": {
+   "flat_size_mm": [
+    256,
+    35
+   ],
+   "folds": 3,
+   "fold_angles_deg": [
+    68.2,
+    42.4,
+    39.2
+   ],
+   "overlap_mm2": -0.0,
+   "area_mm2": 5154
+  },
+  "baffle": {
+   "flat_size_mm": [
+    132,
+    276
+   ],
+   "holes": 7
+  }
+ },
+ "stations_x": [
+  20,
+  80,
+  290,
+  345
+ ],
+ "longest_fold_line_mm": 303.7,
+ "note_edges": "simple version: big flat panels, so fold lines run the full length of the tank",
+ "triangles_per_half": 62,
+ "litres_per_half": 7.71,
+ "litres_total_gross": 15.43,
+ "filler_pad": {
+  "centre_xyz_left": [
+   229,
+   106,
+   513
+  ],
+  "deck_inscribed_dia_mm": 127,
+  "cap_space_dia_mm": 100
+ },
+ "steel_kg_per_half": 2.69,
+ "steel_kg_both": 5.39,
+ "mockup_print_sizes_mm": {
+  "left-rear": [
+   242,
+   249,
+   162
+  ],
+  "left-front-upper": [
+   203,
+   157,
+   176
+  ],
+  "left-front-lower": [
+   183,
+   179,
+   90
+  ],
+  "right-rear": [
+   249,
+   242,
+   162
+  ],
+  "right-front-upper": [
+   203,
+   157,
+   176
+  ],
+  "right-front-lower": [
+   183,
+   179,
+   90
+  ]
+ },
+ "params": {
+  "spine_y": 6.0,
+  "inner_gap": 37.0,
+  "top_slope": 0.18,
+  "x_front": 345.0,
+  "x_rear": 20.0,
+  "front": {
+   "zt": 560.0,
+   "yo": 205.0,
+   "zb": 120.0,
+   "c": 22.0,
+   "c2": 40.0,
+   "yl": 125.0,
+   "k": 0.0,
+   "zs": 320.0
+  },
+  "rear": {
+   "zt": 460.0,
+   "yo": 140.0,
+   "zb": 340.0,
+   "c": 14.0,
+   "c2": 22.0,
+   "yl": 86.0,
+   "k": 0.0,
+   "zs": 350.0
+  }
+ }
+}
