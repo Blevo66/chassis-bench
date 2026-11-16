@@ -13,7 +13,7 @@ P = dict(
   top_slope=0.18,     # top facet falls this much per mm outward
   x_front=345.0, x_rear=20.0,
   # zt top, yo outer, zb bottom, c shoulder, c2 lower outer chamfer, yl lower inner wall (engine), k inner chamfer, zs top of lower inner wall
-  front=dict(zt=560., yo=175., zb=230., c=40., c2=30., yl=120., k=0., zs=320.),
+  front=dict(zt=560., yo=205., zb=120., c=40., c2=40., yl=125., k=0., zs=320.),
   rear =dict(zt=460., yo=118., zb=340., c=26., c2=22., yl=86., k=0., zs=350.),
 )
 
