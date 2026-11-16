@@ -31,10 +31,11 @@ ax[2].set_aspect('equal'); ax[2].grid(alpha=.3); ax[2].set_title('Front view')
 plt.tight_layout(); plt.savefig(f'{OUT}/tank-on-frame-views.png',dpi=75)
 # flats
 flats=pickle.load(open(f'{OUT}/.flats.pkl','rb'))
-names=['strip-1','strip-2','strip-3','front-cap','rear-cap','baffle']
+names=['rear-cone','strip-1','strip-2','strip-3','strip-4','front-cone','baffle']
 fig=plt.figure(figsize=(22,12)); gs=fig.add_gridspec(2,4)
-pos={'strip-1':gs[0,0],'strip-2':gs[0,1],'strip-3':gs[0,2:],'front-cap':gs[1,0],'rear-cap':gs[1,1],'baffle':gs[1,2]}
+pos={'rear-cone':gs[1,0],'strip-1':gs[0,0],'strip-2':gs[0,1],'strip-3':gs[0,2:],'strip-4':gs[1,1:3],'front-cone':gs[1,3],'baffle':None}
 for n in names:
+    if pos[n] is None: continue
     a=fig.add_subplot(pos[n]); f=flats[n]; poly=f[0]; x,y=poly.exterior.xy; a.plot(x,y,'r',lw=1.2)
     for fl in f[1]:
         if fl[2]<3: continue

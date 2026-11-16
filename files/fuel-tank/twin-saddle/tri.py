@@ -34,7 +34,7 @@ def ring_poly(P,t,r1=45.,r2=30.):
     return fillet(tank.section(s,P),r1*k,r2*k)
 
 LAM=90.0   # mm of 'weight' per radian of turning: puts more points round the corners
-def sample(poly,N,start):
+def sample(poly,N,start,phase=0.0):
     ring=sg.LineString(poly.exterior.coords)
     if not sg.Polygon(ring).exterior.is_ccw: ring=sg.LineString(list(ring.coords)[::-1])
     d0=ring.project(sg.Point(start)); L=ring.length
@@ -43,10 +43,11 @@ def sample(poly,N,start):
     seg=np.diff(np.vstack([Q,Q[:1]]),axis=0); ang=np.arctan2(seg[:,1],seg[:,0])
     turn=np.abs((np.diff(np.concatenate([ang,ang[:1]]))+np.pi)%(2*np.pi)-np.pi)
     w=np.concatenate([[0],np.cumsum(np.linalg.norm(seg,axis=1)+LAM*turn)])
-    tgt=np.arange(N)*w[-1]/N
+    tgt=((np.arange(N)+phase)%N)*w[-1]/N
     idx=np.searchsorted(w,tgt); idx=np.clip(idx,0,M-1)
     return Q[idx]
 
+STAGGER=False
 def build(P,side=+1,nst=None,N=None):
     xr,xf=P['x_rear'],P['x_front']
     if nst is None: nst=int(math.ceil((xf-xr)/105.))+1
@@ -56,7 +57,8 @@ def build(P,side=+1,nst=None,N=None):
     rings=[]
     for t,p in zip(ts,polys):
         s=lerp(P['rear'],P['front'],t)
-        Y=sample(p,N,(P['inner_gap'],s['zt']))
+        ai=len(rings)
+        Y=sample(p,N,(P['inner_gap'],s['zt']),0.5*(ai%2) if STAGGER else 0.0)
         x=xr+(xf-xr)*t
         rings.append(np.column_stack([np.full(N,x),P['spine_y']+side*Y[:,0],Y[:,1]]))
     return rings,ts
@@ -67,9 +69,13 @@ def mesh_from(rings,shorter=True):
         band=[]
         for k in range(N):
             k2=(k+1)%N; i0,i1,j0,j1=a*N+k,a*N+k2,(a+1)*N+k,(a+1)*N+k2
-            if np.linalg.norm(V[i0]-V[j1])<=np.linalg.norm(V[i1]-V[j0]):
+            if STAGGER:
+                # ring a+1 is offset half a step: B_k sits between A_k and A_k+1 (a even) or the other way round
+                tri=[(i0,j0,i1),(i1,j0,j1)] if a%2==0 else [(i0,j0,j1),(i0,j1,i1)]
+            elif np.linalg.norm(V[i0]-V[j1])<=np.linalg.norm(V[i1]-V[j0]):
                 tri=[(i0,j0,j1),(i0,j1,i1)]
-            else:
+            if STAGGER: pass
+            elif False:
                 tri=[(i0,j0,i1),(i1,j0,j1)]
             band+=tri
         faces+=band; bands.append(band)

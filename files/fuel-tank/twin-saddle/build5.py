@@ -1,17 +1,20 @@
 """v4 low-poly build: mesh, panels (ring strips + caps + baffle), DXF, mock-up STLs, info."""
 import numpy as np, trimesh, json, os, sys, ezdxf, shapely.geometry as sg, shapely.ops as so
-import tank, tri
+import tank, tri, tri2
 OUT=sys.argv[1]; os.makedirs(OUT,exist_ok=True)
-P=tank.P; T=float(os.environ.get('T','1.2')); NST=int(os.environ.get('NST','4')); NAR=int(os.environ.get('NAR','16'))
-info={'sheet_mm':T,'version':'v4 low-poly','parts':{}}
+P=tank.P; T=float(os.environ.get('T','1.2')); NAR=int(os.environ.get('NAR','9'))
+TIP=float(os.environ.get('TIP','60')); TS=float(os.environ.get('TS','0.5')); AO=float(os.environ.get('AO','20'))
+info={'sheet_mm':T,'version':'v5 big crisp triangles, pointed ends','parts':{}}
 meshes={}
 for side,nm in ((1,'left'),(-1,'right')):
-    rings,ts=tri.build(P,side,nst=NST,N=NAR)
-    m,V,bands,caps=tri.mesh_from(rings)
-    meshes[nm]=(m,V,bands,caps,rings)
-m,V,bands,caps,rings=meshes['left']
+    st=tri2.stations(P,TIP,TS)
+    rings,ap=tri2.build(P,side,NAR,st,AO)
+    m,V,panels=tri2.mesh(rings,ap)
+    meshes[nm]=(m,V,panels,rings)
+m,V,panels,rings=meshes['left']
+bands=[b for _,b in panels]
 info['stations_x']=[round(float(r[0,0])) for r in rings]; info['points_round']=NAR
-info['max_triangle_side_mm']=round(tri.edges_max(V,bands)+0.0,1)
+info['max_triangle_side_mm']=round(tri2.max_edge(V,panels),1)
 info['triangles_per_half']=sum(len(b) for b in bands)
 info['litres_per_half']=round(m.volume/1e6,2); info['litres_total_gross']=round(2*m.volume/1e6,2)
 fn=m.face_normals
@@ -32,7 +35,7 @@ def save_dxf(name,poly,folds=(),holes=(),note=''):
     msp.add_text(f'{name} - LEFT half (mirror for RIGHT) - {T} mm mild steel - {note}',dxfattribs={'layer':'NOTE','height':7}).set_placement((x0,y0-15))
     doc.saveas(f'{OUT}/flat-{name}.dxf')
 flats={}
-for bi,band in enumerate(bands):
+for bi,(pname,band) in enumerate(panels):
     tris2,folds=tri.unfold_band(V,band)
     polys=[sg.Polygon(t) for t in tris2]
     u=so.unary_union([p.buffer(0.05,join_style=2) for p in polys]).buffer(-0.05,join_style=2)
@@ -51,17 +54,13 @@ for bi,band in enumerate(bands):
     ang=-np.arctan2(e[1],e[0]); R=np.array([[np.cos(ang),-np.sin(ang)],[np.sin(ang),np.cos(ang)]])
     from shapely import affinity
     u=affinity.rotate(u,ang,origin=(0,0),use_radians=True); fk=[(R@a,R@b,an,kd) for a,b,an,kd in fk]
-    name=f'strip-{bi+1}'
-    x0=info['stations_x'][bi]; x1=info['stations_x'][bi+1]
-    save_dxf(name,u,fk,note=f'ring strip between x={x0} and x={x1} from pivot; seam at the inner top edge')
+    name=pname
+    note='cone at the rear tip' if pname=='rear-cone' else 'cone at the front tip' if pname=='front-cone' else f'ring strip between x={info["stations_x"][bi-1]} and x={info["stations_x"][bi]} from pivot'
+    save_dxf(name,u,fk,note=note+'; closes on itself at the inner top edge')
     flats[name]=(u,fk)
     info['parts'][name]={'flat_size_mm':[round(v) for v in (u.bounds[2]-u.bounds[0],u.bounds[3]-u.bounds[1])],'folds':len(fk),
         'fold_angles_deg':[round(f[2],1) for f in fk],'overlap_mm2':round(overlap,1),'area_mm2':round(u.area)}
     area_total+=u.area
-for nmc,ring in (('rear-cap',rings[0]),('front-cap',rings[-1])):
-    poly=sg.Polygon(ring[:,1:]); poly=sg.Polygon(np.array(poly.exterior.coords)-np.array(poly.centroid.coords[0]))
-    save_dxf(nmc,poly,note='flat end plate'); flats[nmc]=(poly,[]); area_total+=poly.area
-    info['parts'][nmc]={'flat_size_mm':[round(v) for v in (poly.bounds[2]-poly.bounds[0],poly.bounds[3]-poly.bounds[1])],'area_mm2':round(poly.area)}
 # baffle at mid length
 xm=(P['x_front']+P['x_rear'])/2
 sec=m.section(plane_origin=[xm,0,0],plane_normal=[1,0,0]); pts=sec.vertices[:,1:]
