@@ -3,6 +3,9 @@ import numpy as np, trimesh, json, os, sys, ezdxf, shapely.geometry as sg, shape
 import tank, tri, tri3, tri5, copy, shapely
 OUT=sys.argv[1]; os.makedirs(OUT,exist_ok=True)
 P=copy.deepcopy(tank.P); P['rear']['yo']=140.; P['rear']['c']=14.; P['front']['c']=22.
+for _k in ('zb','yo','zt'):
+    for _e,_s in (('F','front'),('R','rear')):
+        if os.environ.get(_k.upper()+_e): P[_s][_k]=float(os.environ[_k.upper()+_e])
 T=float(os.environ.get('T','1.2')); NAR=int(os.environ.get('NAR','6'))
 XS=tuple(int(v) for v in os.environ.get('XS','20,140,260,345').split(',')); FT=(float(os.environ.get('FTS','0.6')),float(os.environ.get('FTO','12'))); PADBAND=int(os.environ.get('PADBAND','1'))
 info={'sheet_mm':T,'version':'v9 bigger irregular facets, flat pod bottoms, flat filler deck, 80 mm rear face','parts':{}}

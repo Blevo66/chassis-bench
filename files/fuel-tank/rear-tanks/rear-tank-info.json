@@ -1,0 +1,146 @@
+{
+ "version": "rear side tanks v1",
+ "litres_each": 1.56,
+ "litres_pair": 3.12,
+ "bounds_left": [
+  [
+   -380.0,
+   147.0,
+   228.0
+  ],
+  [
+   -80.0,
+   246.0,
+   350.0
+  ]
+ ],
+ "parts": {
+  "strip-1": {
+   "flat_mm": [
+    129,
+    72
+   ],
+   "real_folds": 4,
+   "overlap_mm2": 0.0
+  },
+  "strip-2": {
+   "flat_mm": [
+    185,
+    178
+   ],
+   "real_folds": 5,
+   "overlap_mm2": 0.0
+  },
+  "strip-3": {
+   "flat_mm": [
+    331,
+    115
+   ],
+   "real_folds": 7,
+   "overlap_mm2": 0.0
+  },
+  "strip-4": {
+   "flat_mm": [
+    328,
+    116
+   ],
+   "real_folds": 7,
+   "overlap_mm2": 0.0
+  },
+  "strip-5": {
+   "flat_mm": [
+    138,
+    92
+   ],
+   "real_folds": 4,
+   "overlap_mm2": 0.0
+  },
+  "end-rear": {
+   "flat_mm": [
+    21,
+    26
+   ]
+  },
+  "end-front": {
+   "flat_mm": [
+    36,
+    27
+   ]
+  }
+ },
+ "longest_fold_line_mm": 119.8,
+ "steel_kg_each": 0.82,
+ "lowest_point_z": 228,
+ "stations": [
+  [
+   -110,
+   147,
+   296,
+   196,
+   288,
+   232,
+   262,
+   214,
+   232
+  ],
+  [
+   -200,
+   147,
+   318,
+   214,
+   312,
+   246,
+   268,
+   226,
+   228
+  ],
+  [
+   -290,
+   150,
+   338,
+   206,
+   330,
+   238,
+   292,
+   220,
+   242
+  ],
+  [
+   -350,
+   152,
+   350,
+   186,
+   344,
+   204,
+   322,
+   194,
+   284
+  ]
+ ],
+ "mockup_sizes_mm": {
+  "left-front": [
+   150,
+   99,
+   97
+  ],
+  "left-rear": [
+   150,
+   95,
+   117
+  ],
+  "right-front": [
+   150,
+   99,
+   97
+  ],
+  "right-rear": [
+   150,
+   95,
+   117
+  ]
+ },
+ "clearance_to_scan_mm": {
+  "left": 10.4,
+  "right": 67.4
+ }
+}
