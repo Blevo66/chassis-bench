@@ -1,0 +1,74 @@
+{
+ "clearance_at_45deg_lock": {
+  "tower_shell": {
+   "steering_sweep_mm": 9.1,
+   "frame_mm": 103.3,
+   "frame_pts_inside": 0,
+   "sweep_pts_inside": 0
+  },
+  "neck": {
+   "steering_sweep_mm": 11.5,
+   "frame_mm": 9.3,
+   "frame_pts_inside": 0,
+   "sweep_pts_inside": 0
+  },
+  "bridge": {
+   "steering_sweep_mm": 5.7,
+   "frame_mm": 1.4,
+   "frame_pts_inside": 0,
+   "sweep_pts_inside": 0
+  },
+  "plate_R": {
+   "steering_sweep_mm": 7.8,
+   "frame_mm": 0.3,
+   "frame_pts_inside": 243,
+   "sweep_pts_inside": 0
+  },
+  "plate_L": {
+   "steering_sweep_mm": 7.8,
+   "frame_mm": 0.2,
+   "frame_pts_inside": 411,
+   "sweep_pts_inside": 0
+  },
+  "bolt1": {
+   "steering_sweep_mm": 106.9,
+   "frame_mm": 10.6,
+   "frame_pts_inside": 0,
+   "sweep_pts_inside": 0
+  },
+  "bolt2": {
+   "steering_sweep_mm": 131.5,
+   "frame_mm": 25.4,
+   "frame_pts_inside": 0,
+   "sweep_pts_inside": 0
+  },
+  "headlight": {
+   "steering_sweep_mm": 74.4,
+   "frame_mm": 142.0,
+   "frame_pts_inside": 0,
+   "sweep_pts_inside": 0
+  },
+  "tablet_5in": {
+   "steering_sweep_mm": 54.2,
+   "frame_mm": 252.1,
+   "frame_pts_inside": 0,
+   "sweep_pts_inside": 0
+  },
+  "dash_3in_tft": {
+   "steering_sweep_mm": 32.7,
+   "frame_mm": 162.3,
+   "frame_pts_inside": 0,
+   "sweep_pts_inside": 0
+  }
+ },
+ "bolts_local": [
+  [
+   170,
+   125
+  ],
+  [
+   197,
+   108
+  ]
+ ]
+}
