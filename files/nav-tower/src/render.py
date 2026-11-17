@@ -1,11 +1,12 @@
+BUILD='build_v1.py'
 import numpy as np,pickle,matplotlib;matplotlib.use('Agg');import matplotlib.pyplot as plt
 from matplotlib.collections import PolyCollection
-exec(open('build.py').read().split('parts={}')[0])
+exec(open(BUILD).read().split('parts={}')[0])
 parts=pickle.load(open('parts.pkl','rb'));T=np.load('T.npy');rot=np.load('rot.npy')
 def rotsteer(P,deg):
   L=S2L(P.reshape(-1,3));a=np.radians(deg);c,s=np.cos(a),np.sin(a)
   L=np.c_[c*L[:,0]-s*L[:,1],s*L[:,0]+c*L[:,1],L[:,2]];return L2S(L).reshape(P.shape)
-COL={'tower_shell':(0.15,0.15,0.17),'neck':(0.6,0.62,0.66),'bridge':(0.6,0.62,0.66),'plate_R':(0.6,0.62,0.66),'plate_L':(0.6,0.62,0.66),
+COL={'saddle':(0.6,0.62,0.66),'ubolt_lower':(0.85,0.7,0.2),'ubolt_upper':(0.85,0.7,0.2),'ubolt_lower_backbar':(0.6,0.62,0.66),'ubolt_upper_backbar':(0.6,0.62,0.66),'tower_shell':(0.15,0.15,0.17),'neck':(0.6,0.62,0.66),'bridge':(0.6,0.62,0.66),'plate_R':(0.6,0.62,0.66),'plate_L':(0.6,0.62,0.66),
  'bolt1':(0.85,0.7,0.2),'bolt2':(0.85,0.7,0.2),'headlight':(0.95,0.85,0.3),'tablet_5in':(0.1,0.35,0.85),'dash_3in_tft':(0.1,0.7,0.4)}
 def scene(lock=0,alpha_shell=1):
   tris=[];cols=[]
@@ -29,6 +30,6 @@ fig,ax=plt.subplots(2,2,figsize=(18,18))
 t0,c0=scene(0);t45,c45=scene(45)
 view(ax[0,0],t0,c0,90,0,'Side, straight ahead')
 view(ax[0,1],t0,c0,-35,15,'3/4 front, straight ahead')
-view(ax[1,0],t45,c45,180,18,"Rider's view, bars on full lock (45°, guessed)")
-view(ax[1,1],t45,c45,180,85,'From above at full lock (front of bike at top)')
-plt.tight_layout();plt.savefig('tower-v0-views.png',dpi=60)
+view(ax[1,0],t45,c45,140,30,"From behind and above, bars on full lock (45°, guessed)")
+view(ax[1,1],t0,c0,90,0,'Close-up: U-bolts round the head tube to bars in the frame window',lims=((-260,220),(-30,330)))
+plt.tight_layout();plt.savefig('tower-v1-views.png',dpi=60)
