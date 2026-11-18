@@ -1,12 +1,12 @@
 // =====================================================================
-//  XL125R body-loom box + dash  (ESP32 8-ch MOS board, 3.2" TFT, M10 GPS)
+//  XL125R body-loom box + dash  (ESP32 8-ch MOS board, 4" ST7796 TFT, M10 GPS)
 //  v0.1, untested on hardware. Pins are PROVISIONAL: see config.h.
 //
 //  What it does:
 //   - 5-button left controller: tap / long-press (see handleButtons)
 //   - drives 8 MOSFET outputs: indicators flash in code, no flasher relay
 //   - RPM from an HT-lead pickup, speed + clock from GPS
-//   - 320x240 dash: Ride / Trip / System screens
+//   - 480x320 dash: Ride / Trip / System screens
 //   - odometer + trips saved to flash, also when the supply starts to die
 //   - WiFi hotspot "XL-DASH": live status, output test, firmware update
 //  The brake light is NOT switched here (hard-wired); we only sense it.
@@ -186,75 +186,83 @@ void updateVolts() {
 }
 
 // ------------------------------------------------------------------ display
-const uint16_t COL_DIM = 0x18E3, COL_GREY = 0x7BEF, COL_AMBER = 0xFD60, COL_RED = 0xF8A6,
-               COL_GREEN = 0x2EED, COL_BLUE = 0x3C5F;
+// 4" ST7796S, 480x320 landscape. A full 8-bit frame would be 150 KB, more than
+// the plain ESP32 (no PSRAM) can usually give as one block, so the frame is a
+// 4-bit sprite (75 KB) with a 16-colour palette. In a 4-bit sprite every
+// colour below is a PALETTE INDEX, not an RGB565 value.
+enum : uint8_t { P_BLACK = 0, P_WHITE, P_DIM, P_GREY, P_AMBER, P_RED, P_GREEN, P_BLUE };
+uint16_t palette[16] = {
+  TFT_BLACK, TFT_WHITE, 0x18E3 /*dim*/, 0x7BEF /*grey*/, 0xFD60 /*amber*/,
+  0xF8A6 /*red*/, 0x2EED /*green*/, 0x3C5F /*blue*/,
+  0, 0, 0, 0, 0, 0, 0, 0
+};
 
-void arrow(int x, int y, int dir, bool on) {
-  uint16_t c = on ? COL_GREEN : COL_DIM;
-  if (dir < 0) { spr.fillTriangle(x, y, x + 16, y - 10, x + 16, y + 10, c); spr.fillRect(x + 16, y - 4, 12, 9, c); }
-  else         { spr.fillTriangle(x + 28, y, x + 12, y - 10, x + 12, y + 10, c); spr.fillRect(x, y - 4, 12, 9, c); }
+void arrow(int x, int y, int dir, bool on) {          // 40 x 28 px
+  uint8_t c = on ? P_GREEN : P_DIM;
+  if (dir < 0) { spr.fillTriangle(x, y, x + 22, y - 14, x + 22, y + 14, c); spr.fillRect(x + 22, y - 6, 18, 13, c); }
+  else         { spr.fillTriangle(x + 40, y, x + 18, y - 14, x + 18, y + 14, c); spr.fillRect(x, y - 6, 18, 13, c); }
 }
 
 void drawTop() {
   bool f = flashPhase();
-  arrow(8, 16, -1, (S.indL || S.hazard) && f);
-  arrow(284, 16, 1, (S.indR || S.hazard) && f);
-  uint16_t hb = (S.high || S.flash) ? COL_BLUE : COL_DIM;
-  spr.fillCircle(56, 16, 7, hb);
-  for (int i = -1; i <= 1; i++) spr.drawFastHLine(60, 16 + i * 5, 11, hb);
-  if (S.brake) { spr.fillRoundRect(80, 8, 30, 16, 3, COL_RED); spr.setTextColor(TFT_BLACK); spr.drawCentreString("BRK", 95, 9, 2); }
-  spr.setTextColor(TFT_WHITE);
+  arrow(10, 23, -1, (S.indL || S.hazard) && f);
+  arrow(430, 23, 1, (S.indR || S.hazard) && f);
+  uint8_t hb = (S.high || S.flash) ? P_BLUE : P_DIM;     // high-beam symbol
+  spr.fillCircle(78, 23, 10, hb);
+  for (int i = -1; i <= 1; i++) { spr.drawFastHLine(84, 23 + i * 7, 16, hb); spr.drawFastHLine(84, 24 + i * 7, 16, hb); }
+  if (S.brake) { spr.fillRoundRect(112, 11, 46, 24, 4, P_RED); spr.setTextColor(P_BLACK); spr.drawCentreString("BRK", 135, 15, 2); }
+  spr.setTextColor(P_WHITE);
   char buf[16];
   if (gps.time.isValid() && S.gpsOk) {
     // UTC from GPS; UK local time offset not handled yet (BST = +1)
     snprintf(buf, sizeof buf, "%02d:%02d", gps.time.hour(), gps.time.minute());
   } else strcpy(buf, "--:--");
-  spr.drawCentreString(buf, 160, 8, 2);
-  spr.setTextColor(S.gpsOk ? COL_GREY : COL_AMBER);
+  spr.drawCentreString(buf, 240, 10, 4);                 // font 4 = 26 px
+  spr.setTextColor(S.gpsOk ? P_GREY : P_AMBER);
   snprintf(buf, sizeof buf, S.gpsOk ? "GPS %d" : "NO GPS", S.sats);
-  spr.drawRightString(buf, 270, 9, 2);
-  spr.drawFastHLine(0, 32, 320, COL_DIM);
+  spr.drawRightString(buf, 412, 15, 2);
+  spr.drawFastHLine(0, 46, 480, P_DIM);
 }
 
 void drawRpmBar() {
-  const int n = 24, bx = 10, by = 40, bw = 300, bh = 22, gap = 2;
+  const int n = 30, bx = 14, by = 56, bw = 452, bh = 32, gap = 3;
   const int w = (bw - gap * (n - 1)) / n;
   int lit = (int)roundf(S.rpm / RPM_MAX * n);
   for (int i = 0; i < n; i++) {
     float r = (i + 1) * (float)RPM_MAX / n;
     int h = bh * (0.45f + 0.55f * i / (n - 1));
-    uint16_t c = r > SHIFT_RPM ? COL_RED : r > 7500 ? COL_AMBER : TFT_WHITE;
-    spr.fillRect(bx + i * (w + gap), by + bh - h, w, h, i < lit ? c : COL_DIM);
+    uint8_t c = r > SHIFT_RPM ? P_RED : r > 7500 ? P_AMBER : P_WHITE;
+    spr.fillRect(bx + i * (w + gap), by + bh - h, w, h, i < lit ? c : P_DIM);
   }
-  spr.setTextColor(COL_GREY);
-  spr.drawString("x1000", 10, 66, 1);
-  for (int k = 2; k <= 10; k += 2) spr.drawCentreString(String(k), bx + k * bw / 11, 66, 1);
+  spr.setTextColor(P_GREY);
+  spr.drawString("x1000", 14, 94, 2);
+  for (int k = 2; k <= 10; k += 2) spr.drawCentreString(String(k), bx + k * bw / 11, 94, 2);
   if (S.rpm > SHIFT_RPM && flashPhase()) {
-    spr.fillRect(250, 64, 60, 13, COL_RED); spr.setTextColor(TFT_WHITE); spr.drawCentreString("SHIFT", 280, 67, 1);
+    spr.fillRect(378, 92, 88, 20, P_RED); spr.setTextColor(P_WHITE); spr.drawCentreString("SHIFT", 422, 94, 2);
   }
 }
 
 void drawBottom(const String& a, const String& b) {
-  spr.drawFastHLine(0, 206, 320, COL_DIM);
-  spr.setTextColor(TFT_WHITE);
-  spr.drawString(a, 10, 214, 2);
-  if (b.length()) spr.drawRightString(b, 310, 214, 2);
+  spr.drawFastHLine(0, 274, 480, P_DIM);
+  spr.setTextColor(P_WHITE);
+  spr.drawString(a, 14, 284, 4);
+  if (b.length()) spr.drawRightString(b, 466, 284, 4);
 }
 
 void drawRide() {
   drawRpmBar();
-  spr.setTextColor(TFT_WHITE);
-  spr.setTextSize(2);                          // font 7 (7-segment) x2 = 96 px
-  if (S.gpsOk) spr.drawRightString(String((int)roundf(S.mph)), 205, 88, 7);
-  else         spr.drawRightString("--", 205, 88, 7);
+  spr.setTextColor(P_WHITE);
+  spr.setTextSize(3);                          // font 7 (7-segment, 48 px) x3 = 144 px tall
+  if (S.gpsOk) spr.drawRightString(String((int)roundf(S.mph)), 300, 122, 7);
+  else         spr.drawRightString("--", 300, 122, 7);
   spr.setTextSize(1);
-  spr.setTextColor(COL_GREY); spr.drawString("MPH", 212, 170, 2);
-  spr.drawRect(244, 92, 62, 56, COL_GREY);
-  spr.drawCentreString("GEAR", 275, 96, 1);
-  spr.setTextColor(TFT_WHITE);
-  spr.drawCentreString(S.gear ? String(S.gear) : String("-"), 275, 108, 4);
-  spr.setTextColor(COL_GREY);
-  spr.drawCentreString(String((int)S.rpm) + " rpm", 275, 156, 2);
+  spr.setTextColor(P_GREY); spr.drawString("MPH", 306, 240, 2);
+  spr.drawRect(346, 124, 120, 90, P_GREY); spr.drawRect(347, 125, 118, 88, P_GREY);
+  spr.drawCentreString("GEAR", 406, 132, 2);
+  spr.setTextColor(P_WHITE);
+  spr.drawCentreString(S.gear ? String(S.gear) : String("-"), 406, 152, 6);   // font 6 = 48 px digits
+  spr.setTextColor(P_GREY);
+  spr.drawCentreString(String((int)S.rpm) + " rpm", 406, 226, 2);
   drawBottom("ODO " + String(S.odo, 1), "TRIP A " + String(S.tripA, 1));
 }
 
@@ -265,42 +273,42 @@ String hms(double s) {
 }
 
 void drawTrip() {
-  spr.setTextColor(COL_AMBER); spr.drawString("TRIP", 10, 42, 2);
+  spr.setTextColor(P_AMBER); spr.drawString("TRIP", 14, 58, 4);
   const char* k[] = {"TRIP A", "TRIP B", "RIDE TIME", "AVG SPEED", "TOP SPEED"};
   String v[] = {String(S.tripA, 1) + " mi", String(S.tripB, 1) + " mi", hms(S.rideSecs),
                 String(S.rideSecs > 0 ? S.rideMiles / (S.rideSecs / 3600.0) : 0, 1) + " mph",
                 String(S.topMph, 0) + " mph"};
   for (int i = 0; i < 5; i++) {
-    spr.setTextColor(COL_GREY); spr.drawString(k[i], 10, 70 + i * 24, 2);
-    spr.setTextColor(TFT_WHITE); spr.drawRightString(v[i], 310, 70 + i * 24, 2);
+    spr.setTextColor(P_GREY);  spr.drawString(k[i], 14, 96 + i * 34, 4);
+    spr.setTextColor(P_WHITE); spr.drawRightString(v[i], 466, 96 + i * 34, 4);
   }
   drawBottom("Hold MODE: reset trip A", "");
 }
 
 void drawSystem() {
-  spr.setTextColor(COL_AMBER); spr.drawString("SYSTEM", 10, 42, 2);
-  uint16_t vc = S.volts < 12.2f ? COL_RED : S.volts < 12.8f ? COL_AMBER : COL_GREEN;
-  spr.setTextColor(COL_GREY); spr.drawString("SUPPLY", 10, 70, 2);
-  spr.setTextColor(vc); spr.drawRightString(String(S.volts, 1) + " V", 150, 70, 2);
-  spr.setTextColor(COL_GREY); spr.drawString("GPS", 10, 94, 2);
-  spr.setTextColor(TFT_WHITE); spr.drawRightString(S.gpsOk ? String(S.sats) + " sats" : "no fix", 150, 94, 2);
-  spr.setTextColor(COL_GREY); spr.drawString("WIFI", 10, 118, 2);
-  spr.setTextColor(TFT_WHITE); spr.drawRightString(apOn ? "on" : "off", 150, 118, 2);
+  spr.setTextColor(P_AMBER); spr.drawString("SYSTEM", 14, 58, 4);
+  uint8_t vc = S.volts < 12.2f ? P_RED : S.volts < 12.8f ? P_AMBER : P_GREEN;
+  spr.setTextColor(P_GREY); spr.drawString("SUPPLY", 14, 96, 4);
+  spr.setTextColor(vc);     spr.drawRightString(String(S.volts, 1) + " V", 236, 96, 4);
+  spr.setTextColor(P_GREY); spr.drawString("GPS", 14, 130, 4);
+  spr.setTextColor(P_WHITE); spr.drawRightString(S.gpsOk ? String(S.sats) + " sats" : "no fix", 236, 130, 4);
+  spr.setTextColor(P_GREY); spr.drawString("WIFI", 14, 164, 4);
+  spr.setTextColor(P_WHITE); spr.drawRightString(apOn ? "on" : "off", 236, 164, 4);
   const char* names[] = {"1 IND L", "2 IND R", "3 LOW", "4 HIGH", "5 HORN", "6 USB", "7 AUX", "8 SPARE"};
   for (int i = 0; i < 8; i++) {
-    int y = 66 + i * 16;
-    spr.fillRect(176, y + 2, 10, 10, S.outState[i] ? COL_GREEN : COL_DIM);
-    spr.setTextColor(S.outState[i] ? TFT_WHITE : COL_GREY);
-    spr.drawString(names[i], 194, y, 2);
+    int y = 88 + i * 22;
+    spr.fillRect(268, y + 1, 14, 14, S.outState[i] ? P_GREEN : P_DIM);
+    spr.setTextColor(S.outState[i] ? P_WHITE : P_GREY);
+    spr.drawString(names[i], 292, y, 2);
   }
   drawBottom("Outputs live", "");
 }
 
 void drawScreen() {
-  spr.fillSprite(TFT_BLACK);
+  spr.fillSprite(P_BLACK);
   drawTop();
   if (S.screen == 0) drawRide(); else if (S.screen == 1) drawTrip(); else drawSystem();
-  if (S.horn) { spr.fillRect(110, 186, 100, 18, COL_AMBER); spr.setTextColor(TFT_BLACK); spr.drawCentreString("HORN", 160, 187, 2); }
+  if (S.horn) { spr.fillRect(180, 248, 120, 24, P_AMBER); spr.setTextColor(P_BLACK); spr.drawCentreString("HORN", 240, 252, 2); }
   spr.pushSprite(0, 0);
 }
 
@@ -369,8 +377,9 @@ void setup() {
 
   tft.init(); tft.setRotation(1); tft.fillScreen(TFT_BLACK);
   ledcSetup(0, 5000, 8); ledcAttachPin(PIN_TFT_BL, 0); ledcWrite(0, 255);
-  spr.setColorDepth(8);                          // 75 KB frame, fits without PSRAM
-  spr.createSprite(320, 240);
+  spr.setColorDepth(4);                          // 480x320 x 4 bit = 75 KB, fits without PSRAM
+  if (!spr.createSprite(480, 320)) Serial.println("sprite alloc FAILED");
+  spr.createPalette(palette, 16);
 
   writeOutputs();                                // low beam on straight away
   startAP();

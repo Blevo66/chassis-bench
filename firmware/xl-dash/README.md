@@ -1,6 +1,8 @@
 # XL125R body-loom box + dash firmware (v0.1)
 
-ESP32 firmware for the "ESP32 8 Channel MOS Switch" board (eBay 820144839205), a 3.2" ILI9341 SPI TFT and a u-blox M10 GPS.
+ESP32 firmware for the "ESP32 8 Channel MOS Switch" board (eBay 820144839205, 122 x 87.5 mm), a 4" ST7796S 480x320 SPI TFT (LCDwiki MSP4020, no touch; 108 x 62 mm module) and a u-blox M10 GPS.
+
+Screen note: the 480x320 frame is drawn in a 4-bit, 16-colour sprite (75 KB) because an 8-bit one (150 KB) is unlikely to fit in a plain ESP32 without PSRAM. If "sprite alloc FAILED" shows on the serial monitor, that is the first thing to look at.
 
 **Status: written, NOT compiled or tested yet.** The build server could not reach the PlatformIO registry, so the first compile happens on your laptop. Expect a few small fixes on the first build.
 
