@@ -9,6 +9,7 @@
 //   - 480x320 dash: Ride / Trip / System screens
 //   - odometer + trips saved to flash, also when the supply starts to die
 //   - WiFi hotspot "XL-DASH": live status, output test, firmware update
+//   - ignition battery over Bluetooth (no wire to the engine loom): volts, %, time left
 //  The brake light is NOT switched here (hard-wired); we only sense it.
 // =====================================================================
 #include <Arduino.h>
@@ -18,6 +19,7 @@
 #include <Update.h>
 #include <TFT_eSPI.h>
 #include <TinyGPSPlus.h>
+#include <NimBLEDevice.h>
 #include "config.h"
 
 // ------------------------------------------------------------------ state
@@ -185,6 +187,61 @@ void updateVolts() {
   S.brake = digitalRead(PIN_BRAKE) == LOW;
 }
 
+// ------------------------------------------------------------------ ignition battery (BLE)
+// Payload from firmware/ign-sender: FF FF 'X' 'L' mV(2) mA(2) seq
+volatile uint16_t ignRxMv = 0, ignRxMa = 0xFFFF;
+volatile uint32_t ignRxMs = 0;
+struct { bool ok = false; float volts = 0, pct = 0, ma = 0, hoursLeft = 0; bool sensed = false; } IGN;
+
+class IgnScanCB : public NimBLEAdvertisedDeviceCallbacks {
+  void onResult(NimBLEAdvertisedDevice* d) override {
+    if (!d->haveManufacturerData()) return;
+    std::string m = d->getManufacturerData();
+    if (m.size() < 9 || (uint8_t)m[0] != 0xFF || (uint8_t)m[1] != 0xFF || m[2] != 'X' || m[3] != 'L') return;
+    ignRxMv = (uint8_t)m[4] | ((uint8_t)m[5] << 8);
+    ignRxMa = (uint8_t)m[6] | ((uint8_t)m[7] << 8);
+    ignRxMs = millis();
+  }
+};
+
+void startIgnScan() {
+  NimBLEDevice::init("");
+  NimBLEScan* sc = NimBLEDevice::getScan();
+  sc->setAdvertisedDeviceCallbacks(new IgnScanCB(), true);  // want every advert, not just new devices
+  sc->setActiveScan(false);
+  sc->setInterval(160); sc->setWindow(60);                  // 100 ms / 37.5 ms: leaves air time for WiFi
+  sc->setMaxResults(0);                                     // don't store results, just call back
+  sc->start(0, nullptr, false);                             // scan forever
+}
+
+// Rough Li-ion state of charge from volts per cell (typical curve, a GUESS for your cells)
+float liionPct(float vCell) {
+  static const float V[] = {3.00f, 3.30f, 3.40f, 3.50f, 3.60f, 3.70f, 3.80f, 3.90f, 4.00f, 4.10f, 4.20f};
+  static const float P[] = {0,     4,     8,     15,    28,    42,    55,    68,    80,    90,    100};
+  if (vCell <= V[0]) return 0; if (vCell >= V[10]) return 100;
+  for (int i = 0; i < 10; i++) if (vCell < V[i + 1]) return P[i] + (P[i + 1] - P[i]) * (vCell - V[i]) / (V[i + 1] - V[i]);
+  return 100;
+}
+
+void updateIgn() {
+  uint32_t rx = ignRxMs;
+  IGN.ok = rx && millis() - rx < IGN_STALE_MS;
+  if (!IGN.ok) return;
+  float v = ignRxMv / 1000.0f;
+  IGN.volts += (v - IGN.volts) * (IGN.volts == 0 ? 1.0f : 0.3f);
+  IGN.pct = liionPct(IGN.volts / IGN_CELLS);
+  IGN.sensed = ignRxMa != 0xFFFF;
+  float ma = IGN.sensed ? (float)ignRxMa : IGN_ASSUMED_MA;
+  IGN.ma += (ma - IGN.ma) * (IGN.ma == 0 ? 1.0f : 0.02f);   // slow average: CDI current comes in pulses
+  IGN.hoursLeft = IGN.ma > 1 ? (IGN.pct / 100.0f) * IGN_CAPACITY_MAH / IGN.ma : 0;
+}
+
+uint8_t ignColour();   // defined with the display code
+String ignTimeLeft() {
+  int mins = (int)(IGN.hoursLeft * 60);
+  return String(mins / 60) + "h " + (mins % 60 < 10 ? "0" : "") + String(mins % 60) + "m";
+}
+
 // ------------------------------------------------------------------ display
 // 4" ST7796S, 480x320 landscape. A full 8-bit frame would be 150 KB, more than
 // the plain ESP32 (no PSRAM) can usually give as one block, so the frame is a
@@ -196,6 +253,11 @@ uint16_t palette[16] = {
   0xF8A6 /*red*/, 0x2EED /*green*/, 0x3C5F /*blue*/,
   0, 0, 0, 0, 0, 0, 0, 0
 };
+
+uint8_t ignColour() {
+  float vc = IGN.volts / IGN_CELLS;
+  return !IGN.ok ? P_GREY : vc < IGN_LOW_PER_CELL ? P_RED : vc < IGN_WARN_PER_CELL ? P_AMBER : P_GREEN;
+}
 
 void arrow(int x, int y, int dir, bool on) {          // 40 x 28 px
   uint8_t c = on ? P_GREEN : P_DIM;
@@ -262,7 +324,9 @@ void drawRide() {
   spr.setTextColor(P_WHITE);
   spr.drawCentreString(S.gear ? String(S.gear) : String("-"), 406, 152, 6);   // font 6 = 48 px digits
   spr.setTextColor(P_GREY);
-  spr.drawCentreString(String((int)S.rpm) + " rpm", 406, 226, 2);
+  spr.drawCentreString(String((int)S.rpm) + " rpm", 406, 222, 2);
+  spr.setTextColor(ignColour());
+  spr.drawCentreString(IGN.ok ? "IGN " + String(IGN.volts, 1) + "V " + String((int)IGN.pct) + "%" : String("IGN --"), 406, 244, 2);
   drawBottom("ODO " + String(S.odo, 1), "TRIP A " + String(S.tripA, 1));
 }
 
@@ -294,6 +358,13 @@ void drawSystem() {
   spr.setTextColor(P_WHITE); spr.drawRightString(S.gpsOk ? String(S.sats) + " sats" : "no fix", 236, 130, 4);
   spr.setTextColor(P_GREY); spr.drawString("WIFI", 14, 164, 4);
   spr.setTextColor(P_WHITE); spr.drawRightString(apOn ? "on" : "off", 236, 164, 4);
+  spr.setTextColor(P_GREY); spr.drawString("IGN", 14, 198, 4);
+  spr.setTextColor(ignColour());
+  spr.drawRightString(IGN.ok ? String(IGN.volts, 1) + " V" : String("no signal"), 236, 198, 4);
+  if (IGN.ok) {
+    spr.setTextColor(P_GREY);
+    spr.drawString(String((int)IGN.pct) + "%  " + String((int)IGN.ma) + (IGN.sensed ? " mA" : " mA est") + "  ~" + ignTimeLeft(), 14, 232, 2);
+  }
   const char* names[] = {"1 IND L", "2 IND R", "3 LOW", "4 HIGH", "5 HORN", "6 USB", "7 AUX", "8 SPARE"};
   for (int i = 0; i < 8; i++) {
     int y = 88 + i * 22;
@@ -308,6 +379,9 @@ void drawScreen() {
   spr.fillSprite(P_BLACK);
   drawTop();
   if (S.screen == 0) drawRide(); else if (S.screen == 1) drawTrip(); else drawSystem();
+  if (IGN.ok && IGN.volts / IGN_CELLS < IGN_LOW_PER_CELL && flashPhase()) {
+    spr.fillRect(120, 140, 240, 44, P_RED); spr.setTextColor(P_WHITE); spr.drawCentreString("IGN BATT LOW", 240, 149, 4);
+  }
   if (S.horn) { spr.fillRect(180, 248, 120, 24, P_AMBER); spr.setTextColor(P_BLACK); spr.drawCentreString("HORN", 240, 252, 2); }
   spr.pushSprite(0, 0);
 }
@@ -332,7 +406,8 @@ void startAP() {
   web.on("/api/state", [] {
     String j = "{\"rpm\":" + String((int)S.rpm) + ",\"mph\":" + String(S.mph, 1) +
                ",\"volts\":" + String(S.volts, 2) + ",\"sats\":" + String(S.sats) +
-               ",\"gps\":" + String(S.gpsOk ? "true" : "false") + ",\"odo\":" + String(S.odo, 1) + ",\"out\":[";
+               ",\"gps\":" + String(S.gpsOk ? "true" : "false") + ",\"odo\":" + String(S.odo, 1) +
+               ",\"ign\":" + String(IGN.ok ? IGN.volts : 0, 2) + ",\"ignPct\":" + String((int)IGN.pct) + ",\"out\":[";
     for (int i = 0; i < 8; i++) j += String(S.outState[i] ? 1 : 0) + (i < 7 ? "," : "");
     web.send(200, "application/json", j + "]}");
   });
@@ -383,6 +458,7 @@ void setup() {
 
   writeOutputs();                                // low beam on straight away
   startAP();
+  startIgnScan();                                // after the sprite and WiFi have their memory
 }
 
 uint32_t lastDraw = 0, lastSlow = 0;
@@ -391,7 +467,7 @@ void loop() {
   updateRpm();
   writeOutputs();
   updateGpsAndOdo();
-  if (millis() - lastSlow > 50) { lastSlow = millis(); updateVolts(); }
+  if (millis() - lastSlow > 50) { lastSlow = millis(); updateVolts(); updateIgn(); }
   if (millis() - lastDraw > 50) { lastDraw = millis(); drawScreen(); }   // ~20 fps
   if (apOn) {
     web.handleClient();

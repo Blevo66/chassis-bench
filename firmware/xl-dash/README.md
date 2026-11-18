@@ -51,3 +51,14 @@ Screen mock-up: https://claude.ai/artifact/HZPUvWeBmFoRdDcqrsdwYQ
 - Sparks per rev, shift light, gear ratios and voltage thresholds are guesses in `config.h`.
 - Output test buttons on the WiFi page force outputs on; they reset when WiFi turns off.
 - WiFi hotspot `XL-DASH` turns itself off after 10 minutes or above 5 mph.
+
+## Ignition battery (wireless)
+
+The engine loom stays completely separate. A small ESP32-C3 on the ignition pack (`firmware/ign-sender`) broadcasts its voltage, and current if an INA226 is fitted, over Bluetooth every ~5 s. The dash listens with a passive NimBLE scan and shows:
+
+- **Ride screen:** `IGN 14.6V 72%` under the gear box, coloured green / amber / red.
+- **System screen:** volts, %, current (live or "est") and rough time left.
+- **IGN BATT LOW** flashing banner below `IGN_LOW_PER_CELL`.
+- `IGN --` if nothing heard for 20 s. The engine is unaffected either way.
+
+Set `IGN_CELLS`, `IGN_CAPACITY_MAH` and `IGN_ASSUMED_MA` in `config.h` for your pack. The defaults are guesses. Memory note: WiFi + Bluetooth + the 75 KB screen frame together are tight on a plain ESP32. If it runs out, the first fix is to stop the Bluetooth scan while the WiFi page is open.

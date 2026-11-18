@@ -56,3 +56,15 @@ static const char*  AP_SSID     = "XL-DASH";
 static const char*  AP_PASS     = "changeme123";   // change before use (8+ chars)
 static const uint32_t AP_TIMEOUT_MS = 10UL * 60UL * 1000UL;  // hotspot off after 10 min
 static const float  AP_OFF_ABOVE_MPH = 5.0f;                 // ...or once moving
+
+// ---- Ignition battery (wireless sender, firmware/ign-sender) ----
+// The engine loom is separate; the sender broadcasts its pack voltage (and
+// current if it has an INA226) over Bluetooth. Values below are GUESSES:
+// set them for your actual pack.
+static const int      IGN_CELLS          = 4;       // Li-ion cells in series
+static const float    IGN_CAPACITY_MAH   = 4000;    // pack capacity
+static const float    IGN_ASSUMED_MA     = 700;     // used if no INA226: measure at fast idle
+static const float    IGN_WARN_PER_CELL  = 3.55f;   // amber below this (volts per cell)
+static const float    IGN_LOW_PER_CELL   = 3.35f;   // red + "IGN LOW" banner below this
+static const uint32_t IGN_STALE_MS       = 20000;   // no advert for this long -> "IGN --"
+
