@@ -15,7 +15,15 @@ static const int PIN_OUT[8] = { 26,  27,  19,   2,  15,  12,   0,  -1 };
 static const bool OUT_ACTIVE_HIGH = true;   // guess: HIGH = MOSFET on
 
 // What each output does (index = OUT number - 1)
-enum OutIdx { O_IND_L = 0, O_IND_R, O_LOW, O_HIGH, O_HORN, O_USB, O_AUX, O_SPARE };
+enum OutIdx { O_IND_L = 0, O_IND_R, O_LOW, O_HIGH, O_HORN, O_USB, O_AUX, O_TAIL };
+
+// ---- Rear light: ONE LED lamp, dim = tail, full = brake ----------------
+// Lamp + to its fused feed, lamp - to OUT8. OUT8 PWMs it dim as a tail light.
+// The brake switches are wired from lamp - to EARTH, in parallel with OUT8,
+// so pressing the brake lights it full even if the ESP32 is dead (fail-safe).
+static const int   TAIL_LEDC_CH  = 1;       // channel 0 is the screen backlight
+static const int   TAIL_PWM_HZ   = 1000;    // guess: slow MOS-board drivers may need lower (try 200-500)
+static const float TAIL_DUTY     = 0.20f;   // tail brightness, 0..1 (guess: 15-30% looks right). Keep < 0.6 so brake sensing works
 
 // ---- Left controller, 5 buttons, each pulls to earth when pressed ---
 static const int PIN_BTN_IND_L  = 21;
@@ -27,7 +35,7 @@ static const int PIN_BTN_MODE   = 25;
 
 // ---- Other inputs -----------------------------------------------------
 static const int PIN_RPM    = 34;  // HT-lead pickup, through the filter (input-only pin)
-static const int PIN_BRAKE  = 35;  // opto output, LOW when brake lamp is lit
+static const int PIN_BRAKE  = 35;  // opto across the rear lamp: LOW while lamp - is at earth (brake = always LOW)
 static const int PIN_VOLTS  = 33;  // 100k / 22k divider from box supply (ADC1, works with WiFi)
 
 // ---- GPS (UART2) and screen -------------------------------------------

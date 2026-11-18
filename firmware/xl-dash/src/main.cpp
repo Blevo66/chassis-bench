@@ -10,7 +10,8 @@
 //   - odometer + trips saved to flash, also when the supply starts to die
 //   - WiFi hotspot "XL-DASH": live status, output test, firmware update
 //   - ignition battery over Bluetooth (no wire to the engine loom): volts, %, time left
-//  The brake light is NOT switched here (hard-wired); we only sense it.
+//  Rear light: one LED, PWM dim as tail on OUT8; brake switches short it to earth
+//  in parallel, so the brake light works even with the ESP32 dead.
 // =====================================================================
 #include <Arduino.h>
 #include <Preferences.h>
@@ -129,11 +130,18 @@ void writeOutputs() {
   want[O_HORN]  = S.horn;
   want[O_USB]   = S.usb;
   want[O_AUX]   = S.aux;
-  want[O_SPARE] = false;
+  want[O_TAIL]  = true;                       // tail dim always on; brake = hardware, full
   for (int i = 0; i < 8; i++) {
     bool on = want[i] || S.outTest[i];
     S.outState[i] = on;
-    if (PIN_OUT[i] >= 0) digitalWrite(PIN_OUT[i], on == OUT_ACTIVE_HIGH ? HIGH : LOW);
+    if (PIN_OUT[i] < 0) continue;
+    if (i == O_TAIL) {
+      float d = S.outTest[i] ? 1.0f : (on ? TAIL_DUTY : 0.0f);
+      if (!OUT_ACTIVE_HIGH) d = 1.0f - d;
+      ledcWrite(TAIL_LEDC_CH, (uint32_t)(d * 255.0f + 0.5f));
+    } else {
+      digitalWrite(PIN_OUT[i], on == OUT_ACTIVE_HIGH ? HIGH : LOW);
+    }
   }
 }
 
@@ -184,7 +192,18 @@ void updateVolts() {
   // supply dying (no battery on the body loom): save once
   if (S.volts < VOLT_SAVE_BELOW && S.volts > 2.0f && !savedOnLowVolts) { saveTrips(); savedOnLowVolts = true; }
   if (S.volts > VOLT_SAVE_BELOW + 1.0f) savedOnLowVolts = false;
-  S.brake = digitalRead(PIN_BRAKE) == LOW;
+}
+
+// Brake sense: the opto sees lamp - at earth. The tail PWM pulls it to earth only
+// TAIL_DUTY of the time; the brake switch holds it there. So: brake = LOW for a
+// whole PWM period. 16 reads spread over ~1.3 periods.
+void readBrake() {
+  const uint32_t stepUs = (1300000UL / TAIL_PWM_HZ) / 16;
+  for (int i = 0; i < 16; i++) {
+    if (digitalRead(PIN_BRAKE) != LOW) { S.brake = false; return; }
+    delayMicroseconds(stepUs);
+  }
+  S.brake = true;
 }
 
 // ------------------------------------------------------------------ ignition battery (BLE)
@@ -367,7 +386,7 @@ void drawSystem() {
     spr.setTextColor(P_GREY);
     spr.drawString(String((int)IGN.pct) + "%  " + String((int)IGN.ma) + (IGN.sensed ? " mA" : " mA est") + "  ~" + ignTimeLeft(), 14, 232, 2);
   }
-  const char* names[] = {"1 IND L", "2 IND R", "3 LOW", "4 HIGH", "5 HORN", "6 USB", "7 AUX", "8 SPARE"};
+  const char* names[] = {"1 IND L", "2 IND R", "3 LOW", "4 HIGH", "5 HORN", "6 USB", "7 AUX", "8 TAIL/BRK"};
   for (int i = 0; i < 8; i++) {
     int y = 88 + i * 22;
     spr.fillRect(268, y + 1, 14, 14, S.outState[i] ? P_GREEN : P_DIM);
@@ -395,7 +414,7 @@ button{padding:10px 14px;margin:4px;border:0;border-radius:8px;background:#333;c
 .on{background:#2a7}</style><h2>XL125R box</h2><pre id=s></pre><h3>Test outputs</h3><div id=o></div>
 <h3>Firmware update</h3><form method=POST action=/update enctype=multipart/form-data>
 <input type=file name=f><button>Upload .bin</button></form>
-<script>const n=['IND L','IND R','LOW','HIGH','HORN','USB','AUX','SPARE'];
+<script>const n=['IND L','IND R','LOW','HIGH','HORN','USB','AUX','TAIL (full)'];
 async function t(){const r=await fetch('/api/state');const j=await r.json();
 document.getElementById('s').textContent=`RPM ${j.rpm}  MPH ${j.mph}  ${j.volts} V\nGPS ${j.sats} sats ${j.gps?'fix':'no fix'}  ODO ${j.odo}`;
 document.getElementById('o').innerHTML=n.map((x,i)=>`<button class="${j.out[i]?'on':''}" onclick="fetch('/api/test?n=${i}')">${i+1} ${x}</button>`).join('');}
@@ -440,9 +459,10 @@ void stopAP() {
 void setup() {
   Serial.begin(115200);
   for (int i = 0; i < 8; i++) if (PIN_OUT[i] >= 0) { pinMode(PIN_OUT[i], OUTPUT); digitalWrite(PIN_OUT[i], OUT_ACTIVE_HIGH ? LOW : HIGH); }
+  if (PIN_OUT[O_TAIL] >= 0) { ledcSetup(TAIL_LEDC_CH, TAIL_PWM_HZ, 8); ledcAttachPin(PIN_OUT[O_TAIL], TAIL_LEDC_CH); }
   for (Button* b : buttons) pinMode(b->pin, INPUT_PULLUP);
   pinMode(PIN_RPM, INPUT);                       // filter sets the level (input-only pin)
-  pinMode(PIN_BRAKE, INPUT);                     // opto needs an external 10k pull-up
+  pinMode(PIN_BRAKE, INPUT);                     // opto needs an external 10k pull-up (35 has no internal one)
   attachInterrupt(digitalPinToInterrupt(PIN_RPM), rpmISR, RISING);
   analogSetPinAttenuation(PIN_VOLTS, ADC_11db);
 
@@ -466,6 +486,7 @@ void setup() {
 uint32_t lastDraw = 0, lastSlow = 0;
 void loop() {
   handleButtons();
+  readBrake();
   updateRpm();
   writeOutputs();
   updateGpsAndOdo();

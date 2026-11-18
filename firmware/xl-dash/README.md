@@ -32,7 +32,7 @@ Screen mock-up: https://claude.ai/artifact/HZPUvWeBmFoRdDcqrsdwYQ
 | OUT1..OUT8 | `PIN_OUT[]` | `writeOutputs()` |
 | Buttons 1-5 (P2) | 21, 22, 13, 14, 25 | `handleButtons()` |
 | RPM pickup filter | 34 | `rpmISR()` / `updateRpm()` |
-| Brake sense opto | 35 | `updateVolts()` sets `S.brake` |
+| Brake sense opto (across rear lamp) | 35 | `readBrake()` sets `S.brake` |
 | Volts divider 100k/22k | 33 | `updateVolts()` |
 | GPS TX / RX | 16 / 17 | `updateGpsAndOdo()` |
 | TFT SCK/MOSI/CS/DC, backlight | 18/23/5/4, 32 | `platformio.ini`, `drawScreen()` |
@@ -62,3 +62,24 @@ The engine loom stays completely separate. A small ESP32-C3 on the ignition pack
 - `IGN --` if nothing heard for 20 s. The engine is unaffected either way.
 
 Set `IGN_LIFEPO4`, `IGN_CELLS`, `IGN_CAPACITY_MAH` and `IGN_ASSUMED_MA` in `config.h` for your pack. The defaults are guesses. The CDI is rated 16 V max, so use 3S Li-ion (12.6 V full) or 4S LiFePO4 (14.6 V full), never 4S Li-ion (16.8 V). Memory note: WiFi + Bluetooth + the 75 KB screen frame together are tight on a plain ESP32. If it runs out, the first fix is to stop the Bluetooth scan while the WiFi page is open.
+
+
+## Rear light: one LED, tail and brake
+
+One two-wire LED lamp does both. It's dim as a tail light and goes full brightness on the brake.
+
+```
+ fused +12V ──► lamp + ── LED lamp ── lamp − ──┬──► OUT8 (PWM, dim tail)
+                                               ├──► front brake switch ──► earth
+                                               └──► rear brake switch ───► earth
+ opto: +12V ─ 2k2 ─ LED ─► lamp −     (output to GPIO35 with 10k pull-up to 3.3V)
+```
+
+- OUT8 PWMs the lamp at `TAIL_DUTY` (20%, guess) for the tail.
+- The brake switches short lamp − straight to earth, in parallel with OUT8. Pressing the brake lights it at full brightness **with or without the ESP32 running**. That's the fail-safe.
+- The brake switches must be two-wire with an insulated body, not earthed through the bike.
+- `readBrake()` calls it "brake" when lamp − stays at earth for a whole PWM period. That's why `TAIL_DUTY` must stay well under 100%.
+- If the ESP32 is dead you lose the tail light, but not the brake light.
+- **Check on the bench:**
+  - The lamp must dim cleanly on PWM. A plain LED-plus-resistor lamp should. One with its own constant-current driver might flicker or refuse to dim.
+  - The MOS board must switch cleanly at `TAIL_PWM_HZ`. If it doesn't, drop it to 200–500 Hz.
