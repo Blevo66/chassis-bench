@@ -61,7 +61,7 @@ static const float  AP_OFF_ABOVE_MPH = 5.0f;                 // ...or once movin
 // The engine loom is separate; the sender broadcasts its pack voltage (and
 // current if it has an INA226) over Bluetooth. Values below are GUESSES:
 // set them for your actual pack.
-// CDI max is 16 V (Joel). 4S Li-ion charges to 16.8 V, so it is OUT.
+// Electrex CD7003-DC: 9-16 V (manual). 4S Li-ion charges to 16.8 V, so it is OUT.
 // Fits: 3S Li-ion (12.6 V full) or 4S LiFePO4 (14.6 V full).
 static const bool     IGN_LIFEPO4        = false;   // true for LiFePO4 cells
 static const int      IGN_CELLS          = 3;       // cells in series
