@@ -214,10 +214,12 @@ void startIgnScan() {
   sc->start(0, nullptr, false);                             // scan forever
 }
 
-// Rough Li-ion state of charge from volts per cell (typical curve, a GUESS for your cells)
-float liionPct(float vCell) {
-  static const float V[] = {3.00f, 3.30f, 3.40f, 3.50f, 3.60f, 3.70f, 3.80f, 3.90f, 4.00f, 4.10f, 4.20f};
-  static const float P[] = {0,     4,     8,     15,    28,    42,    55,    68,    80,    90,    100};
+// Rough state of charge from volts per cell (typical curves, GUESSES for your cells)
+float cellPct(float vCell) {
+  static const float VL[] = {3.00f, 3.30f, 3.40f, 3.50f, 3.60f, 3.70f, 3.80f, 3.90f, 4.00f, 4.10f, 4.20f};  // Li-ion
+  static const float VF[] = {2.80f, 3.00f, 3.10f, 3.20f, 3.23f, 3.26f, 3.28f, 3.30f, 3.32f, 3.35f, 3.45f};  // LiFePO4 (flat!)
+  static const float P[]  = {0,     4,     8,     15,    28,    42,    55,    68,    80,    90,    100};
+  const float* V = IGN_LIFEPO4 ? VF : VL;
   if (vCell <= V[0]) return 0; if (vCell >= V[10]) return 100;
   for (int i = 0; i < 10; i++) if (vCell < V[i + 1]) return P[i] + (P[i + 1] - P[i]) * (vCell - V[i]) / (V[i + 1] - V[i]);
   return 100;
@@ -229,7 +231,7 @@ void updateIgn() {
   if (!IGN.ok) return;
   float v = ignRxMv / 1000.0f;
   IGN.volts += (v - IGN.volts) * (IGN.volts == 0 ? 1.0f : 0.3f);
-  IGN.pct = liionPct(IGN.volts / IGN_CELLS);
+  IGN.pct = cellPct(IGN.volts / IGN_CELLS);
   IGN.sensed = ignRxMa != 0xFFFF;
   float ma = IGN.sensed ? (float)ignRxMa : IGN_ASSUMED_MA;
   IGN.ma += (ma - IGN.ma) * (IGN.ma == 0 ? 1.0f : 0.02f);   // slow average: CDI current comes in pulses

@@ -61,4 +61,4 @@ The engine loom stays completely separate. A small ESP32-C3 on the ignition pack
 - **IGN BATT LOW** flashing banner below `IGN_LOW_PER_CELL`.
 - `IGN --` if nothing heard for 20 s. The engine is unaffected either way.
 
-Set `IGN_CELLS`, `IGN_CAPACITY_MAH` and `IGN_ASSUMED_MA` in `config.h` for your pack. The defaults are guesses. Memory note: WiFi + Bluetooth + the 75 KB screen frame together are tight on a plain ESP32. If it runs out, the first fix is to stop the Bluetooth scan while the WiFi page is open.
+Set `IGN_LIFEPO4`, `IGN_CELLS`, `IGN_CAPACITY_MAH` and `IGN_ASSUMED_MA` in `config.h` for your pack. The defaults are guesses. The CDI is rated 16 V max, so use 3S Li-ion (12.6 V full) or 4S LiFePO4 (14.6 V full), never 4S Li-ion (16.8 V). Memory note: WiFi + Bluetooth + the 75 KB screen frame together are tight on a plain ESP32. If it runs out, the first fix is to stop the Bluetooth scan while the WiFi page is open.

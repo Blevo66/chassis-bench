@@ -61,10 +61,13 @@ static const float  AP_OFF_ABOVE_MPH = 5.0f;                 // ...or once movin
 // The engine loom is separate; the sender broadcasts its pack voltage (and
 // current if it has an INA226) over Bluetooth. Values below are GUESSES:
 // set them for your actual pack.
-static const int      IGN_CELLS          = 4;       // Li-ion cells in series
+// CDI max is 16 V (Joel). 4S Li-ion charges to 16.8 V, so it is OUT.
+// Fits: 3S Li-ion (12.6 V full) or 4S LiFePO4 (14.6 V full).
+static const bool     IGN_LIFEPO4        = false;   // true for LiFePO4 cells
+static const int      IGN_CELLS          = 3;       // cells in series
 static const float    IGN_CAPACITY_MAH   = 4000;    // pack capacity
 static const float    IGN_ASSUMED_MA     = 700;     // used if no INA226: measure at fast idle
-static const float    IGN_WARN_PER_CELL  = 3.55f;   // amber below this (volts per cell)
-static const float    IGN_LOW_PER_CELL   = 3.35f;   // red + "IGN LOW" banner below this
+static const float    IGN_WARN_PER_CELL  = IGN_LIFEPO4 ? 3.20f : 3.55f;  // amber below this (V/cell)
+static const float    IGN_LOW_PER_CELL   = IGN_LIFEPO4 ? 3.05f : 3.35f;  // red + "IGN BATT LOW" below this
 static const uint32_t IGN_STALE_MS       = 20000;   // no advert for this long -> "IGN --"
 
