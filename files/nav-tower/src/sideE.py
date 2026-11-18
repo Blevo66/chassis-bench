@@ -24,32 +24,27 @@ h=ConvexHull(CL[:,[1,2]]);ax.add_patch(Polygon(CL[h.vertices][:,[1,2]],fc='#f39c
 W='#f4f4f2';RED='#d0202a';BLU='#1d3f9a';K='#222'
 def poly(pts,fc,z=5,ec=K,lw=1.4):ax.add_patch(Polygon(np.array(pts),closed=True,fc=fc,ec=ec,lw=lw,zorder=z))
 # neck (from clamp front, through fork gap)
-NK=C2S(np.array([[0,25,-38],[0,95,-38],[0,95,-150],[0,25,-150]]))[:,1:];poly(list(map(tuple,NK)),'#555',4)
-# main side panel facets (white), beak, upper facet
-poly([(-118,128),(-222,168),(-196,236),(-120,232)],W)            # lower facet / beak
-poly([(-196,236),(-206,300),(-140,318),(-120,232)],W)             # lamp facet
-poly([(-120,232),(-140,318),(-96,336),(-70,262)],'#e6e6e3')        # rear upper facet
-poly([(-118,128),(-120,232),(-70,262),(-52,196)],'#e6e6e3')       # rear lower facet
-# HRC stripes
-poly([(-214,186),(-202,203),(-118,192),(-118,176)],RED,6,ec='none')
-poly([(-208,212),(-200,224),(-119,212),(-119,200)],BLU,6,ec='none')
-# twin lamps (side view: one lamp visible, front edge)
-ax.add_patch(Polygon([(-204,236),(-214,300),(-196,302),(-188,240)],closed=True,fc='#333',ec=K,zorder=7))
-ax.add_patch(Polygon([(-214,300),(-204,236),(-207,236),(-217,300)],closed=True,fc='#ffd75e',ec=K,zorder=8))
-# screen (short, near vertical)
-poly([(-206,300),(-196,312),(-150,440),(-160,442)],'#9fc3d8aa',6,ec='#345')
-# tablet (5in) + dash (3in) stack, angled to rider
-poly([(-150,410),(-58,372),(-54,382),(-146,420)],'#1a5fe0',7)      # tablet ~150 long (landscape width seen edge-on ~ its height 80) 
-poly([(-150,410),(-140,318),(-96,336),(-58,372)],'#2b2b2b',5)      # nav back box
-poly([(-112,352),(-76,340),(-72,350),(-108,362)],'#19b36b',8)      # 3in dash
+NK=C2S(np.array([[0,25,-38],[0,95,-38],[0,95,-95],[0,25,-95]]))[:,1:];poly(list(map(tuple,NK)),'#555',4)
+poly([(-66,132),(-142,172),(-128,232),(-70,228)],W)                 # beak / lower facet
+poly([(-128,232),(-136,300),(-80,312),(-70,228)],W)                 # lamp facet
+poly([(-70,228),(-80,312),(-30,330),(-20,250)],'#e6e6e3')           # rear upper facet
+poly([(-66,132),(-70,228),(-20,250),(-30,190),(-46,160)],'#e6e6e3') # rear lower facet
+poly([(-136,188),(-128,204),(-68,196),(-67,180)],RED,6,ec='none')
+poly([(-129,214),(-126,226),(-69,218),(-69,206)],BLU,6,ec='none')
+ax.add_patch(Polygon([(-128,236),(-136,298),(-118,300),(-110,240)],closed=True,fc='#333',ec=K,zorder=7))
+ax.add_patch(Polygon([(-136,298),(-128,236),(-131,236),(-139,298)],closed=True,fc='#ffd75e',ec=K,zorder=8))
+poly([(-136,300),(-126,312),(-92,438),(-102,440)],'#9fc3d8aa',6,ec='#345')
+poly([(-94,408),(0,372),(4,382),(-90,418)],'#1a5fe0',7)
+poly([(-94,408),(-80,312),(-30,330),(0,372)],'#2b2b2b',5)
+poly([(-58,350),(-22,338),(-18,348),(-54,360)],'#19b36b',8)
 ax.plot([],[],color='#1a5fe0',lw=6,label='5" tablet (top, angled at you)')
 ax.plot([],[],color='#19b36b',lw=6,label='3" TFT dash (under the tablet)')
 ax.plot([],[],color='#f39c12',lw=6,label='your headstock clamp (as placed)')
 ax.plot([],[],color='#555',lw=6,label='neck through the fork gap (≤48 mm wide)')
-ax.text(-232,268,'twin Baja\nlamps',ha='left',va='center',fontsize=11)
-ax.text(-232,170,'beak',ha='left',fontsize=11)
-ax.text(-158,452,'short upright screen',ha='center',fontsize=11)
-ax.set_xlim(160,-330);ax.set_ylim(-40,490);ax.set_aspect('equal');ax.grid(alpha=.25)
+ax.text(-150,268,'twin Baja\nlamps',ha='left',va='center',fontsize=11)
+ax.text(-152,165,'beak',ha='left',fontsize=11)
+ax.text(-100,452,'short upright screen',ha='center',fontsize=11)
+ax.set_xlim(160,-260);ax.set_ylim(-40,490);ax.set_aspect('equal');ax.grid(alpha=.25)
 ax.set_xlabel('mm (front of bike to the RIGHT)');ax.set_ylabel('mm');ax.legend(loc='lower right',fontsize=10)
 ax.set_title('Option E concept, side view: narrow modern-Dakar tower, 80s details',fontsize=14)
 # front view inset
