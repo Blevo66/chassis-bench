@@ -7,7 +7,7 @@ R = np.array([[1, 0, 0], [0, 0.8824, -0.4705], [0, 0.4705, 0.8824]]); p0 = np.ar
 L2S = lambda P: p0 + np.asarray(P, float) @ R
 OD, LEN, ID = 20.0, 12.0, 6.8   # M8 boss (6.8 = tap drill, for looks)
 # boss centres in local (u back, t up the steering axis), mirrored both sides
-SPOTS = {'A_front_upper': (10, 150), 'B_front_lower': (10, 85)}
+SPOTS = {'A_front_upper': (22, 150), 'B_front_lower': (22, 85)}
 def surf_v(u, t, side):
     m = (np.abs(Pf[:, 1] - u) < 4) & (np.abs(Pf[:, 2] - t) < 4) & (np.sign(Pf[:, 0]) == side)
     return np.abs(Pf[m, 0]).max()
@@ -43,7 +43,7 @@ for name, (u, t) in SPOTS.items():
     a.add_patch(Circle((-u, t), OD / 2, fc='#1e8449', ec='k', lw=1.5, alpha=.9)); a.add_patch(Circle((-u, t), 4, fc='w', ec='k'))
     a.text(-u - 14, t + 12, name[0], fontsize=16, weight='bold', color='#1e8449')
 a.add_patch(Circle((-80, 115), 6, fc='k')); a.text(-130, 100, 'tank boss', fontsize=9)
-a.plot([-10, -10], [150, 85], 'g:', lw=1)
+a.plot([-22, -22], [150, 85], 'g:', lw=1); a.axvline(-8, color='m', ls='--', lw=1); a.text(-6, 200, 'approx weld line\n(guess, ~8 mm\nbehind axis)', color='m', fontsize=9)
 a.set_aspect('equal'); a.set_xlim(-200, 80); a.set_ylim(20, 230); a.grid(alpha=.3)
 a.set_xlabel('mm  (front of bike to the RIGHT; 0 = steering axis)'); a.set_ylabel('mm up the steering axis')
 a.set_title('Side view along the head tube (frame grey, forks/yokes pink)'); a.legend(loc='upper left')
