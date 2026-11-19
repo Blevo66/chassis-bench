@@ -1,0 +1,104 @@
+{
+ "A_front_upper_plusX": {
+  "local_u": 10,
+  "local_t": 150,
+  "surface_v": 25.4,
+  "face_v": 37.4,
+  "clear_to_fork_sweep_mm": 17.7,
+  "scan_xyz_centre_of_face": [
+   40.0,
+   63.2,
+   118.3
+  ],
+  "clamp_xyz_centre_of_face": [
+   -37.4,
+   83.5,
+   10.0
+  ]
+ },
+ "A_front_upper_minusX": {
+  "local_u": 10,
+  "local_t": 150,
+  "surface_v": -28.4,
+  "face_v": -40.4,
+  "clear_to_fork_sweep_mm": 18.5,
+  "scan_xyz_centre_of_face": [
+   -37.8,
+   63.2,
+   118.3
+  ],
+  "clamp_xyz_centre_of_face": [
+   40.4,
+   83.5,
+   10.0
+  ]
+ },
+ "B_front_lower_plusX": {
+  "local_u": 10,
+  "local_t": 85,
+  "surface_v": 25.1,
+  "face_v": 37.1,
+  "clear_to_fork_sweep_mm": 12.8,
+  "scan_xyz_centre_of_face": [
+   39.7,
+   32.6,
+   60.9
+  ],
+  "clamp_xyz_centre_of_face": [
+   -37.1,
+   18.5,
+   10.0
+  ]
+ },
+ "B_front_lower_minusX": {
+  "local_u": 10,
+  "local_t": 85,
+  "surface_v": -28.2,
+  "face_v": -40.2,
+  "clear_to_fork_sweep_mm": 13.3,
+  "scan_xyz_centre_of_face": [
+   -37.6,
+   32.6,
+   60.9
+  ],
+  "clamp_xyz_centre_of_face": [
+   40.2,
+   18.5,
+   10.0
+  ]
+ },
+ "C_rear_upper_plusX": {
+  "local_u": 55,
+  "local_t": 145,
+  "surface_v": 25.0,
+  "face_v": 37.0,
+  "clear_to_fork_sweep_mm": 23.5,
+  "scan_xyz_centre_of_face": [
+   39.6,
+   100.6,
+   92.7
+  ],
+  "clamp_xyz_centre_of_face": [
+   -37.0,
+   78.5,
+   55.0
+  ]
+ },
+ "C_rear_upper_minusX": {
+  "local_u": 55,
+  "local_t": 145,
+  "surface_v": -26.7,
+  "face_v": -38.7,
+  "clear_to_fork_sweep_mm": 23.6,
+  "scan_xyz_centre_of_face": [
+   -36.1,
+   100.6,
+   92.7
+  ],
+  "clamp_xyz_centre_of_face": [
+   38.7,
+   78.5,
+   55.0
+  ]
+ }
+}
