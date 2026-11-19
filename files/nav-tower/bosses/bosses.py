@@ -7,7 +7,7 @@ R = np.array([[1, 0, 0], [0, 0.8824, -0.4705], [0, 0.4705, 0.8824]]); p0 = np.ar
 L2S = lambda P: p0 + np.asarray(P, float) @ R
 OD, LEN, ID = 20.0, 12.0, 6.8   # M8 boss (6.8 = tap drill, for looks)
 # boss centres in local (u back, t up the steering axis), mirrored both sides
-SPOTS = {'A_front_upper': (10, 150), 'B_front_lower': (10, 85), 'C_rear_upper': (55, 145)}
+SPOTS = {'A_front_upper': (10, 150), 'B_front_lower': (10, 85)}
 def surf_v(u, t, side):
     m = (np.abs(Pf[:, 1] - u) < 4) & (np.abs(Pf[:, 2] - t) < 4) & (np.sign(Pf[:, 0]) == side)
     return np.abs(Pf[m, 0]).max()
@@ -43,7 +43,7 @@ for name, (u, t) in SPOTS.items():
     a.add_patch(Circle((-u, t), OD / 2, fc='#1e8449', ec='k', lw=1.5, alpha=.9)); a.add_patch(Circle((-u, t), 4, fc='w', ec='k'))
     a.text(-u - 14, t + 12, name[0], fontsize=16, weight='bold', color='#1e8449')
 a.add_patch(Circle((-80, 115), 6, fc='k')); a.text(-130, 100, 'tank boss', fontsize=9)
-a.plot([-10, -55, -10, -10], [150, 145, 85, 150], 'g:', lw=1)
+a.plot([-10, -10], [150, 85], 'g:', lw=1)
 a.set_aspect('equal'); a.set_xlim(-200, 80); a.set_ylim(20, 230); a.grid(alpha=.3)
 a.set_xlabel('mm  (front of bike to the RIGHT; 0 = steering axis)'); a.set_ylabel('mm up the steering axis')
 a.set_title('Side view along the head tube (frame grey, forks/yokes pink)'); a.legend(loc='upper left')
@@ -57,5 +57,5 @@ for name, (u, t) in SPOTS.items():
 b.set_aspect('equal'); b.set_xlim(-130, 130); b.set_ylim(20, 230); b.grid(alpha=.3)
 b.set_title('Looking from the front (pink haze = everything the forks/yokes\nsweep through at ±40° lock)'); b.set_xlabel('sideways mm')
 txt = '  '.join(f"{k[0]}: {min(report[k+'_plusX']['clear_to_fork_sweep_mm'], report[k+'_minusX']['clear_to_fork_sweep_mm'])} mm" for k in SPOTS)
-fig.suptitle(f'M8 weld-on bosses, 20 OD x 12 long, 3 a side (A front-upper, B front-lower, C rear-upper). Positions approx ±3-5 mm.\nMin clearance from each boss to the fork/yoke sweep at full lock: {txt}', fontsize=11)
+fig.suptitle(f'M8 weld-on bosses, 20 OD x 12 long, 2 a side (A front-upper, B front-lower). Positions approx ±3-5 mm.\nMin clearance from each boss to the fork/yoke sweep at full lock: {txt}', fontsize=11)
 plt.tight_layout(); plt.savefig('bosses/m8-bosses-on-scan.png', dpi=85)
