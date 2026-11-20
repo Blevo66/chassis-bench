@@ -32,8 +32,8 @@ Built from Joel's `Frame Scan.stl` (Fusion export). Units: mm.
 | Brace | oval, 21 wide x 31 tall | scan |
 | Rear tubes (to the scan's cut) | about 17x20 (right) and 19x24 (left), shapes as scanned | scan, rough; the cut ends are rough |
 | Pressed-steel triangle (Joel: head gusset, backbone front, brace) | Backbone front (to about 300 mm back) and brace use the scan's own cross-sections, mirrored about the seam and smoothed along the length. They show flat sides (backbone ±22.4, brace ±10.9) and the welded seam ridge on the top and bottom centreline (backbone ridge 27.6 / 27.9 from centre, brace 16.0 / 17.1), which matches Joel's photos. The ridges are as the scan shows them; the true flange edge may be crisper. | scan + photos |
-| Head gusset, rear junction | ruled loft through the scan's own cross-sections every 4 mm | scan, follows its bumps |
-| Yokes | scan cross-sections every 2 mm along the steering axis, stacked (2 mm steps on sloped edges). Bottom yoke 33 thick plus the centre boss; top yoke 42 thick incl. clamps; risers to 63 above the yoke underside | scan, median error 0.3-0.4 mm |
+| Head gusset, rear junction | Smooth spline lofts. Scan slices every 2 mm are turned into distance fields, mirrored about X=0 (gusset only), Gaussian-smoothed about 1.2 mm, and contoured. | scan: median error 0.7 mm (gusset) / 0.15 mm (junction); under 2% of the surface more than 2 mm proud |
+| Yokes | Kept as stacked scan cross-sections every 2 mm, which is most accurate: a smoothed/prismatic version tested at 1.5 mm median error so was rejected. along the steering axis, stacked (2 mm steps on sloped edges). Bottom yoke 33 thick plus the centre boss; top yoke 42 thick incl. clamps; risers to 63 above the yoke underside | scan, median error 0.3-0.4 mm |
 | Handlebar | scanned centreline, **Ø22.2 assumed** (scan reads ~17-19, shiny parts scan thin) | path good, size a guess |
 | Tank bosses | Ø27, tips at X -40.1 / +40.8, Y about 100, Z about 23 | scan. Their symmetry about X=0 (0.4 mm) is a good check on the centreplane. |
 

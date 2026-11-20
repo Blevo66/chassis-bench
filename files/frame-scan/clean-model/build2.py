@@ -74,8 +74,8 @@ SL=json.load(open('slices.json'))
 def slloft(S):
   ws=[cq.Wire.makePolygon([V(p) for p in T(np.array(x['pts']))],close=True) for x in S]
   return cq.Solid.makeLoft(ws,True)
-parts['head_gusset']=slloft(SL['head'])
-parts['rear_junction']=slloft(SL['rear'])
+parts['head_gusset']=cq.Shape.importBrep('cad/smooth-gusset.brep')
+parts['rear_junction']=cq.Shape.importBrep('cad/smooth-junction.brep')
 # tank bosses: measured centre (scan) y~117.8 z~60, Ø27 (scan), tips x=-52.1 / +29.0
 for side,tipx,inx in (('L',-52.1,-30.0),('R',29.0,10.0)):
   a=T(np.array([inx,117.8,60.0]))[0]; b=T(np.array([tipx,117.8,60.0]))[0]
