@@ -1,0 +1,58 @@
+{
+ "bulkhead": [
+  21.7,
+  93.6
+ ],
+ "button_heads_ti": [
+  17.7,
+  17.7
+ ],
+ "cheek_L": [
+  36.7,
+  126.8
+ ],
+ "cheek_R": [
+  36.7,
+  126.8
+ ],
+ "cheeseboard_alu": [
+  130.8,
+  248.3
+ ],
+ "dash_bracket_alu": [
+  83.9,
+  159.4
+ ],
+ "dash_pod_placeholder": [
+  51.6,
+  141.9
+ ],
+ "lamp_housings": [
+  44.8,
+  120.7
+ ],
+ "lamp_lenses": [
+  84.0,
+  176.4
+ ],
+ "neck_carbon": [
+  12.0,
+  11.4
+ ],
+ "nose_cowl": [
+  21.8,
+  92.3
+ ],
+ "tablet_tab_a9_placeholder": [
+  127.6,
+  263.2
+ ],
+ "top_cradle_forged": [
+  149.0,
+  243.3
+ ],
+ "visor_polycarb": [
+  263.6,
+  415.3
+ ]
+}
