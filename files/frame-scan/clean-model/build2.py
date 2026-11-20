@@ -98,11 +98,15 @@ asm=cq.Assembly(name='xl125r_frame')
 asm.add(frame_body,name='frame',color=cq.Color(0.2,0.3,0.7))
 for k,s_ in forks.items(): asm.add(s_,name=k,color=cq.Color(0.7,0.7,0.7))
 asm.add(axis_ref,name='steering_axis_ref',color=cq.Color(1,0,0))
+import os
+for nm,f,col in (('yoke_bottom','cad/yoke-bottom.brep',(0.85,0.85,0.85)),('yoke_top','cad/yoke-top.brep',(0.85,0.85,0.85)),('handlebar_22mm_assumed','cad/handlebar.brep',(0.3,0.3,0.3))):
+  if os.path.exists(f): asm.add(cq.Shape.importBrep(f),name=nm,color=cq.Color(*col))
 asm.save('cad/xl125r-frame-clean.step')
 cq.exporters.export(cq.Workplane().add(frame_body),'cad/xl125r-frame-clean.stl',tolerance=0.1,angularTolerance=0.1)
 allb=frame_body
 for s_ in forks.values(): allb=allb.fuse(s_)
-cq.exporters.export(cq.Workplane().add(allb),'cad/xl125r-frame-with-forks.stl',tolerance=0.1,angularTolerance=0.1)
+for f in ('cad/yoke-bottom.brep','cad/yoke-top.brep','cad/handlebar.brep'): allb=cq.Compound.makeCompound([allb,cq.Shape.importBrep(f)])
+cq.exporters.export(cq.Workplane().add(allb),'cad/xl125r-front-end.stl',tolerance=0.1,angularTolerance=0.1)
 # aligned copy of the scan for overlay
 sc=trimesh.load('fill2.stl'); sc.apply_transform(M); sc.export('cad/frame-scan-watertight-bike-aligned.stl')
 print('valid',frame_body.isValid(),'vol',round(frame_body.Volume()))

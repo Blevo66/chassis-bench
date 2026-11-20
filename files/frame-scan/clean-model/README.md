@@ -3,7 +3,8 @@
 Built from Joel's `Frame Scan.stl` (Fusion export). Units: mm.
 
 ## Files
-- `xl125r-frame-clean.step`: assembly with 3 parts: `frame` (solid), `fork_tube_L` / `fork_tube_R` (43 mm reference cylinders, bottom of bottom yoke to top of top yoke), and `steering_axis_ref` (a 2 mm rod on the steering axis).
+- `xl125r-frame-clean.step`: assembly with these parts: `frame` (solid); `fork_tube_L` / `fork_tube_R` (43 mm cylinders, bottom of bottom yoke to top of top yoke); `yoke_bottom` and `yoke_top` (top includes the bar-clamp risers); `handlebar_22mm_assumed`; and `steering_axis_ref` (a 2 mm rod on the steering axis).
+- `xl125r-front-end.stl`: everything above in one STL. `yoke-*.stl` and `handlebar.stl`: separate parts.
 - `xl125r-frame-clean.stl`: the frame only. `xl125r-frame-with-forks.stl`: the frame plus the fork tubes.
 - `frame-scan-watertight-bike-aligned.stl`: the watertight scan, moved into the same coordinates so it overlays the model.
 - `transform.json`: the 4x4 matrix that takes scan coordinates to model coordinates.
@@ -14,7 +15,7 @@ Built from Joel's `Frame Scan.stl` (Fusion export). Units: mm.
 - X: lateral (+X = right side of the bike). The frame centreplane is X=0, set from the two fork axes.
 - Y: rearward (-Y = forward, the same convention as the scan).
 - Z: the scan's up direction with roll removed. **Whether this is truly vertical for the bike on its wheels is unknown.** The scan's own up direction was used.
-- The scan was yawed about 3.8 deg and rolled about 0.9 deg relative to the bike. This frame removes both.
+- The scan was rolled about 2.6 deg and yawed about 3.8 deg relative to the bike. This frame removes both.
 - Steering axis: rake 25.4 deg to Z, in the X=0 plane.
 
 ## Where each dimension comes from
@@ -31,6 +32,8 @@ Built from Joel's `Frame Scan.stl` (Fusion export). Units: mm.
 | Brace | oval, 21 wide x 31 tall | scan |
 | Rear tubes (to the scan's cut) | about 17x20 (right) and 19x24 (left), shapes as scanned | scan, rough; the cut ends are rough |
 | Head gusset, rear junction | ruled loft through the scan's own cross-sections every 4 mm | scan, follows its bumps |
+| Yokes | scan cross-sections every 2 mm along the steering axis, stacked (2 mm steps on sloped edges). Bottom yoke 33 thick plus the centre boss; top yoke 42 thick incl. clamps; risers to 63 above the yoke underside | scan, median error 0.3-0.4 mm |
+| Handlebar | scanned centreline, **Ø22.2 assumed** (scan reads ~17-19, shiny parts scan thin) | path good, size a guess |
 | Tank bosses | Ø27, tips at X -40.1 / +40.8, Y about 100, Z about 23 | scan. Their symmetry about X=0 (0.4 mm) is a good check on the centreplane. |
 
 ## Accuracy check
