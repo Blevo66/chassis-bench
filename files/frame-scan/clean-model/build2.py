@@ -46,7 +46,8 @@ def tube_from(rows,sel,pre=(),post=(),n=None,s=1.0,size_override=None,step=14):
   return loft(P,Tg,wi,hi),P,wi,hi
 parts={}; info={}
 HT_OD=50.0
-parts['head_tube']=cq.Solid.makeCylinder(HT_OD/2,HT_LEN,V(ax(0)),V(vb))
+COLLAR_H0,COLLAR_OD=136.0,53.0   # bare top collar above the pressed gusset (scan: 52-54 OD, round to 0.6 mm)
+parts['head_tube']=cq.Solid.makeCylinder(HT_OD/2,COLLAR_H0,V(ax(0)),V(vb)).fuse(cq.Solid.makeCylinder(COLLAR_OD/2,HT_LEN-COLLAR_H0,V(ax(COLLAR_H0)),V(vb)))
 # backbone: clean 180-300 + rear 425-465 (scan y), front extended into head tube; brace-merge zone bridged
 bb=R2['backbone']
 def bsel(c): return (180<c[1]<300)

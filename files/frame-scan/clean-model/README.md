@@ -24,13 +24,14 @@ Built from Joel's `Frame Scan.stl` (Fusion export). Units: mm.
 | Steering axis | from both fork-tube axes (rms fit 0.9 to 1.3 mm), parallel to within 0.3 deg | scan, good |
 | Fork c-c | 182.0 mm, both tubes 93.6 mm from the head axis (about 22 mm yoke offset) | scan, good |
 | Fork tube OD | 43.0 | **Joel**. The scan reads only 30-34 because chrome scans thin. |
-| Head tube OD | 50.0 | **Joel's clamp fit (R25 saddle)**. The scan reads about 53. |
+| Head tube OD | 50.0 from the bottom up to 136 mm, then a bare top collar Ø53 to the top (161) | 50 from **Joel's clamp fit (R25 saddle)**. The collar comes from Joel's note and photos; the scan reads it as a clean circle of 52-54. |
 | Head tube length | 161 (bottom just above the bottom yoke, top where the stem shows) | scan, about ±3 |
 | Head bore | Ø47 x 15 bearing seats each end, Ø40 between | 47 from the bearing; **40 is a guess** |
 | Backbone | oval, about 45 wide x 50 tall (clean section), growing toward the rear junction | scan section areas |
 | Downtube | Ø31.4 (clean section), flares at the engine mount | scan |
 | Brace | oval, 21 wide x 31 tall | scan |
 | Rear tubes (to the scan's cut) | about 17x20 (right) and 19x24 (left), shapes as scanned | scan, rough; the cut ends are rough |
+| Pressed-steel triangle (Joel: head gusset, backbone front, brace) | The scan's sections are rounded, close to oval (corner radius about half the width), so they're modelled as ovals: backbone 45x51, brace 21x31. The gusset side faces are flat at the scan's widths. The weld flanges aren't modelled. | scan |
 | Head gusset, rear junction | ruled loft through the scan's own cross-sections every 4 mm | scan, follows its bumps |
 | Yokes | scan cross-sections every 2 mm along the steering axis, stacked (2 mm steps on sloped edges). Bottom yoke 33 thick plus the centre boss; top yoke 42 thick incl. clamps; risers to 63 above the yoke underside | scan, median error 0.3-0.4 mm |
 | Handlebar | scanned centreline, **Ø22.2 assumed** (scan reads ~17-19, shiny parts scan thin) | path good, size a guess |
