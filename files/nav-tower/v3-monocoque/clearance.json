@@ -1,0 +1,38 @@
+{
+ "button_heads_ti": [
+  17.7,
+  17.7
+ ],
+ "cheeseboard_alu": [
+  130.8,
+  248.3
+ ],
+ "dash_pod_placeholder": [
+  51.6,
+  142.0
+ ],
+ "lamp_housings": [
+  48.4,
+  124.3
+ ],
+ "lamp_lenses": [
+  85.3,
+  180.0
+ ],
+ "m6_inserts_vesa100": [
+  164.7,
+  276.6
+ ],
+ "monocoque_carbon": [
+  12.0,
+  11.4
+ ],
+ "tablet_tab_a9_placeholder": [
+  127.6,
+  263.2
+ ],
+ "visor_polycarb": [
+  274.3,
+  423.3
+ ]
+}
