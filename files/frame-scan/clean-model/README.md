@@ -14,7 +14,7 @@ Built from Joel's `Frame Scan.stl` (Fusion export). Units: mm.
 - X: lateral (+X = right side of the bike). The frame centreplane is X=0, set from the two fork axes.
 - Y: rearward (-Y = forward, the same convention as the scan).
 - Z: the scan's up direction with roll removed. **Whether this is truly vertical for the bike on its wheels is unknown.** The scan's own up direction was used.
-- The scan was rolled about 2.6 deg and yawed about 3.8 deg relative to the bike. This frame removes both.
+- The scan was yawed about 3.8 deg and rolled about 0.9 deg relative to the bike. This frame removes both.
 - Steering axis: rake 25.4 deg to Z, in the X=0 plane.
 
 ## Where each dimension comes from
