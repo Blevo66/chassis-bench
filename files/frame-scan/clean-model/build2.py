@@ -80,6 +80,10 @@ parts['rear_junction']=slloft(SL['rear'])
 for side,tipx,inx in (('L',-52.1,-30.0),('R',29.0,10.0)):
   a=T(np.array([inx,117.8,60.0]))[0]; b=T(np.array([tipx,117.8,60.0]))[0]
   parts['tank_boss_'+side]=cq.Solid.makeCylinder(13.5,float(np.linalg.norm(b-a)),V(a),V((b-a)/np.linalg.norm(b-a)))
+import os
+for nm in ('backbone','brace'):
+  f=f'cad/pressed-{nm}.brep'
+  if os.path.exists(f): parts['pressed_'+nm]=cq.Shape.importBrep(f)
 frame_body=None
 for k,s_ in parts.items(): frame_body=s_ if frame_body is None else frame_body.fuse(s_)
 frame_body=frame_body.clean()

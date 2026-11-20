@@ -31,7 +31,7 @@ Built from Joel's `Frame Scan.stl` (Fusion export). Units: mm.
 | Downtube | Ø31.4 (clean section), flares at the engine mount | scan |
 | Brace | oval, 21 wide x 31 tall | scan |
 | Rear tubes (to the scan's cut) | about 17x20 (right) and 19x24 (left), shapes as scanned | scan, rough; the cut ends are rough |
-| Pressed-steel triangle (Joel: head gusset, backbone front, brace) | The scan's sections are rounded, close to oval (corner radius about half the width), so they're modelled as ovals: backbone 45x51, brace 21x31. The gusset side faces are flat at the scan's widths. The weld flanges aren't modelled. | scan |
+| Pressed-steel triangle (Joel: head gusset, backbone front, brace) | Backbone front (to about 300 mm back) and brace use the scan's own cross-sections, mirrored about the seam and smoothed along the length. They show flat sides (backbone ±22.4, brace ±10.9) and the welded seam ridge on the top and bottom centreline (backbone ridge 27.6 / 27.9 from centre, brace 16.0 / 17.1), which matches Joel's photos. The ridges are as the scan shows them; the true flange edge may be crisper. | scan + photos |
 | Head gusset, rear junction | ruled loft through the scan's own cross-sections every 4 mm | scan, follows its bumps |
 | Yokes | scan cross-sections every 2 mm along the steering axis, stacked (2 mm steps on sloped edges). Bottom yoke 33 thick plus the centre boss; top yoke 42 thick incl. clamps; risers to 63 above the yoke underside | scan, median error 0.3-0.4 mm |
 | Handlebar | scanned centreline, **Ø22.2 assumed** (scan reads ~17-19, shiny parts scan thin) | path good, size a guess |
