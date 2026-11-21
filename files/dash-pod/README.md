@@ -1,4 +1,7 @@
-# Dash pod and tablet STLs (for placing in Fusion)
+# Dash pod and tablet models (for placing in Fusion)
+
+**STEP (use these in Fusion):** `xl-dash-pod.step` and `galaxy-tab-a9-rough.step` are proper solids, each with coloured bodies: the pod has shell, TPU seal, screen glass and screws. The scripts that build them (CadQuery) are `pod.py` and `tab.py`. The STEPs use the same axes and origins as the STLs below. The STEP pod has 2.6 mm pilot holes in the back bosses, which are placeholders.
+
 
 Units are mm, and Z is up. When Fusion asks for units on insert, pick millimetres.
 
