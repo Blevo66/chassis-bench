@@ -8,7 +8,7 @@ Built around the real Waveshare CAD (from waveshareteam/ESP32-S3-Touch-LCD-3.5, 
 Joel wanted the MOSFET board in the pod and didn't like the GPS hump.
 - **Depth: 41 mm** to the back face (plus the 7 mm mounting bosses).
 - **Inside, front to back:** the Waveshare board, then the 8-ch MOSFET module (GUESS 79 × 44 × 18, sitting above the header plug), then the PKCell 1200 mAh LiPo (62 × 35 × 5, real size).
-- **GPS:** not in the pod. The BN-220 comes in its own case, so it mounts on the tower top with its lead into the pod through the boot.
+- **GPS (v3d, current assembly):** inside the pod, with no lump. A thin flexible FPC GPS antenna (~40 × 15 × 0.3, 1575 MHz, u.FL) is stuck to the inside of the back cover's top wall, and a small u.FL receiver board (GUESS 25 × 12 × 4) sits behind the module at the top. The LiPo moved down to make room. The shells are unchanged from v3c, so the `xl-dash-pod-v3c-*` part files are still current, and `xl-dash-pod-v3d-assembly.step` shows the new layout.
 - **Exit boot and vent:** moved to Z −28 on the underside.
 - **Files:** `xl-dash-pod-v3c-*`. The 28 mm version with the hump is in `slim-28mm-gps-hump/`, and the 50 mm version is in `deep-50mm/`.
 - **Clash check** (`src/pod3c.py`): zero overlaps.
