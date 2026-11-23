@@ -4,13 +4,25 @@ Built around the real Waveshare CAD (from waveshareteam/ESP32-S3-Touch-LCD-3.5, 
 
 **Axes (all files):** mm, Z up, Y forward, X right. The screen faces -Y. The origin is the centre of the cover glass, just behind its front face.
 
-## v3e (current): wider for the real MOSFET board
+## v3f (current): thinner, LiPo between the terminal strips
+Joel's idea: the LiPo sits in the gap between the MOSFET board's two screw-terminal strips instead of behind them.
+- **Outside: 105.2 × 66.4 × 33.5 mm** (was 44.2 in v3e). Same width and height, same screws and front ring layout.
+- **MOSFET board model (GUESSED heights from listing photos):** two terminal strips ~10 mm tall along the top and bottom edges, optos/MOSFETs ~3.5 mm in the middle. Measure when it arrives.
+- **Needs the yellow jumpers removed and bridged to H with solder**, because they sit in the gap.
+- **PKCell 1200 mAh LiPo** (62 × 35 × 5) lies on the low parts in the gap (gap ~36 mm vs LiPo 35 mm, guess). Put Kapton tape under it.
+- **GPS receiver** (guess 12 × 25 × 4) sits in the same gap at the right end; the FPC antenna stays along the top wall.
+- A smaller LiPo would not make it thinner: the terminal strips set the depth. Soldering wires straight to the board instead of using the terminals could save roughly another 6 mm (guess).
+- Exit boot and vent at Z −24. Clash check (`src/pod3f.py`): zero overlaps.
+- The 44 mm v3e files are in `wide-44mm/`.
+
+## v3e: wider for the real MOSFET board
 Joel picked the **Fowecry 8-ch opto MOSFET board, 3.3 V version** (Amazon B0H9RL4SFW): 99 × 52 mm, holes 90 × 43 c-c Ø3.2, LR7843 MOSFETs, about 60 W per channel per the listing. Joel chose to widen the pod and keep everything in one box.
 - **Outside: 105.2 × 66.4 × 44.2 mm.** The side bezel is now 6.2 mm; the top and bottom are still 2.5 mm.
 - **MOSFET board** sits right behind the screen board, with its terminals facing the back cover so you can wire it with the cover off. Its PCB also holds the header plug in.
 - **Four M3 × 30 screws** go from the back cover, through the MOSFET board's own holes, into heat-set inserts in the front ring. They clamp the board and close the pod.
 - **Component height behind the MOSFET PCB is GUESSED at 15.4 mm.** Measure it when the board arrives.
 - **Behind that:** the PKCell 1200 mAh LiPo, plus the GPS receiver (guess) and flat FPC antenna along the top.
+- **Files:** now in `wide-44mm/`.
 - **Older versions:** the 98 mm-wide v3c/v3d files are in `narrow-98mm/`.
 - **Clash check** (`src/pod3e.py`): zero overlaps.
 
