@@ -4,7 +4,14 @@ Built around the real Waveshare CAD (from waveshareteam/ESP32-S3-Touch-LCD-3.5, 
 
 **Axes (all files):** mm, Z up, Y forward, X right. The screen faces -Y. The origin is the centre of the cover glass, just behind its front face.
 
-## Size
+## Slim version (v3b, current)
+Joel thought 50 mm was too deep. The MOSFET module, buck and MCP23017 now live in the loom near the tower, and only thin signal wires come into the pod. The GPS sits in a hump on top of the visor, with its antenna facing the sky and a separate printed lid (`xl-dash-pod-v3b-gps-lid`).
+- **Depth: 28 mm** to the back face (plus the 7 mm mounting bosses).
+- Inside: the board, the header plug, and Joel's PKCell 1200 mAh LiPo (62 × 35 × 5, real size from The Pi Hut).
+- Files: `xl-dash-pod-v3b-{front,back,seal,gps-lid}.step/.stl`, `xl-dash-pod-v3b-assembly.step`. The 50 mm version is in `deep-50mm/`.
+- Clash check (`src/pod3b.py`): zero overlaps.
+
+## Size (first, 50 mm deep version)
 - Outside: 97.8 wide × 66.4 tall. Depth is 50 to the back face, plus the 11 mm visor and the 7 mm mounting bosses.
 - **Bezel:** 2.5 mm plastic wall plus a 0.2 mm gap round the glass. The rest of the border is the glass's own black print (about 9.5 mm at the sides and 6 mm at the top and bottom, per Waveshare's drawing).
 
