@@ -4,11 +4,20 @@ Built around the real Waveshare CAD (from waveshareteam/ESP32-S3-Touch-LCD-3.5, 
 
 **Axes (all files):** mm, Z up, Y forward, X right. The screen faces -Y. The origin is the centre of the cover glass, just behind its front face.
 
-## Slim version (v3b, current)
+## v3c (current): MOSFET board inside, no GPS hump
+Joel wanted the MOSFET board in the pod and didn't like the GPS hump.
+- **Depth: 41 mm** to the back face (plus the 7 mm mounting bosses).
+- **Inside, front to back:** the Waveshare board, then the 8-ch MOSFET module (GUESS 79 × 44 × 18, sitting above the header plug), then the PKCell 1200 mAh LiPo (62 × 35 × 5, real size).
+- **GPS:** not in the pod. The BN-220 comes in its own case, so it mounts on the tower top with its lead into the pod through the boot.
+- **Exit boot and vent:** moved to Z −28 on the underside.
+- **Files:** `xl-dash-pod-v3c-*`. The 28 mm version with the hump is in `slim-28mm-gps-hump/`, and the 50 mm version is in `deep-50mm/`.
+- **Clash check** (`src/pod3c.py`): zero overlaps.
+
+## Slim version (v3b)
 Joel thought 50 mm was too deep. The MOSFET module, buck and MCP23017 now live in the loom near the tower, and only thin signal wires come into the pod. The GPS sits in a hump on top of the visor, with its antenna facing the sky and a separate printed lid (`xl-dash-pod-v3b-gps-lid`).
 - **Depth: 28 mm** to the back face (plus the 7 mm mounting bosses).
 - Inside: the board, the header plug, and Joel's PKCell 1200 mAh LiPo (62 × 35 × 5, real size from The Pi Hut).
-- Files: `xl-dash-pod-v3b-{front,back,seal,gps-lid}.step/.stl`, `xl-dash-pod-v3b-assembly.step`. The 50 mm version is in `deep-50mm/`.
+- Files are now in `slim-28mm-gps-hump/`.
 - Clash check (`src/pod3b.py`): zero overlaps.
 
 ## Size (first, 50 mm deep version)
