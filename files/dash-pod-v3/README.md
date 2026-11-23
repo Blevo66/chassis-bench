@@ -4,7 +4,17 @@ Built around the real Waveshare CAD (from waveshareteam/ESP32-S3-Touch-LCD-3.5, 
 
 **Axes (all files):** mm, Z up, Y forward, X right. The screen faces -Y. The origin is the centre of the cover glass, just behind its front face.
 
-## v3f (current): thinner, LiPo between the terminal strips
+## v3g (current): MOSFET board and GPS on the back cover
+Joel's assembly plan: screen and processor in the front ring, MOSFET board and GPS on the back cover, so the two halves come apart as two units.
+- **Same size: 105.2 × 66.4 × 33.5 mm.** LiPo and GPS receiver still sit between the terminal strips (jumpers removed and bridged to H).
+- **MOSFET board** screws down onto 4 standoffs in the back cover with **4 × M3 × 6** from the inside, into M3 heat-set inserts in the standoff tops (holes 90 × 43).
+- **GPS receiver** sticks to a small pad on the back floor; the FPC antenna stays on the top wall.
+- **Pod closes with 4 × M3 × 25** from the back, in corner tubes just outside the MOSFET board's edges, into M3 heat-sets in the front ring's corner posts (at ±46.7, ±28.6).
+- **Header plug** stays on the Waveshare. Give its pigtails a slack loop so the back can open like a book. When closed, the MOSFET PCB still sits just behind the plug and stops it backing off.
+- All MOSFET board heights are still GUESSED from photos. Clash check (`src/pod3g.py`): zero overlaps.
+- v3f (through-screw version) is in `v3f-through-screws/`.
+
+## v3f: thinner, LiPo between the terminal strips
 Joel's idea: the LiPo sits in the gap between the MOSFET board's two screw-terminal strips instead of behind them.
 - **Outside: 105.2 × 66.4 × 33.5 mm** (was 44.2 in v3e). Same width and height, same screws and front ring layout.
 - **MOSFET board model (GUESSED heights from listing photos):** two terminal strips ~10 mm tall along the top and bottom edges, optos/MOSFETs ~3.5 mm in the middle. Measure when it arrives.
