@@ -4,7 +4,17 @@ Built around the real Waveshare CAD (from waveshareteam/ESP32-S3-Touch-LCD-3.5, 
 
 **Axes (all files):** mm, Z up, Y forward, X right. The screen faces -Y. The origin is the centre of the cover glass, just behind its front face.
 
-## v3c (current): MOSFET board inside, no GPS hump
+## v3e (current): wider for the real MOSFET board
+Joel picked the **Fowecry 8-ch opto MOSFET board, 3.3 V version** (Amazon B0H9RL4SFW): 99 × 52 mm, holes 90 × 43 c-c Ø3.2, LR7843 MOSFETs, about 60 W per channel per the listing. Joel chose to widen the pod and keep everything in one box.
+- **Outside: 105.2 × 66.4 × 44.2 mm.** The side bezel is now 6.2 mm; the top and bottom are still 2.5 mm.
+- **MOSFET board** sits right behind the screen board, with its terminals facing the back cover so you can wire it with the cover off. Its PCB also holds the header plug in.
+- **Four M3 × 30 screws** go from the back cover, through the MOSFET board's own holes, into heat-set inserts in the front ring. They clamp the board and close the pod.
+- **Component height behind the MOSFET PCB is GUESSED at 15.4 mm.** Measure it when the board arrives.
+- **Behind that:** the PKCell 1200 mAh LiPo, plus the GPS receiver (guess) and flat FPC antenna along the top.
+- **Older versions:** the 98 mm-wide v3c/v3d files are in `narrow-98mm/`.
+- **Clash check** (`src/pod3e.py`): zero overlaps.
+
+## v3c: MOSFET board inside, no GPS hump
 Joel wanted the MOSFET board in the pod and didn't like the GPS hump.
 - **Depth: 41 mm** to the back face (plus the 7 mm mounting bosses).
 - **Inside, front to back:** the Waveshare board, then the 8-ch MOSFET module (GUESS 79 × 44 × 18, sitting above the header plug), then the PKCell 1200 mAh LiPo (62 × 35 × 5, real size).
