@@ -1,6 +1,7 @@
 // =====================================================================
-//  XL125R body-loom box + dash  (ESP32 8-ch MOS board, 4" ST7796 TFT, M10 GPS)
-//  v0.1, untested on hardware. Pins are PROVISIONAL: see config.h.
+//  XL125R body-loom box + dash
+//  Waveshare ESP32-S3-Touch-LCD-3.5 + Fowecry 8-ch opto MOSFET board + UART GPS
+//  v0.2, untested on hardware. Pin map: see config.h.
 //
 //  What it does:
 //   - 5-button left controller: tap / long-press (see handleButtons)
@@ -14,6 +15,7 @@
 //  in parallel, so the brake light works even with the ESP32 dead.
 // =====================================================================
 #include <Arduino.h>
+#include <Wire.h>
 #include <Preferences.h>
 #include <WiFi.h>
 #include <WebServer.h>
@@ -29,7 +31,9 @@ struct State {
   bool high = false, flash = false, horn = false, aux = false, usb = true;
   bool brake = false;
   int  screen = 0;               // 0 ride, 1 trip, 2 system
-  float rpm = 0, mph = 0, volts = 0;
+  float rpm = 0, mph = 0;
+  bool supplyOn = true;          // 5 V feed present (AXP2101 VBUS)
+  float dashBattV = 0; int dashBattPct = -1; bool charging = false;
   bool gpsOk = false;
   int  sats = 0, gear = 0;
   double odo = 0, tripA = 0, tripB = 0, topMph = 0;
@@ -68,17 +72,80 @@ void updateRpm() {
   if (S.rpm < 50) S.rpm = 0;
 }
 
+// ------------------------------------------------------------------ I2C helpers
+bool i2cWrite(uint8_t addr, uint8_t reg, uint8_t val) {
+  Wire.beginTransmission(addr); Wire.write(reg); Wire.write(val);
+  return Wire.endTransmission() == 0;
+}
+int i2cRead(uint8_t addr, uint8_t reg) {          // -1 if the chip didn't answer
+  Wire.beginTransmission(addr); Wire.write(reg);
+  if (Wire.endTransmission(false) != 0) return -1;
+  if (Wire.requestFrom(addr, (uint8_t)1) != 1) return -1;
+  return Wire.read();
+}
+
+// Screen reset is on pin 1 of the Waveshare's TCA9554 expander (as in Waveshare's example).
+void lcdReset() {
+  int out = i2cRead(TCA_ADDR, 0x01), cfg = i2cRead(TCA_ADDR, 0x03);
+  if (out < 0 || cfg < 0) { Serial.println("TCA9554 not found"); return; }
+  uint8_t bit = 1 << TCA_LCD_RST_BIT;
+  i2cWrite(TCA_ADDR, 0x03, cfg & ~bit);           // that pin = output, others untouched
+  i2cWrite(TCA_ADDR, 0x01, out | bit);  delay(10);
+  i2cWrite(TCA_ADDR, 0x01, out & ~bit); delay(10);
+  i2cWrite(TCA_ADDR, 0x01, out | bit);  delay(200);
+}
+
+// MCP23017 for the left-bar buttons (GPA0..4, pull-ups on, pressed = LOW)
+bool mcpOk = false;
+uint8_t btnMask = 0;                               // bit set = pressed
+void mcpInit() {
+  mcpOk = i2cWrite(MCP_ADDR, 0x00, 0xFF) && i2cWrite(MCP_ADDR, 0x0C, 0xFF);  // IODIRA all in, GPPUA pull-ups
+  Serial.println(mcpOk ? "MCP23017 ok" : "MCP23017 not found: buttons off (bench mode)");
+}
+void mcpRead() {
+  if (!mcpOk) { btnMask = 0; return; }
+  int v = i2cRead(MCP_ADDR, 0x12);                 // GPIOA
+  btnMask = v < 0 ? 0 : (uint8_t)~v;
+}
+
+// AXP2101 power chip (register map from XPowersLib, not yet checked on the board)
+void axpInit() {
+  int adc = i2cRead(AXP_ADDR, 0x30);
+  if (adc >= 0) i2cWrite(AXP_ADDR, 0x30, adc | 0x01);   // enable battery-voltage ADC
+}
+void axpRead() {
+  int st1 = i2cRead(AXP_ADDR, 0x00), st2 = i2cRead(AXP_ADDR, 0x01);
+  if (st1 < 0) return;                               // keep last values
+  S.supplyOn = st1 & 0x20;                           // VBUS good
+  bool battIn = st1 & 0x08;
+  S.charging = st2 >= 0 && ((st2 >> 5) & 0x03) == 0x01;
+  int h = i2cRead(AXP_ADDR, 0x34), l = i2cRead(AXP_ADDR, 0x35);
+  S.dashBattV = (battIn && h >= 0 && l >= 0) ? (((h & 0x1F) << 8) | l) / 1000.0f : 0;
+  int pct = i2cRead(AXP_ADDR, 0xA4);
+  S.dashBattPct = (battIn && pct >= 0 && pct <= 100) ? pct : -1;
+}
+
+// FT6336 touch: a tap anywhere = next page (handy on the bench)
+bool touchWasDown = false;
+bool touchTapped() {
+  int n = i2cRead(TOUCH_ADDR, 0x02);
+  bool down = n > 0 && (n & 0x0F) > 0 && (n & 0x0F) < 3;
+  bool tap = down && !touchWasDown;
+  touchWasDown = down;
+  return tap;
+}
+
 // ------------------------------------------------------------------ buttons
 struct Button {
-  int pin; bool down = false, held = false, lastRaw = false;
+  int idx; bool down = false, held = false, lastRaw = false;
   uint32_t changedMs = 0, downMs = 0;
 };
-Button bL{PIN_BTN_IND_L}, bR{PIN_BTN_IND_R}, bHorn{PIN_BTN_HORN}, bLights{PIN_BTN_LIGHTS}, bMode{PIN_BTN_MODE};
+Button bL{B_IND_L}, bR{B_IND_R}, bHorn{B_HORN}, bLights{B_LIGHTS}, bMode{B_MODE};
 Button* buttons[] = {&bL, &bR, &bHorn, &bLights, &bMode};
 
 // returns: 0 nothing, 1 tap (on release), 2 hold started
 int pollButton(Button& b) {
-  bool raw = digitalRead(b.pin) == LOW;     // pressed pulls to earth
+  bool raw = btnMask & (1 << b.idx);        // pressed pulls to earth
   uint32_t now = millis();
   if (raw != b.lastRaw) { b.lastRaw = raw; b.changedMs = now; }
   if (now - b.changedMs < DEBOUNCE_MS) return 0;
@@ -91,6 +158,8 @@ int pollButton(Button& b) {
 void saveTrips();
 void handleButtons() {
   int e;
+  mcpRead();
+  if (touchTapped()) S.screen = (S.screen + 1) % 3;
   // Indicators: tap = on/cancel (cancels the other side), hold = hazards
   if ((e = pollButton(bL))) {
     if (e == 1) { S.hazard = false; S.indR = false; S.indL = !S.indL; S.indStartOdo = S.odo; }
@@ -102,7 +171,7 @@ void handleButtons() {
   }
   // Horn: on exactly while pressed (no debounce delay on press for safety)
   pollButton(bHorn);
-  S.horn = digitalRead(PIN_BTN_HORN) == LOW;
+  S.horn = btnMask & (1 << B_HORN);
   // Lights: tap = high/low, hold = flash high beam while held
   if ((e = pollButton(bLights)) == 1) S.high = !S.high;
   S.flash = bLights.down && bLights.held;
@@ -186,12 +255,11 @@ void updateGpsAndOdo() {
   }
 }
 
-void updateVolts() {
-  float v = analogReadMilliVolts(PIN_VOLTS) / 1000.0f * VOLT_DIVIDER;
-  S.volts += (v - S.volts) * 0.2f;
-  // supply dying (no battery on the body loom): save once
-  if (S.volts < VOLT_SAVE_BELOW && S.volts > 2.0f && !savedOnLowVolts) { saveTrips(); savedOnLowVolts = true; }
-  if (S.volts > VOLT_SAVE_BELOW + 1.0f) savedOnLowVolts = false;
+void updatePower() {
+  axpRead();
+  // bike supply gone (no battery on the body loom): the dash is now on its LiPo, save once
+  if (!S.supplyOn && !savedOnLowVolts) { saveTrips(); savedOnLowVolts = true; }
+  if (S.supplyOn) savedOnLowVolts = false;
 }
 
 // Brake sense: the opto sees lamp - at earth. The tail PWM pulls it to earth only
@@ -264,9 +332,8 @@ String ignTimeLeft() {
 }
 
 // ------------------------------------------------------------------ display
-// 4" ST7796S, 480x320 landscape. A full 8-bit frame would be 150 KB, more than
-// the plain ESP32 (no PSRAM) can usually give as one block, so the frame is a
-// 4-bit sprite (75 KB) with a 16-colour palette. In a 4-bit sprite every
+// 3.5" ST7796 IPS, 480x320 landscape. The frame is a 4-bit sprite (75 KB) with a
+// 16-colour palette: small enough for internal RAM, so pushing it stays fast. In a 4-bit sprite every
 // colour below is a PALETTE INDEX, not an RGB565 value.
 enum : uint8_t { P_BLACK = 0, P_WHITE, P_DIM, P_GREY, P_AMBER, P_RED, P_GREEN, P_BLUE };
 uint16_t palette[16] = {
@@ -349,6 +416,7 @@ void drawRide() {
   spr.setTextColor(ignColour());
   spr.drawCentreString(IGN.ok ? "IGN " + String(IGN.volts, 1) + "V " + String((int)IGN.pct) + "%" : String("IGN --"), 406, 244, 2);
   drawBottom("ODO " + String(S.odo, 1), "TRIP A " + String(S.tripA, 1));
+  if (!S.supplyOn) { spr.setTextColor(P_AMBER); spr.drawCentreString("ON LIPO", 240, 252, 2); }
 }
 
 String hms(double s) {
@@ -372,9 +440,12 @@ void drawTrip() {
 
 void drawSystem() {
   spr.setTextColor(P_AMBER); spr.drawString("SYSTEM", 14, 58, 4);
-  uint8_t vc = S.volts < 12.2f ? P_RED : S.volts < 12.8f ? P_AMBER : P_GREEN;
   spr.setTextColor(P_GREY); spr.drawString("SUPPLY", 14, 96, 4);
-  spr.setTextColor(vc);     spr.drawRightString(String(S.volts, 1) + " V", 236, 96, 4);
+  spr.setTextColor(S.supplyOn ? P_GREEN : P_AMBER);
+  spr.drawRightString(S.supplyOn ? "on" : "LIPO", 236, 96, 4);
+  spr.setTextColor(P_GREY);
+  spr.drawString(S.dashBattPct >= 0 ? "dash lipo " + String(S.dashBattV, 2) + "V " + String(S.dashBattPct) + "%" + (S.charging ? " chg" : "")
+                                    : String("dash lipo --"), 14, 116, 2);
   spr.setTextColor(P_GREY); spr.drawString("GPS", 14, 130, 4);
   spr.setTextColor(P_WHITE); spr.drawRightString(S.gpsOk ? String(S.sats) + " sats" : "no fix", 236, 130, 4);
   spr.setTextColor(P_GREY); spr.drawString("WIFI", 14, 164, 4);
@@ -416,7 +487,7 @@ button{padding:10px 14px;margin:4px;border:0;border-radius:8px;background:#333;c
 <input type=file name=f><button>Upload .bin</button></form>
 <script>const n=['IND L','IND R','LOW','HIGH','HORN','USB','AUX','TAIL (full)'];
 async function t(){const r=await fetch('/api/state');const j=await r.json();
-document.getElementById('s').textContent=`RPM ${j.rpm}  MPH ${j.mph}  ${j.volts} V\nGPS ${j.sats} sats ${j.gps?'fix':'no fix'}  ODO ${j.odo}`;
+document.getElementById('s').textContent=`RPM ${j.rpm}  MPH ${j.mph}  lipo ${j.volts} V\nGPS ${j.sats} sats ${j.gps?'fix':'no fix'}  ODO ${j.odo}`;
 document.getElementById('o').innerHTML=n.map((x,i)=>`<button class="${j.out[i]?'on':''}" onclick="fetch('/api/test?n=${i}')">${i+1} ${x}</button>`).join('');}
 setInterval(t,500);t();</script>)HTML";
 
@@ -426,7 +497,7 @@ void startAP() {
   web.on("/", [] { web.send_P(200, "text/html", PAGE); });
   web.on("/api/state", [] {
     String j = "{\"rpm\":" + String((int)S.rpm) + ",\"mph\":" + String(S.mph, 1) +
-               ",\"volts\":" + String(S.volts, 2) + ",\"sats\":" + String(S.sats) +
+               ",\"volts\":" + String(S.dashBattV, 2) + ",\"sats\":" + String(S.sats) +
                ",\"gps\":" + String(S.gpsOk ? "true" : "false") + ",\"odo\":" + String(S.odo, 1) +
                ",\"ign\":" + String(IGN.ok ? IGN.volts : 0, 2) + ",\"ignPct\":" + String((int)IGN.pct) + ",\"out\":[";
     for (int i = 0; i < 8; i++) j += String(S.outState[i] ? 1 : 0) + (i < 7 ? "," : "");
@@ -460,11 +531,12 @@ void setup() {
   Serial.begin(115200);
   for (int i = 0; i < 8; i++) if (PIN_OUT[i] >= 0) { pinMode(PIN_OUT[i], OUTPUT); digitalWrite(PIN_OUT[i], OUT_ACTIVE_HIGH ? LOW : HIGH); }
   if (PIN_OUT[O_TAIL] >= 0) { ledcSetup(TAIL_LEDC_CH, TAIL_PWM_HZ, 8); ledcAttachPin(PIN_OUT[O_TAIL], TAIL_LEDC_CH); }
-  for (Button* b : buttons) pinMode(b->pin, INPUT_PULLUP);
-  pinMode(PIN_RPM, INPUT);                       // filter sets the level (input-only pin)
-  pinMode(PIN_BRAKE, INPUT);                     // opto needs an external 10k pull-up (35 has no internal one)
+  Wire.begin(PIN_SDA, PIN_SCL, 400000);
+  mcpInit();
+  axpInit();
+  pinMode(PIN_RPM, INPUT);                       // filter sets the level
+  pinMode(PIN_BRAKE, INPUT_PULLUP);              // opto pulls it LOW
   attachInterrupt(digitalPinToInterrupt(PIN_RPM), rpmISR, RISING);
-  analogSetPinAttenuation(PIN_VOLTS, ADC_11db);
 
   prefs.begin("xl", false);
   S.odo = prefs.getDouble("odo", 0); S.tripA = prefs.getDouble("tripA", 0); S.tripB = prefs.getDouble("tripB", 0);
@@ -472,6 +544,7 @@ void setup() {
 
   GPSSerial.begin(GPS_BAUD, SERIAL_8N1, PIN_GPS_RX, PIN_GPS_TX);
 
+  lcdReset();
   tft.init(); tft.setRotation(1); tft.fillScreen(TFT_BLACK);
   ledcSetup(0, 5000, 8); ledcAttachPin(PIN_TFT_BL, 0); ledcWrite(0, 255);
   spr.setColorDepth(4);                          // 480x320 x 4 bit = 75 KB, fits without PSRAM
@@ -490,7 +563,7 @@ void loop() {
   updateRpm();
   writeOutputs();
   updateGpsAndOdo();
-  if (millis() - lastSlow > 50) { lastSlow = millis(); updateVolts(); updateIgn(); }
+  if (millis() - lastSlow > 50) { lastSlow = millis(); updatePower(); updateIgn(); }
   if (millis() - lastDraw > 50) { lastDraw = millis(); drawScreen(); }   // ~20 fps
   if (apOn) {
     web.handleClient();

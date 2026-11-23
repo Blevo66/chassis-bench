@@ -1,18 +1,24 @@
 #pragma once
 // =====================================================================
 //  XL125R body-loom box: settings and PIN MAP
-//  Matches loom page: https://claude.ai/artifact/7RfLhucct5pzpFFF62vzXr
+//  Hardware: Waveshare ESP32-S3-Touch-LCD-3.5 + Fowecry 8-ch opto MOSFET
+//  board (3.3 V version, jumpers set to H) + UART GPS + MCP23017 for buttons.
+//  Loom page: https://claude.ai/artifact/7RfLhucct5pzpFFF62vzXr
 //
-//  !!! PROVISIONAL !!!  The 8 MOSFET pins below are PLACEHOLDERS.
-//  The MOS board's PCB fixes which GPIO drives each OUT terminal.
-//  Read them off the board (or seller's pin map) and fix PIN_OUT
-//  before connecting anything. Every other pin must avoid those 8.
+//  All loom pins are on the Waveshare's 2x16 header (J8). With no camera
+//  fitted these are free: 17 18 21 38 39 40 41 42 45 46 47 48.
+//  The screen, touch, SD card, audio and I2C (SDA 8 / SCL 7) are fixed by
+//  the Waveshare board and are set in platformio.ini / below.
+//
+//  45 and 46 are strapping pins. They must be LOW at power-up, which the
+//  MOSFET board's opto inputs (LED to earth) do for us, so they are used
+//  for outputs, never for inputs with pull-ups.
 // =====================================================================
 
-// ---- Outputs: OUT1..OUT8 on the MOS board (placeholders!) ----------
+// ---- Outputs: GPIO wired to IN1..IN8 on the MOSFET board -------------
 //                         OUT1 OUT2 OUT3 OUT4 OUT5 OUT6 OUT7 OUT8
-static const int PIN_OUT[8] = { 26,  27,  19,   2,  15,  12,   0,  -1 };
-static const bool OUT_ACTIVE_HIGH = true;   // guess: HIGH = MOSFET on
+static const int PIN_OUT[8] = { 38,  39,  40,  41,  42,  45,  46,  47 };
+static const bool OUT_ACTIVE_HIGH = true;   // jumpers on H: HIGH = MOSFET on
 
 // What each output does (index = OUT number - 1)
 enum OutIdx { O_IND_L = 0, O_IND_R, O_LOW, O_HIGH, O_HORN, O_USB, O_AUX, O_TAIL };
@@ -25,28 +31,31 @@ static const int   TAIL_LEDC_CH  = 1;       // channel 0 is the screen backlight
 static const int   TAIL_PWM_HZ   = 1000;    // guess: slow MOS-board drivers may need lower (try 200-500)
 static const float TAIL_DUTY     = 0.20f;   // tail brightness, 0..1 (guess: 15-30% looks right). Keep < 0.6 so brake sensing works
 
-// ---- Left controller, 5 buttons, each pulls to earth when pressed ---
-static const int PIN_BTN_IND_L  = 21;
-static const int PIN_BTN_IND_R  = 22;
-static const int PIN_BTN_HORN   = 13;
-static const int PIN_BTN_LIGHTS = 14;
-static const int PIN_BTN_MODE   = 25;
-// 26/27 were the spare trip +/- pins; they are borrowed as OUT placeholders above.
+// ---- Left controller: 5 buttons on an MCP23017 (I2C), each pulls to earth ----
+// Set the MCP23017's A0, A1, A2 all HIGH (address 0x27). Its default 0x20
+// clashes with the Waveshare's own TCA9554 expander.
+static const uint8_t MCP_ADDR = 0x27;
+//   MCP pin:                     GPA0 GPA1 GPA2 GPA3 GPA4
+enum BtnIdx { B_IND_L = 0, B_IND_R, B_HORN, B_LIGHTS, B_MODE };
+// Bench testing without the MCP23017: tap the screen to change page, and use
+// the output buttons on the XL-DASH Wi-Fi page.
 
 // ---- Other inputs -----------------------------------------------------
-static const int PIN_RPM    = 34;  // HT-lead pickup, through the filter (input-only pin)
-static const int PIN_BRAKE  = 35;  // opto across the rear lamp: LOW while lamp - is at earth (brake = always LOW)
-static const int PIN_VOLTS  = 33;  // 100k / 22k divider from box supply (ADC1, works with WiFi)
+static const int PIN_RPM    = 21;  // HT-lead pickup, through the filter
+static const int PIN_BRAKE  = 48;  // opto across the rear lamp: LOW while lamp - is at earth (internal pull-up on)
+// No bike-volts pin: the header has no free ADC1 pin. The AXP2101 tells us when
+// the 5 V feed drops (dash runs on its LiPo), and that is when the odo is saved.
 
 // ---- GPS (UART2) and screen -------------------------------------------
-static const int PIN_GPS_RX = 16;  // ESP32 receives here  <- GPS TX
-static const int PIN_GPS_TX = 17;  // optional             -> GPS RX
-static const uint32_t GPS_BAUD = 9600;   // u-blox default; raise after setting 10 Hz
-static const int PIN_TFT_BL = 32;  // backlight PWM (screen SPI pins are in platformio.ini)
+static const int PIN_GPS_RX = 17;  // ESP32 receives here  <- GPS TX
+static const int PIN_GPS_TX = 18;  // optional             -> GPS RX
+static const uint32_t GPS_BAUD = 9600;   // most modules ship at 9600; set to yours
+static const int PIN_TFT_BL = 6;   // Waveshare backlight (fixed)
+static const int PIN_SDA = 8, PIN_SCL = 7;  // Waveshare I2C (fixed): AXP2101 0x34, touch 0x38, TCA9554 0x20
+static const uint8_t TCA_ADDR = 0x20, TCA_LCD_RST_BIT = 1;   // screen reset is on expander pin 1
+static const uint8_t AXP_ADDR = 0x34, TOUCH_ADDR = 0x38;
 
 // ---- Tunables (all guesses until tested on the bike) -----------------
-static const float  VOLT_DIVIDER     = (100.0f + 22.0f) / 22.0f;
-static const float  VOLT_SAVE_BELOW  = 9.0f;    // save odo when supply starts to die
 static const uint32_t HOLD_MS        = 700;     // long-press time
 static const uint32_t DEBOUNCE_MS    = 25;
 static const uint32_t FLASH_PERIOD_MS = 667;    // ~1.5 Hz indicators
