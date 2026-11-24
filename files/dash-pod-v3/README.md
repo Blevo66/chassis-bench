@@ -4,7 +4,15 @@ Built around the real Waveshare CAD (from waveshareteam/ESP32-S3-Touch-LCD-3.5, 
 
 **Axes (all files):** mm, Z up, Y forward, X right. The screen faces -Y. The origin is the centre of the cover glass, just behind its front face.
 
-## v3g (current): MOSFET board and GPS on the back cover
+## v3h (current): chin under the pod for one sealed rectangular bulkhead plug
+Joel wants all the loom wires through ONE rectangular bulkhead plug (OBD/ECU style) in the bottom.
+- **105.2 wide × 33.5 deep**, now **93.4 tall** with the chin (27 mm chin, 72 mm wide, part of the back cover). Everything else as v3g.
+- **Plug size is GUESSED** (sized for a TE AMPSEAL 23-way style header): panel cutout 56 × 20, 2 × M3 flange screws 60 c-c, body 54 × 18 × 22 deep. Set the real cutout once the part is picked.
+- Pin count needed ~20–24: 12 V ×2, earth ×2, OUT1–8, RPM ×2, brake, 5 buttons + common.
+- The chin opens up into the pod behind the split. Cable boot removed; breather vent moved to X −40.
+- v3g (no chin) is in `v3g-no-chin/`.
+
+## v3g: MOSFET board and GPS on the back cover
 Joel's assembly plan: screen and processor in the front ring, MOSFET board and GPS on the back cover, so the two halves come apart as two units.
 - **Same size: 105.2 × 66.4 × 33.5 mm.** LiPo and GPS receiver still sit between the terminal strips (jumpers removed and bridged to H).
 - **MOSFET board** screws down onto 4 standoffs in the back cover with **4 × M3 × 6** from the inside, into M3 heat-set inserts in the standoff tops (holes 90 × 43).
