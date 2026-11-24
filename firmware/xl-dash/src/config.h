@@ -35,6 +35,9 @@ static const float TAIL_DUTY     = 0.20f;   // tail brightness, 0..1 (guess: 15-
 // Set the MCP23017's A0, A1, A2 all HIGH (address 0x27). Its default 0x20
 // clashes with the Waveshare's own TCA9554 expander.
 static const uint8_t MCP_ADDR = 0x27;
+// The MCP lives IN the left controller: 4 wires (3V3, GND, SDA, SCL) via
+// AMPSEAL pins 16-19. Slow the bus to 100 kHz for the ~1 m cable.
+static const uint32_t I2C_HZ = 100000;
 //   MCP pin:                     GPA0 GPA1 GPA2 GPA3 GPA4
 enum BtnIdx { B_IND_L = 0, B_IND_R, B_HORN, B_LIGHTS, B_MODE };
 // Bench testing without the MCP23017: tap the screen to change page, and use

@@ -102,10 +102,19 @@ void mcpInit() {
   mcpOk = i2cWrite(MCP_ADDR, 0x00, 0xFF) && i2cWrite(MCP_ADDR, 0x0C, 0xFF);  // IODIRA all in, GPPUA pull-ups
   Serial.println(mcpOk ? "MCP23017 ok" : "MCP23017 not found: buttons off (bench mode)");
 }
+// The MCP sits in the left controller at the end of a cable through the plug,
+// so it can be unplugged or drop out: on any read failure release all buttons
+// and retry the init every 2 s.
 void mcpRead() {
-  if (!mcpOk) { btnMask = 0; return; }
+  static uint32_t lastTry = 0;
+  if (!mcpOk) {
+    btnMask = 0;
+    if (millis() - lastTry > 2000) { lastTry = millis(); mcpInit(); }
+    return;
+  }
   int v = i2cRead(MCP_ADDR, 0x12);                 // GPIOA
-  btnMask = v < 0 ? 0 : (uint8_t)~v;
+  if (v < 0) { mcpOk = false; btnMask = 0; lastTry = millis(); return; }
+  btnMask = (uint8_t)~v;
 }
 
 // AXP2101 power chip (register map from XPowersLib, not yet checked on the board)
@@ -531,7 +540,7 @@ void setup() {
   Serial.begin(115200);
   for (int i = 0; i < 8; i++) if (PIN_OUT[i] >= 0) { pinMode(PIN_OUT[i], OUTPUT); digitalWrite(PIN_OUT[i], OUT_ACTIVE_HIGH ? LOW : HIGH); }
   if (PIN_OUT[O_TAIL] >= 0) { ledcSetup(TAIL_LEDC_CH, TAIL_PWM_HZ, 8); ledcAttachPin(PIN_OUT[O_TAIL], TAIL_LEDC_CH); }
-  Wire.begin(PIN_SDA, PIN_SCL, 400000);
+  Wire.begin(PIN_SDA, PIN_SCL, I2C_HZ);   // 100 kHz: the bus runs out to the left controller
   mcpInit();
   axpInit();
   pinMode(PIN_RPM, INPUT);                       // filter sets the level
