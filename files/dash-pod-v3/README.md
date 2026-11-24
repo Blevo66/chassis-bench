@@ -4,7 +4,15 @@ Built around the real Waveshare CAD (from waveshareteam/ESP32-S3-Touch-LCD-3.5, 
 
 **Axes (all files):** mm, Z up, Y forward, X right. The screen faces -Y. The origin is the centre of the cover glass, just behind its front face.
 
-## v3m (current): real AMPSEAL 23 header, 5 mm deeper, polished
+## v3n (current): flylead through a cable gland, no panel plug
+Joel 2026-11-24: AMPSEAL "way too big", picked a flylead through a sealed gland.
+- **124.2 wide × 66.4 tall × 33.5 deep** (+6 mm gland boss / 7 mm mounting bosses). R8.7 corners all round.
+- **Flylead:** one sheathed ~10 mm, 17-core cable out of the BACK, straight into the nav tower; plugs on its end live behind the tower. **M20 × 1.5 IP68 nylon cable gland** (6–12 mm cable, 24 AF hex; size TYPICAL, check yours) screws into a printed M20 × 1.5 thread in a 26 mm boss at X 52 / Z 13 (Fusion), so no locknut inside. Print the thread, or print the 18.5 mm tap-drill hole and run an M20 × 1.5 tap through.
+- Polish kept from v3m: split shadow line, chamfered glass rim, tapered M5 bosses, flush breather (PTFE vent inside), "XL125R DASH" deboss.
+- Clash check clean (gland thread overlaps its own printed thread by design).
+- v3m (AMPSEAL 23 inside) is in `v3m-ampseal/`. Scripts `src/pod3n.py`, `src/lite3n.py`.
+
+## v3m: real AMPSEAL 23 header, 5 mm deeper, polished
 Joel: "make it a bit deeper, and drop the rounded corners right down on that end", then "make it look perfect and polished".
 - **131.2 wide × 66.4 tall × 38.5 deep** (+7 mm mounting bosses). Plug end corners R2.5 (rest of the pod R8.7).
 - **Real header:** TE 776228-1 (sealed AMPSEAL 23, vertical), from TE's own STEP (`parts/te-776228-1-ampseal23.stp`). Measured: socket 43.4 × 23.6 × 19 tall, flange 60.8 × 32.1 × 3.5 with **no screw holes**, body + solder tails 16 mm behind the flange.
@@ -22,7 +30,7 @@ Joel wants all the loom wires through ONE rectangular bulkhead plug (OBD/ECU sty
 - Files kept in `v3h-chin-rejected/`.
 
 ## 3D viewer
-Spin it round on your phone: https://claude.ai/artifact/EH1iRSsUwUcDufBJbzJEgK (v3m and v3l, see-inside, explode). Renders: https://claude.ai/artifact/XFMFhj66m8xGHSTDTvJPC7
+Spin it round on your phone: https://claude.ai/artifact/EH1iRSsUwUcDufBJbzJEgK (v3n and v3m, see-inside, explode). Renders: https://claude.ai/artifact/XFMFhj66m8xGHSTDTvJPC7
 
 ## v3l: wider pod, screen to the left, one bulkhead plug out of the right side
 Joel: "just make the thing wider with the screen offset to the left".

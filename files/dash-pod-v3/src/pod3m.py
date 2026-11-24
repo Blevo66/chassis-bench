@@ -4,7 +4,7 @@
 import cadquery as cq, math, sys
 SCR='/tmp/claude-0/-home-user/08d74280-4fa3-53a7-b96e-82eec05e12b5/scratchpad/'
 def rr(w,h,r): return cq.Sketch().rect(w,h).vertices().fillet(r)
-RT=2.5                                   # v3m: right-end corner radius (Joel: drop the rounding right down on that end)
+RT=6.0                                   # v3m: right-end corner radius (Joel 14:42: round them off again; was 2.5)
 def rr2(w,h,r,rt): return cq.Sketch().rect(w,h).vertices('<X').fillet(r).vertices('>X').fillet(max(rt,0.3))
 def slab(sk,z0,z1,cx=0,cy=0): return cq.Workplane("XY").workplane(offset=z0).center(cx,cy).placeSketch(sk).extrude(z1-z0)
 def box(x0,x1,y0,y1,z0,z1): return cq.Workplane("XY").box(x1-x0,y1-y0,z1-z0).translate(((x0+x1)/2,(y0+y1)/2,(z0+z1)/2))
@@ -100,7 +100,7 @@ hole=box(XR-WALL-1,XR+1,-21.9,21.9,PZ-12.0,PZ+12.0)   # socket + 0.2 all round. 
 gasket=cq.Workplane("YZ").workplane(offset=FX1).center(0,PZ).placeSketch(rr(60.8,32.1,5.0)).extrude(GK)
 gasket=gasket.cut(box(FX1-1,XR,-21.7,21.7,PZ-11.8,PZ+11.8))   # hugs the socket: TPU stretches over it
 back=back.cut(hole); front=front.cut(hole)
-pocket=box(FX0-0.3,XR-WALL+0.01,-30.7,30.7,PZ-16.4,PZ+16.4)          # flange + gasket room
+pocket=box(FX0-0.3,XR-WALL+0.01,-30.8,30.8,PZ-16.4,PZ+16.4)          # flange + gasket room (also carves the inner corner rounds at the plug end)
 back=back.cut(pocket); front=front.cut(pocket)
 RW=3.0; RX1=FX0+0.3                        # rib faces 0.3 mm into the flange -> gasket squeeze
 back=back.union(box(RX1-RW,RX1,-27,27,ZB+2.4,PZ-10.6))      # floor rib on the flange's back edge strip
