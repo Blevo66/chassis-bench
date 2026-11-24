@@ -1,0 +1,210 @@
+<title>XL Dash Docking Head</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: one column; a 3D stage on top, renders, then the spec. Dark workshop palette, single look by choice (matches the v3 pod viewer). */
+:root{--bg:#14171a;--panel:#1d2226;--fg:#e7ebee;--mut:#97a3ac;--acc:#e0702a;--gold:#d4a446;--line:#2d343a;
+ --disp:"Barlow Semi Condensed","Arial Narrow",system-ui,sans-serif;--body:"IBM Plex Sans",system-ui,-apple-system,sans-serif;--mono:"IBM Plex Mono",ui-monospace,monospace;color-scheme:dark}
+html,body{background:var(--bg);color:var(--fg)}
+body{font:15px/1.55 var(--body)}
+.wrap{max-width:1100px;margin:0 auto;padding-block:18px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:22px}
+header h1{font:600 30px/1.1 var(--disp);letter-spacing:.01em;margin:0;text-wrap:balance}
+header p{margin:6px 0 0;color:var(--mut);max-width:68ch}
+.tag{display:inline-block;font:600 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--acc);margin-bottom:6px}
+.viewer{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--panel)}
+.bar{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;padding:10px 12px;border-bottom:1px solid var(--line)}
+.seg{display:inline-flex;flex-wrap:wrap;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{background:transparent;color:var(--mut);border:0;padding:7px 11px;font:500 13px var(--body);cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--acc);color:#16110d;font-weight:600}
+button:focus-visible,label:focus-within{outline:2px solid var(--acc);outline-offset:2px}
+label{display:inline-flex;align-items:center;gap:6px;color:var(--mut);font-size:13px}
+input[type=range]{width:110px;accent-color:var(--acc)}
+#stage{position:relative;height:min(62vh,560px);min-height:320px}
+canvas{display:block;width:100%;height:100%;touch-action:none}
+#load{position:absolute;inset:0;display:grid;place-items:center;color:var(--mut)}
+#cap{position:absolute;left:12px;bottom:10px;right:12px;color:var(--mut);font-size:12.5px;pointer-events:none}
+h2{font:600 21px/1.2 var(--disp);margin:0 0 10px;letter-spacing:.01em}
+.gal{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+figure{margin:0;background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+figure img{display:block;width:100%;aspect-ratio:4/3;object-fit:cover}
+figcaption{padding:8px 10px;font-size:13px;color:var(--mut)}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:22px}
+.cols>section{min-width:0}
+ul{margin:0;padding-left:18px}li{margin:4px 0}
+.tbl{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font:600 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--mut)}
+td.n{font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+.pill{display:inline-block;font:600 10.5px var(--mono);letter-spacing:.05em;padding:2px 6px;border-radius:999px;text-transform:uppercase}
+.g{background:#24402e;color:#8fe0a8}.q{background:#46341a;color:#f0c27a}
+a{color:var(--gold)}
+.pins{display:grid;grid-template-columns:repeat(9,minmax(0,1fr));gap:4px;font:500 11px var(--mono);max-width:560px}
+.pins div{background:#2a2414;border:1px solid #4a3d1c;color:#f1d48d;border-radius:6px;padding:5px 2px;text-align:center;overflow-wrap:anywhere}
+.small{font-size:13px;color:var(--mut)}
+body.shot .wrap>*:not(.viewer),body.shot .bar,body.shot #cap{display:none}
+body.shot .wrap{padding:0;max-width:none}body.shot .viewer{border:0;border-radius:0}body.shot #stage{height:100vh}
+[hidden]{display:none!important}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@600&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<div class="wrap">
+<header>
+  <span class="tag">Idea · alongside pod v3n</span>
+  <h1>Docking dash head</h1>
+  <p>The screen and LiPo live in a 17.5 mm head that hooks onto a dock on the nav tower and latches. The dock keeps the MOSFET board, GPS, 5 V buck and loom. 18 spring pogo pins carry the low-current signals. Press the button on top of the dock to lift the head off; a snap cap covers the pins.</p>
+</header>
+<div class="viewer">
+  <div class="bar">
+    <div class="seg" role="group" aria-label="View">
+      <button id="m-docked" aria-pressed="true">Docked</button>
+      <button id="m-off" aria-pressed="false">Head off</button>
+      <button id="m-cap" aria-pressed="false">Cap on</button>
+    </div>
+    <label><input id="xr" type="checkbox"> See inside</label>
+    <label>Explode <input id="ex" type="range" min="0" max="1" step="0.01" value="0"></label>
+  </div>
+  <div id="stage"><canvas id="c"></canvas><div id="load">Loading model…</div>
+  <div id="cap">Drag to spin, pinch to zoom. Head 105.2 × 66.4 × 17.5 mm, dock 22.7 mm deep. MOSFET board, antenna, buck and the Waveshare's back side are estimates.</div></div>
+</div>
+
+<section>
+  <h2>Renders</h2>
+  <div class="gal">
+    <figure><img src="r-hero.jpg" alt="Docked head and dock from the front three-quarter"><figcaption>Docked, rider's view. Shadow line at the head/dock join.</figcaption></figure>
+    <figure><img src="r-off.jpg" alt="Head lifted off the dock showing hooks, latch tongue and pogo pins"><figcaption>Head off: two hooks at the bottom, latch tongue at the top, gold pads.</figcaption></figure>
+    <figure><img src="r-dockface.jpg" alt="Dock face with pogo pins, TPU ring and slots"><figcaption>Dock face: 18 pogo pins inside a black TPU ring, hook slots, tongue slot.</figcaption></figure>
+    <figure><img src="r-cap.jpg" alt="Dock with the snap cap fitted"><figcaption>Head off and cap on. The cap uses the same hooks and latch.</figcaption></figure>
+    <figure><img src="r-side.jpg" alt="Side view showing head and dock depths"><figcaption>Side: head 17.5 mm (v3n pod is 33.5), dock 22.7 mm plus M5 bosses.</figcaption></figure>
+    <figure><img src="r-xray.jpg" alt="See-through view of the internals"><figcaption>See-through: Waveshare + LiPo in the head; MOSFET board, GPS, buck in the dock.</figcaption></figure>
+    <figure><img src="r-exploded.jpg" alt="Exploded view of all parts"><figcaption>Exploded, front to back.</figcaption></figure>
+    <figure><img src="r-back.jpg" alt="Back of the dock with M5 bosses and grommet"><figcaption>Dock back: tapered M5 bosses at 60 c-c, flush TPU grommet for the loom.</figcaption></figure>
+  </div>
+</section>
+
+<div class="cols">
+<section>
+  <h2>How it works</h2>
+  <ul>
+    <li><b>On:</b> tilt the head, drop its two bottom hooks into the dock slots, push the top in. The tongue's barb pushes the sprung bar aside and it snaps over. Positive latch, no magnets.</li>
+    <li><b>Off:</b> press the flush button on top of the dock (wedge slides the bar 2 mm), tilt the top out, lift.</li>
+    <li><b>Hold:</b> once latched the head can't lift (tongue slot is tight top and bottom), so the hooks can't unhook. Vibration loads go into the hooks and tongue, not the pins.</li>
+    <li><b>Seal:</b> TPU ring round the pins, 0.3 proud, squashed by the head's back face. Head and dock each have the v3 TPU seal at their own split.</li>
+    <li><b>Head power:</b> the head's LiPo charges from the dock's 5 V when docked. Off the bike it runs on the LiPo (auto-off after 60 s without 5 V, as in the firmware now).</li>
+    <li><b>Dock wiring:</b> back cover off, MOSFET terminals face you. Loom comes in through the grommet in the back.</li>
+  </ul>
+</section>
+<section>
+  <h2>Pogo contacts (2 × 9 at 2.54 mm)</h2>
+  <div class="pins">
+    <div>IN1</div><div>IN2</div><div>IN3</div><div>IN4</div><div>IN5</div><div>IN6</div><div>IN7</div><div>IN8</div><div>5V</div>
+    <div>GND</div><div>GND</div><div>3V3</div><div>RPM</div><div>BRK</div><div>SDA</div><div>SCL</div><div>GPS TX</div><div>GPS RX</div>
+  </div>
+  <p class="small">Suggested order only, pin 1 top-left looking at the dock. All signals are low current; the 2 A light/horn currents never leave the dock. Pads on the head are 1.7 mm gold (ENIG) on a 48 × 9 mm adapter board that plugs onto the Waveshare J8 header.</p>
+  <p class="small"><b>Not modelled:</b> a fail-safe on the dock to keep low beam and tail on with the head off. Easy to add later (a few parts on the dock's 5 V); say if you want it.</p>
+</section>
+</div>
+
+<section>
+  <h2>What's measured and what's guessed</h2>
+  <div class="tbl"><table>
+    <tr><th>Item</th><th>Size used</th><th>Source</th></tr>
+    <tr><td>Cover glass, LCD, Waveshare PCB outline</td><td class="n">92.44 × 61 × 1.1</td><td><span class="pill g">Waveshare CAD</span></td></tr>
+    <tr><td>Waveshare back-side parts (sets head depth)</td><td class="n">to 3.3 behind PCB</td><td><span class="pill q">guess</span> from simplified model</td></tr>
+    <tr><td>J8 header height / adapter header</td><td class="n">5.1 + 3.0</td><td><span class="pill q">guess</span></td></tr>
+    <tr><td>LiPo 1200 mAh</td><td class="n">62 × 35 × 5</td><td><span class="pill q">typical</span></td></tr>
+    <tr><td>Fowecry MOSFET board</td><td class="n">99 × 52, 10 tall terminals</td><td><span class="pill q">guess</span> until your STEP tonight</td></tr>
+    <tr><td>Pogo pins (barrel, travel)</td><td class="n">Ø1.5, ~0.6 compressed</td><td><span class="pill q">generic</span>, no part picked</td></tr>
+    <tr><td>ATGM336H GPS board</td><td class="n">12 × 15</td><td><span class="pill g">listing</span></td></tr>
+    <tr><td>GPS ceramic antenna</td><td class="n">19 × 6 × 5</td><td><span class="pill q">estimate</span> from photos</td></tr>
+    <tr><td>5 V buck</td><td class="n">15 × 13 × 4.5</td><td><span class="pill q">placeholder</span></td></tr>
+    <tr><td>Latch bar, spring, button</td><td class="n">2 mm travel</td><td><span class="pill q">concept</span>, needs a test print</td></tr>
+  </table></div>
+</section>
+
+<section>
+  <h2>Files</h2>
+  <p class="small">Single-body STEPs, Fusion axes (X right, Y forward, Z up, screen faces −Y, origin = glass centre). In repo <b>blevo66/chassis-bench</b>, branch <b>claude/project-thread-d5zumi</b>, folder <b>files/dash-dock-idea/</b>. The v3n pod files are untouched.</p>
+  <ul id="files"></ul>
+</section>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/environments/RoomEnvironment.js"></script>
+<script>
+const RAW='https://raw.githubusercontent.com/blevo66/chassis-bench/claude/project-thread-d5zumi/files/dash-dock-idea/';
+const FL=[['head-front','Head front ring'],['head-back','Head back (hooks, tongue, pad window)'],['head-seal','Head TPU seal'],['dock-tub','Dock tub'],['dock-back','Dock back cover'],['dock-seal','Dock TPU seal'],['pogo-ring','Pogo TPU ring'],['dock-cap','Dock cap'],['latch-bar','Latch bar'],['latch-button','Latch button'],['assembly','Full assembly (multi-part, for looking)']];
+document.getElementById('files').innerHTML=FL.map(([f,t])=>`<li><a href="${RAW}xl-dash-dock-v1-${f}.step">${t}</a></li>`).join('');
+const shot=location.search.includes('shot');if(shot)document.body.classList.add('shot');
+const cv=document.getElementById('c'),stage=document.getElementById('stage');
+const R=new THREE.WebGLRenderer({canvas:cv,antialias:true,preserveDrawingBuffer:true});R.setPixelRatio(Math.min(devicePixelRatio,2));
+R.toneMapping=THREE.ACESFilmicToneMapping;R.outputEncoding=THREE.sRGBEncoding;
+const scene=new THREE.Scene();scene.background=new THREE.Color(0x14171a);
+const pm=new THREE.PMREMGenerator(R);scene.environment=pm.fromScene(new THREE.RoomEnvironment(),0.04).texture;
+const cam=new THREE.PerspectiveCamera(30,1,10,3000);
+const ctl=new THREE.OrbitControls(cam,cv);ctl.enableDamping=true;
+scene.add(new THREE.HemisphereLight(0xdfe6ff,0x202020,0.5));
+const key=new THREE.DirectionalLight(0xffffff,1.2);key.position.set(150,260,220);scene.add(key);
+const rim=new THREE.DirectionalLight(0xffd9b0,0.5);rim.position.set(-200,80,-200);scene.add(rim);
+const col=c=>new THREE.Color(c).convertSRGBToLinear();
+const mat=(c,r=0.5,m=0)=>new THREE.MeshStandardMaterial({color:col(c),roughness:r,metalness:m,envMapIntensity:0.6});
+const SH=mat('#2a2e33',0.5);SH.side=THREE.DoubleSide;
+const M={shell:SH,seal:mat('#e0702a',0.7),tpu:mat('#0d0d0e',0.85),pcb:mat('#1f5a3a',0.45,0.1),gold:mat('#d9b25a',0.25,1),mos:mat('#2a4f9e',0.5),lipo:mat('#b9bcc4',0.35,0.6),steel:mat('#c9ccd0',0.3,1),grx:mat('#2f8a46'),ant:mat('#c9a640',0.4,0.3),blk:mat('#0c0c0c',0.45)};
+// screen face
+const tc=document.createElement('canvas');tc.width=924;tc.height=610;const g=tc.getContext('2d');
+g.fillStyle='#000';g.fillRect(0,0,924,610);const vx=95,vy=60;
+for(let i=0;i<24;i++){g.fillStyle=i<15?'#38d27a':(i>=19?'#2a1616':'#1a2026');g.fillRect(vx+24+i*28.5,vy+22,22,40);}
+g.fillStyle='#fff';g.font='700 230px sans-serif';g.textAlign='right';g.fillText('27',vx+470,vy+340);
+g.font='600 36px sans-serif';g.fillStyle='#9aa4ae';g.textAlign='left';g.fillText('mph',vx+480,vy+340);
+g.font='600 30px sans-serif';g.fillStyle='#e9eef2';g.fillText('TRIP 042.7',vx+26,vy+440);g.fillText('GPS 9',vx+560,vy+440);
+const tex=new THREE.CanvasTexture(tc);tex.encoding=THREE.sRGBEncoding;
+const gs=new THREE.Shape(),GW=92.44,GH=61.0,GR=6.0,gx=-GW/2,gy=-GH/2;
+gs.moveTo(gx+GR,gy);gs.lineTo(gx+GW-GR,gy);gs.quadraticCurveTo(gx+GW,gy,gx+GW,gy+GR);gs.lineTo(gx+GW,gy+GH-GR);gs.quadraticCurveTo(gx+GW,gy+GH,gx+GW-GR,gy+GH);
+gs.lineTo(gx+GR,gy+GH);gs.quadraticCurveTo(gx,gy+GH,gx,gy+GH-GR);gs.lineTo(gx,gy+GR);gs.quadraticCurveTo(gx,gy,gx+GR,gy);
+const gg=new THREE.ShapeGeometry(gs,12),gp=gg.attributes.position,gu=gg.attributes.uv;
+for(let i=0;i<gp.count;i++)gu.setXY(i,(gp.getX(i)-gx)/GW,(gp.getY(i)-gy)/GH);gu.needsUpdate=true;
+const glassFace=new THREE.Mesh(gg,new THREE.MeshBasicMaterial({map:tex,polygonOffset:true,polygonOffsetFactor:-4,polygonOffsetUnits:-4}));
+glassFace.rotation.x=Math.PI/2;glassFace.position.set(0,-0.05,0);
+const root=new THREE.Group();root.rotation.x=-Math.PI/2;scene.add(root);   // files are Z-up, -Y toward rider
+const head=new THREE.Group(),dock=new THREE.Group(),capG=new THREE.Group();root.add(head,dock,capG);
+head.add(glassFace);
+// [file, material, group, explode offset along +Y (away from rider)]
+const P={head_front:['shell','h',-1.4],glass:['blk','h',-1.4],waveshare_simplified:['pcb','h',-0.9],lipo_1200:['lipo','h',-0.4],head_seal:['seal','h',-0.15],
+ adapter_header:['blk','h',0.05],adapter_pcb:['pcb','h',0.25],adapter_pads:['gold','h',0.25],head_back:['shell','h',0.1],
+ pogo_ring_tpu:['tpu','d',0.55],pogo_pins:['gold','d',0.7],pogo_pcb:['pcb','d',0.85],latch_bar:['steel','d',0.95],latch_button:['shell','d',0.95],latch_spring:['steel','d',0.95],
+ dock_tub:['shell','d',0.75],gps_antenna_est:['ant','d',1.05],mosfet_fowecry_99x52:['mos','d',1.25],dock_seal:['seal','d',1.45],
+ gps_atgm336h:['grx','d',1.6],buck_5v_est:['grx','d',1.6],dock_back:['shell','d',1.75],grommet_tpu:['tpu','d',1.9],loom_cable:['blk','d',1.9],dock_cap:['shell','c',0]};
+const objs={};let mode='docked';
+fetch('meshes.json').then(r=>r.json()).then(D=>{
+ for(const k in P){const d=D[k];if(!d)continue;
+  const bin=atob(d.b64),n=bin.length/2,p=new Float32Array(n);
+  for(let i=0;i<n;i++){const u=bin.charCodeAt(2*i)|(bin.charCodeAt(2*i+1)<<8),c=i%3;p[i]=d.min[c]+u*d.scale[c];}
+  const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.BufferAttribute(p,3));geo.computeVertexNormals();
+  const m=new THREE.Mesh(geo,M[P[k][0]]);m.userData.e=P[k][2];objs[k]=m;({h:head,d:dock,c:capG})[P[k][1]].add(m);}
+ document.getElementById('load').hidden=true;fromHash();window.READY=true;
+}).catch(()=>{document.getElementById('load').textContent='Could not load the model.';});
+function apply(){
+ const ex=+document.getElementById('ex').value,xr=document.getElementById('xr').checked;
+ for(const k in objs){const o=objs[k];if(k==='dock_cap')continue;o.position.y=o.userData.e*ex*45;}
+ glassFace.position.y=-0.05-1.4*ex*45;
+ head.visible=mode!=='cap';capG.visible=mode==='cap';
+ // head off: set beside the dock, turned so its back (hooks, tongue, pads) faces you
+ if(mode==='off'){head.position.set(-125,-20,0);head.rotation.set(0,0,-2.55);}else{head.position.set(0,0,0);head.rotation.set(0,0,0);}
+ SH.transparent=xr;SH.opacity=xr?0.18:1;SH.depthWrite=!xr;SH.needsUpdate=true;
+ for(const b of ['docked','off','cap'])document.getElementById('m-'+b).setAttribute('aria-pressed',b===mode);
+}
+const VIEWS={hero:[[150,85,200],[0,0,-18]],off:[[200,140,290],[-60,5,0]],dockface:[[90,45,190],[0,-2,-20]],side:[[290,40,-25],[0,0,-25]],back:[[-150,-60,-260],[0,0,-25]],xray:[[160,85,190],[0,0,-18]],exploded:[[330,160,190],[25,0,-55]],cap:[[150,85,190],[0,0,-25]]};
+// camera views are in scene coords (Y up, +Z toward rider)
+function view(n){const v=VIEWS[n]||VIEWS.hero;cam.position.set(...v[0]);ctl.target.set(...v[1]);ctl.update();}
+function fromHash(){const h=location.hash.slice(1);
+ mode=h==='off'||h==='dockface'?'off':h==='cap'?'cap':'docked';
+ document.getElementById('xr').checked=h==='xray';document.getElementById('ex').value=h==='exploded'?1:0;
+ if(h==='dockface'){head.visible=false;}
+ view(h||'hero');apply();if(h==='dockface')head.visible=false;}
+for(const b of ['docked','off','cap'])document.getElementById('m-'+b).onclick=()=>{mode=b;apply();};
+document.getElementById('xr').onchange=apply;document.getElementById('ex').oninput=apply;
+window.addEventListener('hashchange',fromHash);
+function size(){const w=stage.clientWidth,h=stage.clientHeight;R.setSize(w,h,false);cam.aspect=w/h;
+ cam.fov=2*Math.atan(Math.tan(15*Math.PI/180)*Math.max(1,1.4/cam.aspect))*180/Math.PI;cam.updateProjectionMatrix();}
+new ResizeObserver(size).observe(stage);size();view('hero');
+(function loop(){ctl.update();R.render(scene,cam);requestAnimationFrame(loop);})();
+</script>
