@@ -15,10 +15,17 @@ Joel wants all the loom wires through ONE rectangular bulkhead plug (OBD/ECU sty
 ## 3D viewer
 Spin it round on your phone: https://claude.ai/artifact/EH1iRSsUwUcDufBJbzJEgK (v3j and v3k, see-inside, explode).
 
-## v3j (current): no visor peak
+## v3l (current): wider pod, screen to the left, one bulkhead plug out of the right side
+Joel: "just make the thing wider with the screen offset to the left".
+- **131.2 wide × 66.4 tall × 33.5 deep.** The whole pod is 26 mm wider on the right; screen, Waveshare and MOSFET board stay where they were (screen centre is 13 mm left of the pod centre). No visor peak.
+- **Side plug** on the right face, size GUESSED for an AMPSEAL 23-way style header: 56 × 20 cutout centred 17 mm behind the front face, so it straddles the front/back split (notch in both halves). 2 × M3 flange screws at 60 c-c into bosses in the back cover. The plug's own panel gasket seals the cutout; the TPU seal is broken there.
+- Everything else as v3j (ATGM336H, ceramic antenna pocket, MOSFET board on the back cover, 4 corner screws). Clash check (`src/pod3l.py`): zero overlaps.
+- v3j (105 wide, no plug) is in `v3j-no-peak-narrow/`; the side-block idea v3k is in `v3k-side-block-rejected/`.
+
+## v3j: no visor peak
 Joel: "get rid of the peak". Same as v3i otherwise: **105.2 × 66.4 × 33.5 mm**, ATGM336H GPS, ceramic antenna pocket in the top wall, MOSFET board on the back cover.
 
-## v3k (option, `v3k-side-plug/`): one sealed rectangular bulkhead plug out of the right side
+## v3k (REJECTED, `v3k-side-block-rejected/`): one sealed rectangular bulkhead plug out of the right side
 Joel wants one bulkhead plug out of one side ("more universal going forward").
 - There is no room inside: the MOSFET board fills the pod side to side (0.6 mm spare). So a 26 mm block is added to the right of the back cover: **131.2 wide** (screen no longer centred), same height and depth.
 - Plug size GUESSED for an AMPSEAL 23-way style header: 56 × 20 cutout, 2 × M3 flange screws 60 c-c, body 54 × 18 × 22 deep. Wires pass into the pod through a window in the old side wall.
