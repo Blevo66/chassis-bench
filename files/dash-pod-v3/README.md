@@ -141,3 +141,19 @@ The clash check in `src/pod3.py` found zero overlaps between the shell, the real
 ## Notes
 - The board's USB-C faces the right-hand wall and can't be reached with the cover on. Update the firmware over Wi-Fi (OTA), or through the header's USB pins (U_N / U_P).
 - Header J8 (2×16, 2.54 mm, female): the free pins with no camera fitted are IO17, 18, 21, 38–42 and 45–48. It also carries TXD/RXD, I2C, VBUS (5 V in) and VBAT.
+
+## v3q: Joel's real MOSFET board (2026-11-24)
+
+Built from Joel's own STEP of the Fowecry 8-ch board (`parts/fowecry-mosfet-board-joel.step`). Script `src/pod3q.py`.
+
+**Measured from Joel's model (facts):** PCB 99 x 52 x 1.5, mounting holes 91 x 44 (was 90 x 43), tallest screw terminals 14.1 mm above the PCB (I had guessed 10), input strip 9.5-10.5, jumper headers ~8.5-9.0, MOSFETs/optos 2.5-4.5.
+
+**Changes from v3p:**
+- Back 4.3 mm deeper: pod is now 143.2 x 66.4 x **37.8** mm (v3p 33.5). Terminals clear the back wall by ~0.6 mm.
+- MOSFET standoffs moved to 91 x 44.
+- LiPo: the 62 x 35 PKCell 1200 no longer fits between the terminal strips (gap ~33 mm). Drawn a **500 mAh ~30 x 36 x 5** cell lying on the jumper headers, left side, ~0.7 mm under the back wall. Cell size is a guess at a typical 500 mAh pouch.
+- GPS receiver stuck straight to the back wall (right of centre); ceramic antenna pocket moved to the top wall above the WS28 socket, clear of the 14 mm terminals.
+
+**Guesses / unconfirmed:** which terminal strip is at the top (I put the 14 mm strip at the top), LiPo size, GPS sizes (arrives 25 Nov).
+
+Renders: `renders/v3q-*.png`. Old v3p files in `v3p-guessed-mosfet/`.

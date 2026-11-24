@@ -140,7 +140,7 @@ board=board.rotate((0,0,0),(0,0,1),90).translate((0,0,-PD))
 # ends up at the top is MY CHOICE (unconfirmed): 16 mm output strip at the top, 11 mm input strip + VIN at the bottom.
 mos=cq.importers.importStep(SCR+'mos/mosfet.step').rotate((0,0,0),(1,0,0),-90).translate((0,0,PF))
 parts={
- 'lipo_500_30x36x5':    box(-40,-4,-15,15,PB-10.0-0.3-5.0,PB-10.0-0.3),   # v3q: smaller cell lying on the jumper headers (10 mm)
+ 'lipo_500_30x36x5':    box(-40,-4,-15,15,PF-10.6-5.0,PF-10.6),   # v3q: smaller cell lying on the jumper headers (tops 10.5 mm, Joel's model)
  'gps_receiver_atgm336h': box(33,45,-7.5,7.5,ZB+2.5,ZB+2.5+5.0),
  'gps_ceramic_antenna_est': box(62.5,81.5,OH/2-WALL-5.0+0.9,OH/2-1.6,-28.5,-22.5),
  'mosfet_fowecry_99x52':mos,
