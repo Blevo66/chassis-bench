@@ -12,7 +12,19 @@ Joel wants all the loom wires through ONE rectangular bulkhead plug (OBD/ECU sty
 - The chin opens up into the pod behind the split. Cable boot removed; breather vent moved to X −40.
 - Files kept in `v3h-chin-rejected/`.
 
-## v3i (current): ATGM336H GPS with its ceramic antenna
+## 3D viewer
+Spin it round on your phone: https://claude.ai/artifact/EH1iRSsUwUcDufBJbzJEgK (v3j and v3k, see-inside, explode).
+
+## v3j (current): no visor peak
+Joel: "get rid of the peak". Same as v3i otherwise: **105.2 × 66.4 × 33.5 mm**, ATGM336H GPS, ceramic antenna pocket in the top wall, MOSFET board on the back cover.
+
+## v3k (option, `v3k-side-plug/`): one sealed rectangular bulkhead plug out of the right side
+Joel wants one bulkhead plug out of one side ("more universal going forward").
+- There is no room inside: the MOSFET board fills the pod side to side (0.6 mm spare). So a 26 mm block is added to the right of the back cover: **131.2 wide** (screen no longer centred), same height and depth.
+- Plug size GUESSED for an AMPSEAL 23-way style header: 56 × 20 cutout, 2 × M3 flange screws 60 c-c, body 54 × 18 × 22 deep. Wires pass into the pod through a window in the old side wall.
+- Front ring and seal are the same as v3j. Clash check (`src/pod3k.py`): zero overlaps.
+
+## v3i: GPS ceramic antenna, with the visor peak (now in `v3i-peak/`)
 Joel ordered the ATGM336H GPS (QuveX, Amazon): 12 × 15 mm board, VCC/GND/TX/RX/PPS, active ceramic antenna on an IPX lead.
 - Same pod as v3g: **105.2 × 66.4 × 33.5 mm**, MOSFET board + GPS on the back cover, 4 × M3 × 25 corner screws.
 - **Antenna** (size ESTIMATED from the listing photos: ~19 × 6 × 5 mm) lies flat under the top wall, facing the sky, behind the MOSFET board's top terminal strip. The top wall is thinned to 1.6 mm in a 22 × 9 pocket over it (outside unchanged). Re-check against the real part.
