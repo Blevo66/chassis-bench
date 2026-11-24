@@ -4,6 +4,15 @@ Built around the real Waveshare CAD (from waveshareteam/ESP32-S3-Touch-LCD-3.5, 
 
 **Axes (all files):** mm, Z up, Y forward, X right. The screen faces -Y. The origin is the centre of the cover glass, just behind its front face.
 
+## v3m (current): real AMPSEAL 23 header, 5 mm deeper, polished
+Joel: "make it a bit deeper, and drop the rounded corners right down on that end", then "make it look perfect and polished".
+- **131.2 wide × 66.4 tall × 38.5 deep** (+7 mm mounting bosses). Plug end corners R2.5 (rest of the pod R8.7).
+- **Real header:** TE 776228-1 (sealed AMPSEAL 23, vertical), from TE's own STEP (`parts/te-776228-1-ampseal23.stp`). Measured: socket 43.4 × 23.6 × 19 tall, flange 60.8 × 32.1 × 3.5 with **no screw holes**, body + solder tails 16 mm behind the flange.
+- **Mounting:** flange INSIDE against the right wall on a 1 mm TPU gasket (`xl-dash-pod-v3m-plug-gasket`, print in **black** TPU). Header slides in sideways from the split into the back cover; a floor rib in the back cover and a rib under the front ledge press on the flange's long edges (0.3 mm squeeze, shows as a small overlap in the clash check) when the pod closes. Only the socket comes through: 0.2 mm gap, 0.8 mm chamfer.
+- **Polish:** shadow-line reveal at the split, chamfered glass rim, tapered M5 bosses, flush 3 mm breather (stick a 12 mm adhesive PTFE vent over it inside; the cable boot is gone), "XL125R DASH" debossed on the back.
+- Solder tails end about 7 mm short of the MOSFET board edge, with open space above and below for the wires to turn.
+- v3l (plug size guessed) is in `v3l-plug-guess/`. Scripts: `src/pod3m.py`, `src/lite3m.py`.
+
 ## v3h (REJECTED by Joel, "looks shite"): chin under the pod for one sealed rectangular bulkhead plug
 Joel wants all the loom wires through ONE rectangular bulkhead plug (OBD/ECU style) in the bottom.
 - **105.2 wide × 33.5 deep**, now **93.4 tall** with the chin (27 mm chin, 72 mm wide, part of the back cover). Everything else as v3g.
@@ -13,9 +22,9 @@ Joel wants all the loom wires through ONE rectangular bulkhead plug (OBD/ECU sty
 - Files kept in `v3h-chin-rejected/`.
 
 ## 3D viewer
-Spin it round on your phone: https://claude.ai/artifact/EH1iRSsUwUcDufBJbzJEgK (v3j and v3k, see-inside, explode).
+Spin it round on your phone: https://claude.ai/artifact/EH1iRSsUwUcDufBJbzJEgK (v3m and v3l, see-inside, explode). Renders: https://claude.ai/artifact/XFMFhj66m8xGHSTDTvJPC7
 
-## v3l (current): wider pod, screen to the left, one bulkhead plug out of the right side
+## v3l: wider pod, screen to the left, one bulkhead plug out of the right side
 Joel: "just make the thing wider with the screen offset to the left".
 - **131.2 wide × 66.4 tall × 33.5 deep.** The whole pod is 26 mm wider on the right; screen, Waveshare and MOSFET board stay where they were (screen centre is 13 mm left of the pod centre). No visor peak.
 - **Side plug** on the right face, size GUESSED for an AMPSEAL 23-way style header: 56 × 20 cutout centred 17 mm behind the front face, so it straddles the front/back split (notch in both halves). 2 × M3 flange screws at 60 c-c into bosses in the back cover. The plug's own panel gasket seals the cutout; the TPU seal is broken there.
