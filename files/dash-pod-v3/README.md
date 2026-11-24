@@ -8,7 +8,7 @@ Built around the real Waveshare CAD (from waveshareteam/ESP32-S3-Touch-LCD-3.5, 
 Joel: not keen on the threaded gland boss; "all the plugs look huge" on such a small pod.
 - **124.2 × 66.4 × 33.5 mm.** No plug on the pod. ~10 mm 17-core flylead out of the back through a **flush black TPU (95A) grommet**: 22 mm flange 0.3 mm below the back face, 15 mm neck, 18 mm retaining lip inside, 9.4 mm bore, 5 mm tail for glue-lined heat-shrink. Grommet is in the assembly STEP; print it separately.
 - **Back cover ends taper in 1.5 mm** toward the back (top/bottom straight, so the GPS antenna pocket keeps its wall).
-- **Plug lives in the nav tower:** HangTon WS28 24-pin 5 A (square-flange socket 36 × 36, M30, 4 × M3 at 28.5; plug Ø34 × 56) — socket bolted through the tower, plug on the flylead end. 12 V and earth get 2 pins each.
+- **Plug lives in the nav tower:** HangTon WS28 24-pin 5 A (square-flange socket 36 × 36, M30 × 1, panel hole Ø28.5, 4 × Ø3.2 holes on a 30 mm square, 23 deep (9.8 behind flange); plug Ø34 × 56) — socket bolted through the tower, plug on the flylead end. 12 V and earth get 2 pins each.
 - v3n (M20 gland boss) is in `v3n-gland/`. Scripts `src/pod3o.py`, `src/lite3o.py`.
 
 ## v3n: flylead through a cable gland, no panel plug
