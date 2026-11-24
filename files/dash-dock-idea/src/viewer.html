@@ -49,9 +49,9 @@ body.shot .wrap{padding:0;max-width:none}body.shot .viewer{border:0;border-radiu
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@600&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
 <div class="wrap">
 <header>
-  <span class="tag">Idea · alongside pod v3n</span>
+  <span class="tag">Idea v2 · alongside pod v3n</span>
   <h1>Docking dash head</h1>
-  <p>The screen and LiPo live in a 17.5 mm head that hooks onto a dock on the nav tower and latches. The dock keeps the MOSFET board, GPS, 5 V buck and loom. 18 spring pogo pins carry the low-current signals. Press the button on top of the dock to lift the head off; a snap cap covers the pins.</p>
+  <p><b>v2.</b> The screen and LiPo live in a 17.5 mm head that pulls onto a dock on the nav tower. Two steel locating pins line it up and four pairs of strong magnets hold it. A standard 2 × 16 pogo block in the dock presses straight onto the ends of a long-pin header pushed into the Waveshare's J8 socket, so there's no custom board. The dock keeps the MOSFET board, GPS, 5 V buck and loom. A magnetic cap covers the pins with the head off.</p>
 </header>
 <div class="viewer">
   <div class="bar">
@@ -64,16 +64,16 @@ body.shot .wrap{padding:0;max-width:none}body.shot .viewer{border:0;border-radiu
     <label>Explode <input id="ex" type="range" min="0" max="1" step="0.01" value="0"></label>
   </div>
   <div id="stage"><canvas id="c"></canvas><div id="load">Loading model…</div>
-  <div id="cap">Drag to spin, pinch to zoom. Head 105.2 × 66.4 × 17.5 mm, dock 22.7 mm deep. MOSFET board, antenna, buck and the Waveshare's back side are estimates.</div></div>
+  <div id="cap">Drag to spin, pinch to zoom. v2 · Head 105.2 × 66.4 × 17.5 mm, dock 22.7 mm deep. MOSFET board, antenna, buck and the Waveshare's back side are estimates.</div></div>
 </div>
 
 <section>
   <h2>Renders</h2>
   <div class="gal">
     <figure><img src="r-hero.jpg" alt="Docked head and dock from the front three-quarter"><figcaption>Docked, rider's view. Shadow line at the head/dock join.</figcaption></figure>
-    <figure><img src="r-off.jpg" alt="Head lifted off the dock showing hooks, latch tongue and pogo pins"><figcaption>Head off: two hooks at the bottom, latch tongue at the top, gold pads.</figcaption></figure>
-    <figure><img src="r-dockface.jpg" alt="Dock face with pogo pins, TPU ring and slots"><figcaption>Dock face: 18 pogo pins inside a black TPU ring, hook slots, tongue slot.</figcaption></figure>
-    <figure><img src="r-cap.jpg" alt="Dock with the snap cap fitted"><figcaption>Head off and cap on. The cap uses the same hooks and latch.</figcaption></figure>
+    <figure><img src="r-off.jpg" alt="Head off the dock showing pin ends and dowel holes"><figcaption>Head off: J8 pin ends flush in the back, two pin holes, magnets under the skin.</figcaption></figure>
+    <figure><img src="r-dockface.jpg" alt="Dock face with pogo pins, TPU ring and slots"><figcaption>Dock face: 2 × 16 pogo block in a black TPU ring, two 4 mm locating pins.</figcaption></figure>
+    <figure><img src="r-cap.jpg" alt="Dock with the snap cap fitted"><figcaption>Head off and cap on. The cap has the same magnets and pin holes.</figcaption></figure>
     <figure><img src="r-side.jpg" alt="Side view showing head and dock depths"><figcaption>Side: head 17.5 mm (v3n pod is 33.5), dock 22.7 mm plus M5 bosses.</figcaption></figure>
     <figure><img src="r-xray.jpg" alt="See-through view of the internals"><figcaption>See-through: Waveshare + LiPo in the head; MOSFET board, GPS, buck in the dock.</figcaption></figure>
     <figure><img src="r-exploded.jpg" alt="Exploded view of all parts"><figcaption>Exploded, front to back.</figcaption></figure>
@@ -85,22 +85,20 @@ body.shot .wrap{padding:0;max-width:none}body.shot .viewer{border:0;border-radiu
 <section>
   <h2>How it works</h2>
   <ul>
-    <li><b>On:</b> tilt the head, drop its two bottom hooks into the dock slots, push the top in. The tongue's barb pushes the sprung bar aside and it snaps over. Positive latch, no magnets.</li>
-    <li><b>Off:</b> press the flush button on top of the dock (wedge slides the bar 2 mm), tilt the top out, lift.</li>
-    <li><b>Hold:</b> once latched the head can't lift (tongue slot is tight top and bottom), so the hooks can't unhook. Vibration loads go into the hooks and tongue, not the pins.</li>
-    <li><b>Seal:</b> TPU ring round the pins, 0.3 proud, squashed by the head's back face. Head and dock each have the v3 TPU seal at their own split.</li>
-    <li><b>Head power:</b> the head's LiPo charges from the dock's 5 V when docked. Off the bike it runs on the LiPo (auto-off after 60 s without 5 V, as in the firmware now).</li>
-    <li><b>Dock wiring:</b> back cover off, MOSFET terminals face you. Loom comes in through the grommet in the back.</li>
+    <li><b>On:</b> offer the head up, the two 4 mm stainless dowels find their holes, and the magnets pull it home against the pogo springs.</li>
+    <li><b>Off:</b> pull it straight off. No button, no latch.</li>
+    <li><b>Hold:</b> 4 pairs of 12 × 3 mm N52 discs behind 0.5 mm skins (1.3 mm between each pair). The dowels take all the sideways and up-down load, so the magnets only resist pull-off. My rough estimate is 60–100 N of hold against 15–30 N of pogo push. That's a guess, so do a pull test and a shake test on the first print.</li>
+    <li><b>Pogo straight onto J8:</b> J8 is a female 2 × 16 socket, so a gold long-pin 2 × 16 header pushes into it. Its pins run back through a printed guide and are trimmed flush with the back face. Those pin ends are the pogo targets.</li>
+    <li><b>Seal:</b> TPU ring round the pogo block, 0.3 proud, squashed by the head's back face. The v3 TPU seals and shadow lines are kept at both splits.</li>
+    <li><b>Dock wiring:</b> take the back cover off and the MOSFET terminals face you. The loom comes in through a flush grommet in the back.</li>
   </ul>
 </section>
 <section>
-  <h2>Pogo contacts (2 × 9 at 2.54 mm)</h2>
-  <div class="pins">
-    <div>IN1</div><div>IN2</div><div>IN3</div><div>IN4</div><div>IN5</div><div>IN6</div><div>IN7</div><div>IN8</div><div>5V</div>
-    <div>GND</div><div>GND</div><div>3V3</div><div>RPM</div><div>BRK</div><div>SDA</div><div>SCL</div><div>GPS TX</div><div>GPS RX</div>
-  </div>
-  <p class="small">Suggested order only, pin 1 top-left looking at the dock. All signals are low current; the 2 A light/horn currents never leave the dock. Pads on the head are 1.7 mm gold (ENIG) on a 48 × 9 mm adapter board that plugs onto the Waveshare J8 header.</p>
-  <p class="small"><b>Not modelled:</b> a fail-safe on the dock to keep low beam and tail on with the head off. Easy to add later (a few parts on the dock's 5 V); say if you want it.</p>
+  <h2>Pogo contacts (J8, 2 × 16 at 2.54 mm)</h2>
+  <p class="small">All 32 J8 positions line up with the pogo block. The dock only wires the 18 you need: IN1–8, 5V (VBUS), 3V3, GND × 2, RPM, brake, SDA, SCL, GPS TX and RX. The 2 A light and horn currents never leave the dock.</p>
+  <p class="small"><b>Pull the unused pins out of the long header, VBAT above all.</b> With the head off, any pin left in is bare on the back face. VBAT is the LiPo, live next to GND, so a spanner across it would short the battery. Pliers push single pins out of a header easily.</p>
+  <p class="small">Pin ends are small (0.64 mm square), so alignment rests on the dowels (±0.15 mm or so). Use a gold-plated header and crown-tip pogo pins. Tinned pins fret under vibration.</p>
+  <p class="small"><b>Not modelled:</b> a fail-safe on the dock to keep low beam and tail on with the head off. Say if you want it.</p>
 </section>
 </div>
 
@@ -110,20 +108,21 @@ body.shot .wrap{padding:0;max-width:none}body.shot .viewer{border:0;border-radiu
     <tr><th>Item</th><th>Size used</th><th>Source</th></tr>
     <tr><td>Cover glass, LCD, Waveshare PCB outline</td><td class="n">92.44 × 61 × 1.1</td><td><span class="pill g">Waveshare CAD</span></td></tr>
     <tr><td>Waveshare back-side parts (sets head depth)</td><td class="n">to 3.3 behind PCB</td><td><span class="pill q">guess</span> from simplified model</td></tr>
-    <tr><td>J8 header height / adapter header</td><td class="n">5.1 + 3.0</td><td><span class="pill q">guess</span></td></tr>
+    <tr><td>J8 socket height, long-pin header (needs ~11 mm of pin from the J8 face to the back face)</td><td class="n">5.1 + 2.5 body</td><td><span class="pill q">guess</span></td></tr>
+    <tr><td>Magnets</td><td class="n">Ø12 × 3 N52 × 8</td><td><span class="pill q">pick</span>, hold force estimated</td></tr>
+    <tr><td>Locating dowels</td><td class="n">Ø4 × 7.5, 4.5 proud</td><td><span class="pill g">standard</span> stainless h6</td></tr>
     <tr><td>LiPo 1200 mAh</td><td class="n">62 × 35 × 5</td><td><span class="pill q">typical</span></td></tr>
     <tr><td>Fowecry MOSFET board</td><td class="n">99 × 52, 10 tall terminals</td><td><span class="pill q">guess</span> until your STEP tonight</td></tr>
-    <tr><td>Pogo pins (barrel, travel)</td><td class="n">Ø1.5, ~0.6 compressed</td><td><span class="pill q">generic</span>, no part picked</td></tr>
+    <tr><td>2 × 16 pogo block, 2.54 mm</td><td class="n">41.8 × 5.2 × 3, ~1 mm compressed</td><td><span class="pill q">generic</span>, no part picked</td></tr>
     <tr><td>ATGM336H GPS board</td><td class="n">12 × 15</td><td><span class="pill g">listing</span></td></tr>
     <tr><td>GPS ceramic antenna</td><td class="n">19 × 6 × 5</td><td><span class="pill q">estimate</span> from photos</td></tr>
     <tr><td>5 V buck</td><td class="n">15 × 13 × 4.5</td><td><span class="pill q">placeholder</span></td></tr>
-    <tr><td>Latch bar, spring, button</td><td class="n">2 mm travel</td><td><span class="pill q">concept</span>, needs a test print</td></tr>
   </table></div>
 </section>
 
 <section>
   <h2>Files</h2>
-  <p class="small">Single-body STEPs, Fusion axes (X right, Y forward, Z up, screen faces −Y, origin = glass centre). In repo <b>blevo66/chassis-bench</b>, branch <b>claude/project-thread-d5zumi</b>, folder <b>files/dash-dock-idea/</b>. The v3n pod files are untouched.</p>
+  <p class="small">Single-body STEPs, Fusion axes (X right, Y forward, Z up, screen faces −Y, origin = glass centre). In repo <b>Blevo66/chassis-bench</b>, branch <b>claude/project-thread-d5zumi</b>, folder <b>files/dash-dock-idea/</b>. The v3n pod files are untouched.</p>
   <ul id="files"></ul>
 </section>
 </div>
@@ -131,9 +130,9 @@ body.shot .wrap{padding:0;max-width:none}body.shot .viewer{border:0;border-radiu
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/environments/RoomEnvironment.js"></script>
 <script>
-const RAW='https://raw.githubusercontent.com/blevo66/chassis-bench/claude/project-thread-d5zumi/files/dash-dock-idea/';
-const FL=[['head-front','Head front ring'],['head-back','Head back (hooks, tongue, pad window)'],['head-seal','Head TPU seal'],['dock-tub','Dock tub'],['dock-back','Dock back cover'],['dock-seal','Dock TPU seal'],['pogo-ring','Pogo TPU ring'],['dock-cap','Dock cap'],['latch-bar','Latch bar'],['latch-button','Latch button'],['assembly','Full assembly (multi-part, for looking)']];
-document.getElementById('files').innerHTML=FL.map(([f,t])=>`<li><a href="${RAW}xl-dash-dock-v1-${f}.step">${t}</a></li>`).join('');
+const RAW='https://raw.githubusercontent.com/Blevo66/chassis-bench/claude/project-thread-d5zumi/files/dash-dock-idea/';
+const FL=[['head-front','Head front ring'],['head-back','Head back (pin guide, magnet pockets, dowel holes)'],['head-seal','Head TPU seal'],['dock-tub','Dock tub (pogo slot, magnets, dowels)'],['dock-back','Dock back cover'],['dock-seal','Dock TPU seal'],['pogo-ring','Pogo TPU ring'],['dock-cap','Dock cap'],['assembly','Full assembly (multi-part, for looking)']];
+document.getElementById('files').innerHTML=FL.map(([f,t])=>`<li><a href="${RAW}xl-dash-dock-v2-${f}.step">${t}</a></li>`).join('');
 const shot=location.search.includes('shot');if(shot)document.body.classList.add('shot');
 const cv=document.getElementById('c'),stage=document.getElementById('stage');
 const R=new THREE.WebGLRenderer({canvas:cv,antialias:true,preserveDrawingBuffer:true});R.setPixelRatio(Math.min(devicePixelRatio,2));
@@ -169,8 +168,8 @@ const head=new THREE.Group(),dock=new THREE.Group(),capG=new THREE.Group();root.
 head.add(glassFace);
 // [file, material, group, explode offset along +Y (away from rider)]
 const P={head_front:['shell','h',-1.4],glass:['blk','h',-1.4],waveshare_simplified:['pcb','h',-0.9],lipo_1200:['lipo','h',-0.4],head_seal:['seal','h',-0.15],
- adapter_header:['blk','h',0.05],adapter_pcb:['pcb','h',0.25],adapter_pads:['gold','h',0.25],head_back:['shell','h',0.1],
- pogo_ring_tpu:['tpu','d',0.55],pogo_pins:['gold','d',0.7],pogo_pcb:['pcb','d',0.85],latch_bar:['steel','d',0.95],latch_button:['shell','d',0.95],latch_spring:['steel','d',0.95],
+ longpin_header_body:['blk','h',-0.2],longpin_header_pins:['gold','h',-0.2],magnets_head_12x3:['steel','h',0.1],head_back:['shell','h',0.1],
+ pogo_ring_tpu:['tpu','d',0.55],pogo_strips:['blk','d',0.7],pogo_pins:['gold','d',0.7],pogo_pcb:['pcb','d',0.85],dowels_4mm:['steel','d',0.75],magnets_dock_12x3:['steel','d',0.75],
  dock_tub:['shell','d',0.75],gps_antenna_est:['ant','d',1.05],mosfet_fowecry_99x52:['mos','d',1.25],dock_seal:['seal','d',1.45],
  gps_atgm336h:['grx','d',1.6],buck_5v_est:['grx','d',1.6],dock_back:['shell','d',1.75],grommet_tpu:['tpu','d',1.9],loom_cable:['blk','d',1.9],dock_cap:['shell','c',0]};
 const objs={};let mode='docked';
@@ -187,7 +186,7 @@ function apply(){
  for(const k in objs){const o=objs[k];if(k==='dock_cap')continue;o.position.y=o.userData.e*ex*45;}
  glassFace.position.y=-0.05-1.4*ex*45;
  head.visible=mode!=='cap';capG.visible=mode==='cap';
- // head off: set beside the dock, turned so its back (hooks, tongue, pads) faces you
+ // head off: set beside the dock, turned so its back (pin ends, dowel holes) faces you
  if(mode==='off'){head.position.set(-125,-20,0);head.rotation.set(0,0,-2.55);}else{head.position.set(0,0,0);head.rotation.set(0,0,0);}
  SH.transparent=xr;SH.opacity=xr?0.18:1;SH.depthWrite=!xr;SH.needsUpdate=true;
  for(const b of ['docked','off','cap'])document.getElementById('m-'+b).setAttribute('aria-pressed',b===mode);
