@@ -12,7 +12,14 @@ Joel wants all the loom wires through ONE rectangular bulkhead plug (OBD/ECU sty
 - The chin opens up into the pod behind the split. Cable boot removed; breather vent moved to X −40.
 - Files kept in `v3h-chin-rejected/`.
 
-## v3g (current again): MOSFET board and GPS on the back cover
+## v3i (current): ATGM336H GPS with its ceramic antenna
+Joel ordered the ATGM336H GPS (QuveX, Amazon): 12 × 15 mm board, VCC/GND/TX/RX/PPS, active ceramic antenna on an IPX lead.
+- Same pod as v3g: **105.2 × 66.4 × 33.5 mm**, MOSFET board + GPS on the back cover, 4 × M3 × 25 corner screws.
+- **Antenna** (size ESTIMATED from the listing photos: ~19 × 6 × 5 mm) lies flat under the top wall, facing the sky, behind the MOSFET board's top terminal strip. The top wall is thinned to 1.6 mm in a 22 × 9 pocket over it (outside unchanged). Re-check against the real part.
+- **GPS board** sits on a 10 × 14 pad on the back floor at the right end of the terminal-strip gap.
+- v3g (thin FPC antenna) is in `v3g-fpc-antenna/`. Clash check (`src/pod3i.py`): zero overlaps.
+
+## v3g: MOSFET board and GPS on the back cover
 Joel's assembly plan: screen and processor in the front ring, MOSFET board and GPS on the back cover, so the two halves come apart as two units.
 - **Same size: 105.2 × 66.4 × 33.5 mm.** LiPo and GPS receiver still sit between the terminal strips (jumpers removed and bridged to H).
 - **MOSFET board** screws down onto 4 standoffs in the back cover with **4 × M3 × 6** from the inside, into M3 heat-set inserts in the standoff tops (holes 90 × 43).
