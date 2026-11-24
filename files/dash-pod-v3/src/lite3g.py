@@ -1,4 +1,4 @@
-src=open('cad3/pod3e.py').read().split('# ---------------- CHECKS')[0]
+src=open('cad3/pod3g.py').read().split('# ---------------- CHECKS')[0]
 src=src.replace("board=cq.importers.importStep(SCR+'ws/wsrepo/hardware/mechanical/ESP32-S3-Touch-LCD-3_5.stp')\nboard=board.rotate((0,0,0),(0,0,1),90).translate((0,0,-PD))","board=None")
 exec(src)
 # simplified Waveshare board in pod axes (from the real STEP's extents)
