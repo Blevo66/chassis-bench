@@ -4,7 +4,13 @@ Built around the real Waveshare CAD (from waveshareteam/ESP32-S3-Touch-LCD-3.5, 
 
 **Axes (all files):** mm, Z up, Y forward, X right. The screen faces -Y. The origin is the centre of the cover glass, just behind its front face.
 
-## v3o (current): flush TPU grommet, tapered back, single unit
+## v3p (current): HangTon WS28 24-pin socket straight out of the back
+Joel 2026-11-24: wants the WS28 on the unit, "straight out the back".
+- **143.2 × 66.4 × 33.5 mm** (EXT 38). Socket centre X 64.6 (pod axes), right of the MOSFET board so the ~10 mm solder-cup stub has wire room; otherwise the pod would need ~11 mm more depth.
+- WS28 type Z (seller's table): flange 36 × 36, 4 × Ø3.2 on 30 mm square, panel hole Ø28.5, M30 × 1, L 23, rear stub Ø27.8 × 9.8. Flange thickness 2.5 GUESSED. 1 mm TPU gasket (`xl-dash-pod-v3p-ws28-gasket.stl`), 4 × M3 × 10 + nyloc nuts.
+- Grommet version v3o is in `v3o-grommet/`. Scripts `src/pod3p.py`, `src/lite3p.py`.
+
+## v3o: flush TPU grommet, tapered back, single unit
 Joel: not keen on the threaded gland boss; "all the plugs look huge" on such a small pod.
 - **124.2 × 66.4 × 33.5 mm.** No plug on the pod. ~10 mm 17-core flylead out of the back through a **flush black TPU (95A) grommet**: 22 mm flange 0.3 mm below the back face, 15 mm neck, 18 mm retaining lip inside, 9.4 mm bore, 5 mm tail for glue-lined heat-shrink. Grommet is in the assembly STEP; print it separately.
 - **Back cover ends taper in 1.5 mm** toward the back (top/bottom straight, so the GPS antenna pocket keeps its wall).
