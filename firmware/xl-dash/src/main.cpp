@@ -267,8 +267,20 @@ void updateGpsAndOdo() {
 void updatePower() {
   axpRead();
   // bike supply gone (no battery on the body loom): the dash is now on its LiPo, save once
-  if (!S.supplyOn && !savedOnLowVolts) { saveTrips(); savedOnLowVolts = true; }
+  static uint32_t lostMs = 0;
+  if (!S.supplyOn && !savedOnLowVolts) { saveTrips(); savedOnLowVolts = true; lostMs = millis(); }
   if (S.supplyOn) savedOnLowVolts = false;
+  // Auto-off: bike supply gone for OFF_DELAY_S (engine stopped, not just a stall) -> switch
+  // the whole board off through the AXP2101 so the LiPo isn't drained. It comes back on when
+  // the bike supply returns (AXP powers up on VBUS) or from a press on PWRON.
+  static bool offTried = false;
+  if (S.supplyOn) offTried = false;
+  if (!S.supplyOn && !apOn && !offTried && millis() - lostMs > OFF_DELAY_S * 1000UL) {
+    offTried = true;                                  // once only: no flash-wear loop if the write fails
+    saveTrips();
+    int r = i2cRead(AXP_ADDR, 0x10);                 // PMU common config, bit0 = soft power-off (XPowersLib shutdown(); check on the bench)
+    if (r >= 0) i2cWrite(AXP_ADDR, 0x10, r | 0x01);
+  }
 }
 
 // Brake sense: the opto sees lamp - at earth. The tail PWM pulls it to earth only

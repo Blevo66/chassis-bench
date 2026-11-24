@@ -57,6 +57,9 @@ static const int PIN_TFT_BL = 6;   // Waveshare backlight (fixed)
 static const int PIN_SDA = 8, PIN_SCL = 7;  // Waveshare I2C (fixed): AXP2101 0x34, touch 0x38, TCA9554 0x20
 static const uint8_t TCA_ADDR = 0x20, TCA_LCD_RST_BIT = 1;   // screen reset is on expander pin 1
 static const uint8_t AXP_ADDR = 0x34, TOUCH_ADDR = 0x38;
+// Power: no on/off switch. Dash wakes when the bike's 5 V feed appears (engine running) and
+// switches itself off this long after it goes (long enough to ride out a stall and re-kick).
+static const uint32_t OFF_DELAY_S = 60;
 
 // ---- Tunables (all guesses until tested on the bike) -----------------
 static const uint32_t HOLD_MS        = 700;     // long-press time
