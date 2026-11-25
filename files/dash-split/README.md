@@ -46,6 +46,8 @@ Joel: v3t (all in one, 142 x 66 x 46) looked bulky -> light screen pod on the to
   across (MY=0) until we know which side the board's VIN terminal is; 8 mm between socket body and board end. Box +15 long.
 - v5c (Joel: 'shrink the width'): 70 wide (was 82). Retainer is now a plate behind the flange with two feet screwed DOWN into
   floor bosses (short M3 heat-sets), so nothing sits outside the 60.8 flange. Lid screws moved to x 29 / L-6, y +-27.5. ~114 g.
+- v5d: M12 slid 14 mm to the -y side (Joel: the 12 V in is the big terminal on the side opposite the row of output terminals),
+  hex turned so its flats face the side walls.
 
 ## Brain box v4 (superseded, flange outside): AMPSEAL in the END, free-standing (brain-box-v4-end-plug/, src/brain4.py)
 - Joel 2026-11-25: 'make the ampseal plug go in the end of the unit' + 'ignore living in the triangle' (no frame fit any more).

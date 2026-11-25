@@ -60,9 +60,9 @@ pca=box(BXC-31.25,BXC+31.25,-12.7,12.7,W+0.8,W+4.4)        # ~62.5 x 25.4, no he
 buck=box(BXC-24,BXC-4,14,30,W+0.5,W+5.5)                    # 12->5 V buck ~20 x 16 (guess)
 # ---- Hamadap M12 12-pin socket in the FAR END wall (x=L), opposite the AMPSEAL (Joel v5b: 'screen plug out the other wall,
 # in the space next to the 12 V in'). Centred across the box for now; slide MY once the board's VIN terminal side is confirmed.
-MY,MZ=0.0,ZC
+MY,MZ=-14.0,ZC                            # v5d: shifted to the -y side, the same side as the board's 12 V (VIN) terminal (Joel)
 def seg(u0,Lh,r): return cq.Workplane("YZ").workplane(offset=L-u0-Lh).center(MY,MZ).circle(r).extrude(Lh)   # u = depth in from the outer face
-def hseg(u0,Lh,af): return cq.Workplane("YZ").workplane(offset=L-u0-Lh).center(MY,MZ).polygon(6,af/math.cos(math.pi/6)).extrude(Lh)
+def hseg(u0,Lh,af): return cq.Workplane("YZ").workplane(offset=L-u0-Lh).center(MY,MZ).polygon(6,af/math.cos(math.pi/6)).extrude(Lh).rotate((0,MY,MZ),(1,MY,MZ),30)   # flats facing +-y
 base=base.cut(seg(-1,W+2,8.1))
 m12=(hseg(W,3.0,19.0).union(seg(W+3.0,6.0,5.0)).union(seg(0,W,7.9))
      .union(hseg(-3.0,3.0,19.0)).union(seg(-4.5,1.5,7.9)).union(seg(-10.5,6.0,5.9)))
