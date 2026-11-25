@@ -14,7 +14,13 @@ Joel: v3t (all in one, 142 x 66 x 46) looked bulky -> light screen pod on the to
 - ONE 8-pin M12 A-coded socket on the RIGHT side face (Joel said "M14", read as M12). Typical M12 sizes, not a chosen part.
 - Board-plug STEP of the Waveshare is in ../dash-pod-v3/parts (assembly here has no board).
 
-## Brain box (brain-box/)
+## Brain box v2, CURRENT (brain-box-v2/, src/brain2.py)
+Joel: slim it behind the plugs. 105 x 110 footprint; 40 mm tall only over the plug end (first 40 mm across the box), 45 deg ramp,
+then 29 mm. MOSFET board on 7.5 mm standoffs with the PCA9685 (headers not fitted) lying under it; 5 V buck on the floor behind the plugs.
+Stepped 2.5 mm lid; TPU seal swept along the stepped rim (it runs down the 45 deg ramp in the side walls so the lid screws still squeeze it).
+Screen link plug: Joel's Amazon Hamadap M12 12-pin pair is fine (1 A/pin, link draws ~0.5 A); its real sizes still needed.
+
+## Brain box v1 (brain-box/)
 - 105 long x 110 wide x 40 tall, sits in the frame triangle on the brace slope (15.2 deg), front-bottom corner 144 mm behind
   the steering axis / 75.5 below the head-tube bottom (clean frame model coords). Fit check vs the clean model: ~2.5 mm all round
   (scan may read ~1.5 mm fat per side). Box sticks out ~60 mm left of the frame centreline incl. plug side.
