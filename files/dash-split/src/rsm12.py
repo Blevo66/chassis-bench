@@ -24,3 +24,9 @@ def plug(seg):
     u=FL_T+0.2      # mating cable plug: coupling nut (screws over the M12 end) + grip + 6.0 mm cable (RS 283-4972; head sizes guessed)
     p=seg(u,14,10.0).union(seg(u+14,31,7.5)).union(seg(u+45,30,3.0))
     return p.cut(seg(FL_T,CPL_L+0.5,CPL_R+0.2))   # hollow where it goes over the socket's coupling
+def plug_ra(seg,xbody):
+    """Right-angle cable plug (RS 877-1208 female RA end, sizes GUESSED): coupling nut on the socket axis, then the
+    moulded elbow body and cable turn 90 deg. xbody(u_centre) returns the elbow body + cable as a solid."""
+    u=FL_T+0.2
+    p=seg(u,14,10.0).cut(seg(FL_T,CPL_L+0.5,CPL_R+0.2))
+    return p.union(xbody(FL_T+CPL_L+9.0))

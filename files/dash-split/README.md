@@ -5,7 +5,7 @@ Joel: v3t (all in one, 142 x 66 x 46) looked bulky -> light screen pod on the to
 Joel picked RS PRO pre-wired, shielded, front panel-mount M12 8-pin A-coded sockets with an M16x1.5 clamp nut:
 - **Screen pod v8** (screen-pod-v8-rs-m12/, src/pod8.py): male **RS 250-0742** in the right side wall, flange outside, nut inside. Its lead S-bends down under the board (gap to the Waveshare parts ~2 mm, checked against the board STEP).
 - **Brain box v7** (brain-box-v7-rs-m12/, src/brain7.py): the plain 137 x 94.5 x 38 box (option A) with the female **RS 250-0736** beside the AMPSEAL. The female sits on the box because it carries 5 V out, so its contacts are the shrouded ones.
-- Cable: **RS 283-4972**, 1 m F-M, 6.0 mm.
+- Cable: **RS 877-1208**, 2 m, RIGHT-ANGLE female at the screen pod, straight male at the brain box, 6.4 mm, unshielded, coding not stated (Joel wants the 90 deg end at the screen). Was 283-4972 (1 m straight).
 - Shared socket model: src/rsm12.py. ONLY the M16x1.5 thread is from RS. Flange, nut, body length and plug sizes are GUESSES: measure the real parts and change the numbers there, then re-run pod8.py / brain7.py.
 - No clashes in either box. Renders: renders/v8-*.png, renders/v11b-*.png.
 

@@ -63,7 +63,12 @@ _x0=XR-rsm12.THR_L
 _path=cq.Workplane("XY").spline([(_x0,SY,SZ),(_x0-7,SY,SZ-3.0),(_x0-16,SY,SZ-4.5)],tangents=[(-1,0,0),(-1,0,0)])
 lead=cq.Workplane("YZ").workplane(offset=_x0).center(SY,SZ).circle(3.0).sweep(_path)
 sock=sock.union(lead)
-plug=rsm12.plug(lambda u,L,r: ax(XR+u,L,r))                                             # RS 283-4972 cable, male-socket end
+def _elbow(uc):   # elbow body r8 dropping DOWN from the nut, then the 6.4 mm cable (RS 877-1208, sizes guessed)
+    x=XR+uc
+    body=cq.Workplane("XZ").workplane(offset=-(SY+8)).center(x,SZ).circle(8.5).extrude(26)    # y SY+8 .. SY-18
+    cab=cq.Workplane("XZ").workplane(offset=-(SY-18)).center(x,SZ).circle(3.2).extrude(40)
+    return body.union(cab)
+plug=rsm12.plug_ra(lambda u,L,r: ax(XR+u,L,r),_elbow)                                    # RS 877-1208 right-angle female end
 # ---------------- BACK COVER ----------------
 back=slab(rr(OW+EXT,OH,OR),ZB,ZS,cx=EC)
 try: back=back.faces("<Z").edges().fillet(1.5)
