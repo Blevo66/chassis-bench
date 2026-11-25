@@ -1,7 +1,15 @@
 # XL dash v4: SPLIT into a screen pod + brain box (2026-11-25)
 Joel: v3t (all in one, 142 x 66 x 46) looked bulky -> light screen pod on the tower, "brain" under the tank in the frame triangle.
 
-## Screen pod v7, CURRENT: screen centred, socket out the RIGHT SIDE (screen-pod-v7-centred/, src/pod7.py)
+## RS M12 link, CURRENT (2026-11-25): screen pod v8 + brain box v7
+Joel picked RS PRO pre-wired, shielded, front panel-mount M12 8-pin A-coded sockets with an M16x1.5 clamp nut:
+- **Screen pod v8** (screen-pod-v8-rs-m12/, src/pod8.py): male **RS 250-0742** in the right side wall, flange outside, nut inside. Its lead S-bends down under the board (gap to the Waveshare parts ~2 mm, checked against the board STEP).
+- **Brain box v7** (brain-box-v7-rs-m12/, src/brain7.py): the plain 137 x 94.5 x 38 box (option A) with the female **RS 250-0736** beside the AMPSEAL. The female sits on the box because it carries 5 V out, so its contacts are the shrouded ones.
+- Cable: **RS 283-4972**, 1 m F-M, 6.0 mm.
+- Shared socket model: src/rsm12.py. ONLY the M16x1.5 thread is from RS. Flange, nut, body length and plug sizes are GUESSES: measure the real parts and change the numbers there, then re-run pod8.py / brain7.py.
+- No clashes in either box. Renders: renders/v8-*.png, renders/v11b-*.png.
+
+## Screen pod v7: screen centred, socket out the RIGHT SIDE (screen-pod-v7-centred/, src/pod7.py)
 - Joel 2026-11-25: 'shrink the length slightly and make the screen central'.
 - 104.8 x 66.4 x 26.5 mm (3.5 mm extra each side of the screen), ~56 g PETG.
 - Socket centre y -13 / z -14.5, tucked behind the board's thin right edge (board STEP: only 4.5 deep for x>40, 1.4 for x>46).
@@ -38,7 +46,7 @@ Joel: v3t (all in one, 142 x 66 x 46) looked bulky -> light screen pod on the to
 - ONE 8-pin M12 A-coded socket on the RIGHT side face (Joel said "M14", read as M12). Typical M12 sizes, not a chosen part.
 - Board-plug STEP of the Waveshare is in ../dash-pod-v3/parts (assembly here has no board).
 
-## Brain box v5, CURRENT: AMPSEAL in the END, flange INSIDE (brain-box-v5-internal-flange/, src/brain5.py)
+## Brain box v5: AMPSEAL in the END, flange INSIDE (brain-box-v5-internal-flange/, src/brain5.py)
 - Joel 2026-11-25: 'the flange sits internally'. Header fits from inside as TE intends: flange rim on a 1 mm TPU gasket against the
   end wall's inner face, printed retainer behind it on 4 standoffs (M3 heat-sets). Shroud pokes ~15 mm out of the end.
 - 152 x 82 x 38 mm (taller to fit the 32.1 flange inside), ~128 g PETG. Board, PCA9685, buck as v4.
