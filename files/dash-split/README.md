@@ -1,7 +1,13 @@
 # XL dash v4: SPLIT into a screen pod + brain box (2026-11-25)
 Joel: v3t (all in one, 142 x 66 x 46) looked bulky -> light screen pod on the tower, "brain" under the tank in the frame triangle.
 
-## Screen pod v6, CURRENT: Hamadap socket out the RIGHT SIDE, no visor (screen-pod-v6-side-plug/, src/pod6.py)
+## Screen pod v7, CURRENT: screen centred, socket out the RIGHT SIDE (screen-pod-v7-centred/, src/pod7.py)
+- Joel 2026-11-25: 'shrink the length slightly and make the screen central'.
+- 104.8 x 66.4 x 26.5 mm (3.5 mm extra each side of the screen), ~56 g PETG.
+- Socket centre y -13 / z -14.5, tucked behind the board's thin right edge (board STEP: only 4.5 deep for x>40, 1.4 for x>46).
+  Rear body 5 mm clear of the board parts; leads run straight in under the parts. LiPo moved to x 4..40.
+
+## Screen pod v6 (superseded): Hamadap socket out the RIGHT SIDE, no visor (screen-pod-v6-side-plug/, src/pod6.py)
 - Joel 2026-11-25: 'make the cable come out the side, lose the visor for now'.
 - 111.8 x 66.4 x 26.5 mm (+7 mm M5 bosses, 60 c-c), ~60 g PETG. Right side extended 14 mm to hold the socket.
 - Socket centre y -14 / z -13.6, hex flats top/bottom (19 AF est.) in the 20.8 mm inner depth; wall seat 0.3 deep (2.8 mm panel).
