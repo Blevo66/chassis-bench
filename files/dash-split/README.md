@@ -38,7 +38,12 @@ Joel: v3t (all in one, 142 x 66 x 46) looked bulky -> light screen pod on the to
 - ONE 8-pin M12 A-coded socket on the RIGHT side face (Joel said "M14", read as M12). Typical M12 sizes, not a chosen part.
 - Board-plug STEP of the Waveshare is in ../dash-pod-v3/parts (assembly here has no board).
 
-## Brain box v4, CURRENT: AMPSEAL in the END, free-standing (brain-box-v4-end-plug/, src/brain4.py)
+## Brain box v5, CURRENT: AMPSEAL in the END, flange INSIDE (brain-box-v5-internal-flange/, src/brain5.py)
+- Joel 2026-11-25: 'the flange sits internally'. Header fits from inside as TE intends: flange rim on a 1 mm TPU gasket against the
+  end wall's inner face, printed retainer behind it on 4 standoffs (M3 heat-sets). Shroud pokes ~15 mm out of the end.
+- 137 x 82 x 38 mm (taller to fit the 32.1 flange inside), ~117 g PETG. Board, PCA9685, buck, Hamadap M12 as v4.
+
+## Brain box v4 (superseded, flange outside): AMPSEAL in the END, free-standing (brain-box-v4-end-plug/, src/brain4.py)
 - Joel 2026-11-25: 'make the ampseal plug go in the end of the unit' + 'ignore living in the triangle' (no frame fit any more).
 - 132 x 82 x 33 mm, ~105 g PETG. AMPSEAL in the x=0 end wall, mounted from outside (flange + 1 mm TPU gasket + printed retainer, 4x M3 heat-sets).
 - 10 mm wire-bend gap behind the AMPSEAL tails, then the MOSFET board (99 long) on 7.5 mm standoffs; PCA9685 and buck under it.
