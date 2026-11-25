@@ -169,3 +169,10 @@ Pin split (ratings are typical M12 A-coded catalogue values, check the part you 
 - Bottom, 12-pin (~1.5 A/pin): 12 V x2, power earth x4 (lamp current returns through the board), signal earth (controller + RPM screen), brake, RPM, controller 3V3, SDA, SCL.
 
 Old WS28 version in `v3q-ws28/`.
+
+## v3s: LiPo between the boards, right-angle J8 plug (2026-11-25, current)
+
+Same shells as v3r (132.2 x 66.4 x 37.8, two M12 sockets). Script `src/pod3s.py`.
+- **LiPo** moved (Joel's CAD): 500 mAh, ~30 x 36 x 5 (typical size, guess), long side vertical, flat in the ~11 mm gap between the Waveshare PCB and the MOSFET PCB, sat just above the J8 plug. Clash check clean.
+- **J8 plug**: 2x16 2.54 right-angle male header (snapped from 2x20/2x40), wires soldered to the tails pointing up the pod, printed hood over it filled with glue. Drawn as its envelope (z -12.95..-18.2, under 6 mm to the MOSFET PCB). A Dupont housing does NOT fit (needs ~12-14 mm).
+- **M12 sockets**: Joel picked Amazon Hamadap 2-pack M12 12-pin A-coded male front-mount, potted pigtail, IP67. Still drawn at typical size (16.2 hole) until the listing's panel hole size is known.
