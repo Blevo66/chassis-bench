@@ -14,7 +14,7 @@ def box(x0,x1,y0,y1,z0,z1): return cq.Workplane("XY").box(x1-x0,y1-y0,z1-z0).tra
 def rr(w,h,r): return cq.Sketch().rect(w,h).vertices().fillet(r)
 def slab(cx,cy,w,h,r,z0,z1): return cq.Workplane("XY").workplane(offset=z0).center(cx,cy).placeSketch(rr(w,h,r)).extrude(z1-z0)
 W=2.5; LID=2.5; R=4.0
-L,WD,H=152.0,82.0,38.0                    # 152 long x 82 wide x 38 tall (v5b: +15 for the end-wall M12)
+L,WD,H=152.0,70.0,38.0                    # 152 long x 82 wide x 38 tall (v5b: +15 for the end-wall M12)
 CX=L/2
 outer=slab(CX,0,L,WD,R,0,H)
 try: outer=outer.faces("<Z").edges().fillet(2.0)
@@ -35,15 +35,18 @@ ch=(cq.Workplane("YZ").workplane(offset=-0.01).center(0,ZC+1.0).rect(45.4,27.6).
 base=base.cut(ch)
 gasket=box(W,W+GK,-30.4,30.4,ZC-16.05,ZC+16.05).cut(box(W-1,W+GK+1,-21.7,21.7,ZC-11.8,ZC+13.8))
 RET0=XA+22.1; RET1=RET0+3.0
-ret=box(RET0,RET1,-37.5,37.5,ZC-16.0,ZC+16.0).cut(box(RET0-1,RET1+1,-28.4,28.4,ZC-10.5,ZC+14.0))
+# v5c (Joel: 'shrink the width'): retainer no longer screws outside the flange. It is a plate behind the flange, as wide as the
+# flange, with two feet screwed DOWN into floor bosses (M3 heat-sets), so the box only needs to clear the 60.8 flange.
+ret=box(RET0,RET1,-30.2,30.2,W+0.3,ZC+16.0).cut(box(RET0-1,RET1+1,-28.4,28.4,ZC-10.5,ZC+14.0))
 for sy in (-1,1):
     for z0,z1 in ((ZC-8.7,ZC-5.9),(ZC+9.4,ZC+12.2)):
         ret=ret.cut(box(RET0-1,RET1+1,min(sy*27.9,sy*30.8),max(sy*27.9,sy*30.8),z0,z1))   # notches for ribs on the header's rear body
-SCR4=[(-34.6,ZC-11.5),(-34.6,ZC+11.5),(34.6,ZC-11.5),(34.6,ZC+11.5)]
-for y,z in SCR4:
-    base=base.union(cq.Workplane("YZ").workplane(offset=W-0.01).center(y,z).circle(3.4).extrude(RET0-W+0.01))   # standoff to the retainer
-    base=base.cut(cq.Workplane("YZ").workplane(offset=RET0-5.5).center(y,z).circle(2.0).extrude(6))             # heat-set
-    ret=ret.cut(cq.Workplane("YZ").workplane(offset=RET0-1).center(y,z).circle(1.7).extrude(6))
+FT=W+2.5                                   # floor boss top (feet sit under the header rear body, which starts at ZC-10.3)
+for sy in (-1,1):
+    y=sy*24.0
+    base=base.union(cq.Workplane("XY").workplane(offset=W-0.01).center(RET1+5.0,y).rect(9.0,9.0).extrude(FT-W+0.01))
+    base=base.cut(cq.Workplane("XY").workplane(offset=FT-4.0).center(RET1+5.0,y).circle(2.0).extrude(4.1))   # short M3 heat-set (3-4 mm)
+    ret=ret.union(box(RET0,RET1+9.5,y-4.5,y+4.5,FT,FT+3.0)).cut(cq.Workplane("XY").workplane(offset=FT-1).center(RET1+5.0,y).circle(1.7).extrude(6))
 ampp=box(XA-48,XA-0.2,-32,32,ZC-18,ZC+18).union(cq.Workplane("YZ").workplane(offset=XA-78).center(0,ZC).circle(7.0).extrude(30))
 # ---- MOSFET board on 4 standoffs, PCA9685 + buck under it ----
 BXC,BZ=XA+38.1+10+49.5,W+7.5
@@ -54,7 +57,7 @@ for sx in (-1,1):
         base=base.union(cq.Workplane("XY").workplane(offset=W-0.01).center(x,y).circle(3.2).extrude(BZ-W+0.01))
         base=base.cut(cq.Workplane("XY").workplane(offset=W-0.5).center(x,y).circle(1.4).extrude(3))
 pca=box(BXC-31.25,BXC+31.25,-12.7,12.7,W+0.8,W+4.4)        # ~62.5 x 25.4, no header pins, wires soldered
-buck=box(BXC-20,BXC-4,14,34,W+0.5,W+5.5)                    # 12->5 V buck ~16 x 20 (guess)
+buck=box(BXC-24,BXC-4,14,30,W+0.5,W+5.5)                    # 12->5 V buck ~20 x 16 (guess)
 # ---- Hamadap M12 12-pin socket in the FAR END wall (x=L), opposite the AMPSEAL (Joel v5b: 'screen plug out the other wall,
 # in the space next to the 12 V in'). Centred across the box for now; slide MY once the board's VIN terminal side is confirmed.
 MY,MZ=0.0,ZC
@@ -65,7 +68,7 @@ m12=(hseg(W,3.0,19.0).union(seg(W+3.0,6.0,5.0)).union(seg(0,W,7.9))
      .union(hseg(-3.0,3.0,19.0)).union(seg(-4.5,1.5,7.9)).union(seg(-10.5,6.0,5.9)))
 m12p=seg(-4.7-14,14,10.0).union(seg(-4.7-45,31,7.5)).union(seg(-4.7-75,30,3.5))
 # ---- lid screws: 4 bosses in the corners (clear of the AMPSEAL tails and retainer bosses) ----
-LS=[(14.0,-35.0),(14.0,35.0),(L-6.0,-35.0),(L-6.0,35.0)]
+LS=[(29.0,-27.5),(29.0,27.5),(L-6.0,-27.5),(L-6.0,27.5)]
 for x,y in LS:
     base=base.union(cq.Workplane("XY").workplane(offset=W-0.01).center(x,y).circle(3.4).extrude(H-LID-W+0.01))
     base=base.cut(cq.Workplane("XY").workplane(offset=H-LID-6.0).center(x,y).circle(2.0).extrude(6.1))
@@ -76,7 +79,7 @@ groove=ringw(1.2,1.25,1.3).translate((0,0,H-LID-1.2))
 base=base.cut(groove)
 seal=ringw(1.0,1.25,1.5).translate((0,0,H-LID-1.2))   # 1.5 tall in a 1.2 groove: 0.3 squeeze
 # breather 3 mm in the lid
-lid=lid.cut(cq.Workplane("XY").workplane(offset=H-LID-1).center(L-20,25).circle(1.5).extrude(5))
+lid=lid.cut(cq.Workplane("XY").workplane(offset=H-LID-1).center(L-20,18).circle(1.5).extrude(5))
 parts={'ampseal23_776228_1':amp,'ampseal_gasket_tpu':gasket,'ampseal_retainer':ret,'mosfet_fowecry_99x52':mos,
        'm12_socket_8pin':m12,'pca9685_module':pca,'buck_5v':buck,'m12_plug_straight':m12p,'ampseal_plug_770680_est':ampp}
 def vol(a,b):
