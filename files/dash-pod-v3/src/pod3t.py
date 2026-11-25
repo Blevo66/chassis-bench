@@ -120,8 +120,8 @@ RW=3.0
 # ribs from the front ring onto the flange, 0.3 mm squeeze: +X long edge, plus pads on both short ends
 # (the -X long edge has the header's rear body right behind it, so no rib there)
 front=front.union(box(AXC+16.05-RW,AXC+16.05,-27,27,FZ1-0.3,-3.15))
-for y0 in (-30.4,27.4):
-    front=front.union(box(AXC-10,AXC+10,y0,y0+3.0,FZ1-0.3,-3.15))
+# (end pads removed: the straight header's rear body fills the flange's short ends too. Clamping to be
+#  finalised with the RIGHT-ANGLE header 1-776087-1 once Joel sends its STEP.)
 # socket opening: 0.8 mm chamfer on the outside edge
 ch=(cq.Workplane("XY").workplane(offset=ZB-0.01).center(AXC,0).rect(25.6,45.4).workplane(offset=0.81).rect(24.0,43.8).loft())
 back=back.cut(ch)
