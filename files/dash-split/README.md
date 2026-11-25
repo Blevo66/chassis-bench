@@ -1,7 +1,13 @@
 # XL dash v4: SPLIT into a screen pod + brain box (2026-11-25)
 Joel: v3t (all in one, 142 x 66 x 46) looked bulky -> light screen pod on the tower, "brain" under the tank in the frame triangle.
 
-## Screen pod (screen-pod/)
+## Screen pod, CURRENT: plug out the back (screen-pod-back-plug/, src/pod4b.py)
+- 97.8 x 66.4 x 31 mm (+7 mm M5 bosses, 60 c-c, now 18 mm above centre). ~56 g PETG shell (solid estimate).
+- M12 8-pin through the flat back LID at x -20 / y -2 (left of centre, looking at the back from behind it's on the right), behind the patch where the
+  Waveshare's back-side parts are only 9.8 mm deep (from its STEP). Socket tip 3.7 mm clear of the board.
+- LiPo moved right, GPS receiver left, antenna under the top wall.
+
+## Screen pod, side-plug version (screen-pod/)
 - 113.8 x 66.4 x 26.5 mm (+7 mm M5 mount bosses on the back, 60 c-c as before). ~61 g of PETG shell (solid estimate).
 - Waveshare ESP32-S3-Touch-LCD-3.5 + 500 mAh LiPo + ATGM336H GPS + ceramic antenna (antenna size estimated).
 - Deep front ring holds everything; flat 2.5 mm back lid with TPU seal, 4x M3.
