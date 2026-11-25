@@ -32,7 +32,15 @@ Joel: v3t (all in one, 142 x 66 x 46) looked bulky -> light screen pod on the to
 - ONE 8-pin M12 A-coded socket on the RIGHT side face (Joel said "M14", read as M12). Typical M12 sizes, not a chosen part.
 - Board-plug STEP of the Waveshare is in ../dash-pod-v3/parts (assembly here has no board).
 
-## Brain box v2, CURRENT (brain-box-v2/, src/brain2.py)
+## Brain box v3, CURRENT (brain-box-v3/, src/brain3.py)
+- Joel 2026-11-25: 'the plug on the control box doesn't have to be flush anymore so it can stick out'.
+- AMPSEAL 776228-1 mounted from OUTSIDE: flange + 1 mm TPU gasket on the wall's outer face, printed retainer frame with 4 legs, M3 into heat-sets
+  in bosses inside the wall. Shroud + flange stick out ~23 mm; only the 16 mm rear body is inside (window 61.4 x 24.7 in the wall).
+  NOTE: TE's rim seal is meant for panel-from-the-front; here the flat gasket behind the flange does the sealing (my design, untested).
+- 105 x 89 mm (was 110 across), 33 tall at the plug end stepping to 29 (was 40/29). ~88 g PETG (was ~139). Buck moved under the MOSFET board.
+- Frame fit (clean model, XOFF -15.5 to keep it centred): 2.5 under, 9.6 over, 3.0 in front.
+
+## Brain box v2 (superseded) (brain-box-v2/, src/brain2.py)
 - 2026-11-25: M12 swapped to the same Hamadap 12-pin back-mount socket as the screen pod (sizes estimated from Joel's photo). Plug end stays ~40 mm tall: the AMPSEAL flange alone is 32 mm.
 Joel: slim it behind the plugs. 105 x 110 footprint; 40 mm tall only over the plug end (first 40 mm across the box), 45 deg ramp,
 then 29 mm. MOSFET board on 7.5 mm standoffs with the PCA9685 (headers not fitted) lying under it; 5 V buck on the floor behind the plugs.

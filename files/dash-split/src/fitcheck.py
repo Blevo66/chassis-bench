@@ -3,8 +3,8 @@ import numpy as np, struct, math, sys
 F=sys.argv[1]
 b=open(F,'rb').read(); n=struct.unpack('<I',b[80:84])[0]
 P=np.frombuffer(b[84:84+50*n],dtype=np.dtype([('n','<3f4'),('v','<9f4'),('a','<u2')]))['v'].reshape(-1,3).astype(float)
-A=math.radians(15.2); Y0F,Z0F,XOFF=144.0,-75.5,-5.0
-L,Y0,Y1,H=105.0,-50.0,60.0,40.0
+A=math.radians(15.2); Y0F,Z0F,XOFF=144.0,-75.5,float(sys.argv[2]) if len(sys.argv)>2 else -5.0
+L,Y0,Y1,H=(105.0,-50.0,60.0,40.0) if len(sys.argv)<4 else tuple(map(float,sys.argv[3].split(",")))
 u=P[:,1]-Y0F; v=P[:,2]-Z0F
 x=u*math.cos(A)+v*math.sin(A); z=-u*math.sin(A)+v*math.cos(A); y=P[:,0]-XOFF
 dx=np.maximum(np.maximum(0-x,x-L),0); dy=np.maximum(np.maximum(Y0-y,y-Y1),0); dz=np.maximum(np.maximum(0-z,z-H),0)
