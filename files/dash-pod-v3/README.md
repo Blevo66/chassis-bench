@@ -158,7 +158,7 @@ Built from Joel's own STEP of the Fowecry 8-ch board (`parts/fowecry-mosfet-boar
 
 Renders: `renders/v3q-*.png`. Old v3p files in `v3p-guessed-mosfet/`.
 
-## v3r: two M12 round plugs (2026-11-25, current)
+## v3r: two M12 round plugs (2026-11-25)
 
 Joel: the WS28 "looks ridiculous" -> picked two small M12 plugs. Script `src/pod3r.py`. Pod **132.2 x 66.4 x 37.8 mm** (v3q 143.2). Same real MOSFET board, LiPo, GPS as v3q; antenna pocket shifted to X 51-71.
 
@@ -170,9 +170,19 @@ Pin split (ratings are typical M12 A-coded catalogue values, check the part you 
 
 Old WS28 version in `v3q-ws28/`.
 
-## v3s: LiPo between the boards, right-angle J8 plug (2026-11-25, current)
+## v3s: LiPo between the boards, right-angle J8 plug (2026-11-25)
 
 Same shells as v3r (132.2 x 66.4 x 37.8, two M12 sockets). Script `src/pod3s.py`.
 - **LiPo** moved (Joel's CAD): 500 mAh, ~30 x 36 x 5 (typical size, guess), long side vertical, flat in the ~11 mm gap between the Waveshare PCB and the MOSFET PCB, sat just above the J8 plug. Clash check clean.
 - **J8 plug**: 2x16 2.54 right-angle male header (snapped from 2x20/2x40), wires soldered to the tails pointing up the pod, printed hood over it filled with glue. Drawn as its envelope (z -12.95..-18.2, under 6 mm to the MOSFET PCB). A Dupont housing does NOT fit (needs ~12-14 mm).
 - **M12 sockets**: Joel picked Amazon Hamadap 2-pack M12 12-pin A-coded male front-mount, potted pigtail, IP67. Still drawn at typical size (16.2 hole) until the listing's panel hole size is known.
+
+## v3t: one AMPSEAL 23 plug, flush in the back face, right-angle header (2026-11-25, current)
+Joel: M12s only ~1 A per pin, wants one big rectangular plug FLUSH on the back, with 90 degree pins so the wires leave sideways.
+- TE AMPSEAL 23 right-angle header 1-776087-1 (TE's STEP, parts/te-1-776087-1-ampseal23-right-angle.stp), socket face flush with the back face at the right-hand end, centre X 67.2. Contacts listed 17 A (RS).
+- Flange sits inside on a printed collar + 1 mm TPU gasket (seal part); a rib on the front ring squeezes the flange 0.3 mm when the pod closes (no screws: the flange has no holes).
+- Board-lock pegs snipped off (there is no PCB): wires solder straight to the right-angle tails, which point toward the MOSFET board.
+- Slot beside the socket for the loom plug's latch arm. Small pocket in the front ring for the header's rear body (front skin ~2.3 mm).
+- Pod ~141.7 wide. Clash check: only overlap is the rib's intended 0.3 mm squeeze on the flange.
+- Breakout-PCB idea for the straight header (files/ampseal-breakout) PARKED by Joel.
+- Guessed: gasket squeeze, latch slot size (from TE's model, not a drawing), right-angle J8 plug size.
