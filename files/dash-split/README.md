@@ -22,6 +22,7 @@ Joel: v3t (all in one, 142 x 66 x 46) looked bulky -> light screen pod on the to
 - Board-plug STEP of the Waveshare is in ../dash-pod-v3/parts (assembly here has no board).
 
 ## Brain box v2, CURRENT (brain-box-v2/, src/brain2.py)
+- 2026-11-25: M12 swapped to the same Hamadap 12-pin back-mount socket as the screen pod (sizes estimated from Joel's photo). Plug end stays ~40 mm tall: the AMPSEAL flange alone is 32 mm.
 Joel: slim it behind the plugs. 105 x 110 footprint; 40 mm tall only over the plug end (first 40 mm across the box), 45 deg ramp,
 then 29 mm. MOSFET board on 7.5 mm standoffs with the PCA9685 (headers not fitted) lying under it; 5 V buck on the floor behind the plugs.
 Stepped 2.5 mm lid; TPU seal swept along the stepped rim (it runs down the 45 deg ramp in the side walls so the lid screws still squeeze it).

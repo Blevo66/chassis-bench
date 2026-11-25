@@ -58,14 +58,15 @@ for x,z in SCR4:
     base=base.union(cq.Workplane("XZ").workplane(offset=-(FY0-GK)).center(x,z).circle(3.4).extrude(-(RET0-(FY0-GK))))
     base=base.cut(cq.Workplane("XZ").workplane(offset=-(RET0-5.5)).center(x,z).circle(2.0).extrude(-6))
     ret=ret.cut(cq.Workplane("XZ").workplane(offset=-(RET0-1)).center(x,z).circle(1.7).extrude(-6))
-# ---- M12 8-pin socket to the screen pod, same wall, rear end ----
+# ---- M12 12-pin socket (Hamadap) to the screen pod, same wall, rear end ----
 MX,MZ=89.0,ZC
 ax=lambda y0,Lh,r: cq.Workplane("XZ").workplane(offset=-y0).center(MX,MZ).circle(r).extrude(-Lh)
 hexw=lambda y0,Lh,af: cq.Workplane("XZ").workplane(offset=-y0).center(MX,MZ).polygon(6,af/math.cos(math.pi/6)).extrude(-Lh)
 base=base.cut(ax(Y0-1,W+2,8.1))
-m12=(ax(Y0-8.0,6.0,6.0).union(ax(Y0-2.0,2.0,10.0)).union(ax(Y0,W+0.4,7.9))
-     .union(hexw(Y0+W+0.4,3.0,20.0)).union(ax(Y0+W+3.4,12.0,6.5)))
-m12p=ax(Y0-22.0,14,10.0).union(ax(Y0-53.0,31,7.5)).union(ax(Y0-83.0,30,3.5))
+# Joel's Amazon Hamadap M12 12-pin A-coded back-mount socket (same part as the screen pod; nut/hex/length split ESTIMATED from his photo)
+m12=(hexw(Y0+W,3.0,19.0).union(ax(Y0+W+3.0,6.0,5.0)).union(ax(Y0,W,7.9))
+     .union(hexw(Y0-3.0,3.0,19.0)).union(ax(Y0-4.5,1.5,7.9)).union(ax(Y0-10.5,6.0,5.9)))
+m12p=ax(Y0-4.7-14,14,10.0).union(ax(Y0-4.7-45,31,7.5)).union(ax(Y0-4.7-75,30,3.5))
 # mating AMPSEAL plug (TE 770680-1), envelope GUESS: 64 x 36 body ~48 long incl. boot + 12 mm loom
 ampp=box(XC-32,XC+32,Y0-48,Y0-0.2,ZC-18,ZC+18).union(cq.Workplane("XZ").workplane(offset=-(Y0-48)).center(XC,ZC).circle(7.0).extrude(30))
 # ---- MOSFET board on 4 standoffs ----
