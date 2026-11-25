@@ -14,7 +14,7 @@ def box(x0,x1,y0,y1,z0,z1): return cq.Workplane("XY").box(x1-x0,y1-y0,z1-z0).tra
 def rr(w,h,r): return cq.Sketch().rect(w,h).vertices().fillet(r)
 def slab(cx,cy,w,h,r,z0,z1): return cq.Workplane("XY").workplane(offset=z0).center(cx,cy).placeSketch(rr(w,h,r)).extrude(z1-z0)
 W=2.5; LID=2.5; R=4.0
-L,WD,H=137.0,82.0,38.0                    # 137 long x 82 wide x 38 tall
+L,WD,H=152.0,82.0,38.0                    # 152 long x 82 wide x 38 tall (v5b: +15 for the end-wall M12)
 CX=L/2
 outer=slab(CX,0,L,WD,R,0,H)
 try: outer=outer.faces("<Z").edges().fillet(2.0)
@@ -55,14 +55,15 @@ for sx in (-1,1):
         base=base.cut(cq.Workplane("XY").workplane(offset=W-0.5).center(x,y).circle(1.4).extrude(3))
 pca=box(BXC-31.25,BXC+31.25,-12.7,12.7,W+0.8,W+4.4)        # ~62.5 x 25.4, no header pins, wires soldered
 buck=box(BXC-20,BXC-4,14,34,W+0.5,W+5.5)                    # 12->5 V buck ~16 x 20 (guess)
-# ---- Hamadap M12 12-pin socket in the -y side wall near the far end ----
-MX,MZ=L-24.0,ZC; Y0=-WD/2
-ax=lambda y0,Lh,r: cq.Workplane("XZ").workplane(offset=-y0).center(MX,MZ).circle(r).extrude(-Lh)
-hexw=lambda y0,Lh,af: cq.Workplane("XZ").workplane(offset=-y0).center(MX,MZ).polygon(6,af/math.cos(math.pi/6)).extrude(-Lh)
-base=base.cut(ax(Y0-1,W+2,8.1))
-m12=(hexw(Y0+W,3.0,19.0).union(ax(Y0+W+3.0,6.0,5.0)).union(ax(Y0,W,7.9))
-     .union(hexw(Y0-3.0,3.0,19.0)).union(ax(Y0-4.5,1.5,7.9)).union(ax(Y0-10.5,6.0,5.9)))
-m12p=ax(Y0-4.7-14,14,10.0).union(ax(Y0-4.7-45,31,7.5)).union(ax(Y0-4.7-75,30,3.5))
+# ---- Hamadap M12 12-pin socket in the FAR END wall (x=L), opposite the AMPSEAL (Joel v5b: 'screen plug out the other wall,
+# in the space next to the 12 V in'). Centred across the box for now; slide MY once the board's VIN terminal side is confirmed.
+MY,MZ=0.0,ZC
+def seg(u0,Lh,r): return cq.Workplane("YZ").workplane(offset=L-u0-Lh).center(MY,MZ).circle(r).extrude(Lh)   # u = depth in from the outer face
+def hseg(u0,Lh,af): return cq.Workplane("YZ").workplane(offset=L-u0-Lh).center(MY,MZ).polygon(6,af/math.cos(math.pi/6)).extrude(Lh)
+base=base.cut(seg(-1,W+2,8.1))
+m12=(hseg(W,3.0,19.0).union(seg(W+3.0,6.0,5.0)).union(seg(0,W,7.9))
+     .union(hseg(-3.0,3.0,19.0)).union(seg(-4.5,1.5,7.9)).union(seg(-10.5,6.0,5.9)))
+m12p=seg(-4.7-14,14,10.0).union(seg(-4.7-45,31,7.5)).union(seg(-4.7-75,30,3.5))
 # ---- lid screws: 4 bosses in the corners (clear of the AMPSEAL tails and retainer bosses) ----
 LS=[(14.0,-35.0),(14.0,35.0),(L-6.0,-35.0),(L-6.0,35.0)]
 for x,y in LS:

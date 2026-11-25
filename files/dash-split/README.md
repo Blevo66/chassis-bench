@@ -41,7 +41,9 @@ Joel: v3t (all in one, 142 x 66 x 46) looked bulky -> light screen pod on the to
 ## Brain box v5, CURRENT: AMPSEAL in the END, flange INSIDE (brain-box-v5-internal-flange/, src/brain5.py)
 - Joel 2026-11-25: 'the flange sits internally'. Header fits from inside as TE intends: flange rim on a 1 mm TPU gasket against the
   end wall's inner face, printed retainer behind it on 4 standoffs (M3 heat-sets). Shroud pokes ~15 mm out of the end.
-- 137 x 82 x 38 mm (taller to fit the 32.1 flange inside), ~117 g PETG. Board, PCA9685, buck, Hamadap M12 as v4.
+- 152 x 82 x 38 mm (taller to fit the 32.1 flange inside), ~128 g PETG. Board, PCA9685, buck as v4.
+- v5b (Joel: 'screen plug out the other wall, in the space next to the 12 V in'): Hamadap M12 moved to the FAR END wall, centred
+  across (MY=0) until we know which side the board's VIN terminal is; 8 mm between socket body and board end. Box +15 long.
 
 ## Brain box v4 (superseded, flange outside): AMPSEAL in the END, free-standing (brain-box-v4-end-plug/, src/brain4.py)
 - Joel 2026-11-25: 'make the ampseal plug go in the end of the unit' + 'ignore living in the triangle' (no frame fit any more).
