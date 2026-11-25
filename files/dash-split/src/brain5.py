@@ -14,16 +14,25 @@ def box(x0,x1,y0,y1,z0,z1): return cq.Workplane("XY").box(x1-x0,y1-y0,z1-z0).tra
 def rr(w,h,r): return cq.Sketch().rect(w,h).vertices().fillet(r)
 def slab(cx,cy,w,h,r,z0,z1): return cq.Workplane("XY").workplane(offset=z0).center(cx,cy).placeSketch(rr(w,h,r)).extrude(z1-z0)
 W=2.5; LID=2.5; R=4.0
-L,WD,H=137.0,70.0,38.0                    # 152 long x 82 wide x 38 tall (v5b: +15 for the end-wall M12)
+L,WD,H=137.0,70.0,38.0                    # 137 long x 70 wide x 38 tall (+ M12 bulge at the plug end)
 CX=L/2
-outer=slab(CX,0,L,WD,R,0,H)
+# v5f (Joel: 'make the lump more integrated'): ONE outline for the whole box. The M12 bulge at the plug end runs full height
+# under the lid and tapers back into the side wall over 40 mm; outside corners R4, inside corner R8.
+MY,MZ=-45.0,W+0.3+16.05
+LX=27.0; LY1=MY-11.0-1.0-W; TP=40.0
+PTS=[(0,WD/2),(0,LY1),(LX,LY1),(LX+TP,-WD/2),(L,-WD/2),(L,WD/2)]
+def solid(inset,z0,z1,rv=4.0,rc=8.0):     # rv convex corner radius, rc concave (where the taper meets the side)
+    wp=cq.Workplane("XY").workplane(offset=z0).polyline(PTS).close().offset2D(-rv,'arc').offset2D(rv+rc,'arc').offset2D(-rc-inset,'arc')
+    return wp.extrude(z1-z0)
+BIG=lambda z0,z1: box(-50,L+50,-150,150,z0,z1)
+outer=solid(0,0,H)
 try: outer=outer.faces("<Z").edges().fillet(2.0)
 except Exception as e: print('bottom fillet skip',e)
 try: outer=outer.faces(">Z").edges().fillet(1.5)
 except Exception as e: print('top fillet skip',e)
-cav=slab(CX,0,L-2*W,WD-2*W,R-W,W,H-LID)
-base=outer.cut(box(-5,L+5,-WD,WD,H-LID,H+5)).cut(cav)
-lid=outer.intersect(box(-5,L+5,-WD,WD,H-LID,H+5))
+cav=solid(W,W,H-LID)
+base=outer.cut(BIG(H-LID,H+5)).cut(cav)
+lid=outer.intersect(BIG(H-LID,H+5))
 # ---- AMPSEAL in the x=0 end wall, mounted from outside ----
 ZC=W+0.3+16.05; GK=1.0
 XA=W+GK-18.4                              # socket face; flange front face (18.4) sits on the gasket on the wall's inner face
@@ -60,17 +69,6 @@ pca=box(BXC-31.25,BXC+31.25,-12.7,12.7,W+0.8,W+4.4)        # ~62.5 x 25.4, no he
 buck=box(BXC-24,BXC-4,14,30,W+0.5,W+5.5)                    # 12->5 V buck ~20 x 16 (guess)
 # ---- v5e (Joel: 'try adding a lump on one side next to the AMPSEAL plug'): Hamadap M12 in the SAME END as the AMPSEAL,
 # in a hollow lump on the -y side. Lump is part of the base with its own roof under the lid line, open into the main cavity.
-MY,MZ=-45.0,ZC
-LX,LY0=27.0,-WD/2+1.0                      # lump length along the box, inner edge overlaps the side wall
-LY1=MY-11.0-1.0-W                          # outer face of the lump (hex corner 11 + 1 mm + wall)
-LT=H-LID                                   # lump roof flush with the base rim height
-lump=slab(LX/2,(LY0+LY1)/2,LX,LY0-LY1,3.0,0,LT)
-try: lump=lump.faces("<Z").edges().fillet(2.0)
-except Exception as e: print('lump fillet skip',e)
-try: lump=lump.faces(">Z").edges().fillet(1.5)
-except Exception as e: print('lump top fillet skip',e)
-base=base.union(lump)
-base=base.cut(slab(LX/2,(LY0+LY1)/2+1.5,LX-2*W,LY0-LY1+3.0-2*W,1.5,W,LT-W))       # hollow, open into the main cavity
 def seg(u0,Lh,r): return cq.Workplane("YZ").workplane(offset=u0).center(MY,MZ).circle(r).extrude(Lh)     # u = depth in from the x=0 outer face
 def hseg(u0,Lh,af): return cq.Workplane("YZ").workplane(offset=u0).center(MY,MZ).polygon(6,af/math.cos(math.pi/6)).extrude(Lh).rotate((0,MY,MZ),(1,MY,MZ),30)
 base=base.cut(seg(-1,W+2,8.1))
@@ -84,7 +82,7 @@ for x,y in LS:
     base=base.cut(cq.Workplane("XY").workplane(offset=H-LID-6.0).center(x,y).circle(2.0).extrude(6.1))
     lid=lid.cut(cq.Workplane("XY").workplane(offset=H-LID-1).center(x,y).circle(1.7).extrude(5)).cut(cq.Workplane("XY").workplane(offset=H-1.0).center(x,y).circle(3.1).extrude(2))
 # ---- TPU seal: flat ring in a groove in the base rim ----
-ringw=lambda w,inset,h: slab(CX,0,L-2*inset+w,WD-2*inset+w,R-inset+w/2,0,h).cut(slab(CX,0,L-2*inset-w,WD-2*inset-w,R-inset-w/2,-1,h+1))
+ringw=lambda w,inset,h: solid(inset-w/2,0,h).cut(solid(inset+w/2,-1,h+1))
 groove=ringw(1.2,1.25,1.3).translate((0,0,H-LID-1.2))
 base=base.cut(groove)
 seal=ringw(1.0,1.25,1.5).translate((0,0,H-LID-1.2))   # 1.5 tall in a 1.2 groove: 0.3 squeeze
