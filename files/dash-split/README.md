@@ -1,7 +1,12 @@
 # XL dash v4: SPLIT into a screen pod + brain box (2026-11-25)
 Joel: v3t (all in one, 142 x 66 x 46) looked bulky -> light screen pod on the tower, "brain" under the tank in the frame triangle.
 
-## Screen pod, CURRENT: Hamadap M12 12-pin back-mount socket (screen-pod-hamadap/, src/pod4c.py)
+## Screen pod v5, CURRENT: sun visor (screen-pod-v5-visor/, src/pod5.py)
+- v4c + the outer wall carries on past the glass as a hood: 13 mm proud at the top, fading to nothing 40 mm down the sides. Softer 2.2 back edge.
+- Body still 97.8 x 66.4 x 26.5 behind the glass; ~55 g PETG. Internals and Hamadap socket unchanged from v4c.
+- Wiring: screen-pod-wiring.html (also published as an artifact).
+
+## Screen pod v4c: Hamadap M12 12-pin back-mount socket (screen-pod-hamadap/, src/pod4c.py)
 - 97.8 x 66.4 x 26.5 mm (+7 mm M5 bosses, 60 c-c). ~50 g PETG shell (solid estimate). 4.5 mm thinner than v4b.
 - Socket = Joel's Amazon Hamadap M12 12-pin A-coded back-mount pair (screws in from inside, M16 thread through a 16.2 hole in the flat back lid
   at x -20 / y -2). Socket body 5.2 mm clear of the board, so its moulded leads must bend within ~5 mm.
