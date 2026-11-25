@@ -31,6 +31,11 @@
 // Ghost trail behind the needle (fake motion blur). 0 = off.
 #define GHOST_TRAIL 1
 
+// 80s-style tricolour stripes in the background. 0 = plain background.
+// STRIPE_ALPHA = how strong the big diagonal stripes are (0-255, ~40 = subtle).
+#define RETRO_STRIPES 1
+#define STRIPE_ALPHA 46
+
 // GPS (optional). TX wire from the GPS goes to GPS_RX_PIN. -1 = no GPS.
 #define GPS_RX_PIN 17
 #define GPS_TX_PIN 18
@@ -449,11 +454,51 @@ static const Rect R_SPEED = {282, 50, 194, 102};
 static const Rect R_TRIP = {340, 186, 136, 28}, R_ODO = {340, 218, 136, 28}, R_BATT = {340, 250, 136, 28};
 
 // ------------------------------------------------------------------ static backgrounds
+// Retro tricolour (red / white / blue) stripes, 80s dirt-bike tank style.
+static const uint16_t C_S_RED = RGB(230, 20, 30), C_S_WHT = RGB(235, 235, 240), C_S_BLU = RGB(20, 60, 200);
+static void slantBand(float x0, float y0, float x1, float thick, float slope, uint16_t c, uint8_t a) {
+  // parallelogram from x0 to x1, top edge y = y0 + slope*(x - x0), 'thick' px tall
+  float xs[4] = {x0, x1, x1, x0};
+  float ys[4] = {y0, y0 + slope * (x1 - x0), y0 + slope * (x1 - x0) + thick, y0 + thick};
+  convexPoly(xs, ys, 4, c, a);
+}
+static void kinkedBand(float y, float thick, float kx, float slope, uint16_t c, uint8_t a) {
+  // flat from the left edge to kx, then kicks up to the top edge at 'slope'
+  float xa = kx + (y - 40) * 0.2f, xb = xa + thick * 0.2f;   // corner shifts so the bands stay parallel
+  float fx[4] = {-2, xa, xb, -2}, fy[4] = {y, y, y + thick, y + thick};
+  convexPoly(fx, fy, 4, c, a);
+  float up = (y + thick) / -slope;
+  float kxs[4] = {xa, xa + y / -slope, xb + (y + thick) / -slope + 0.0f * up, xb};
+  float kys[4] = {y, 0, 0, y + thick};
+  kxs[2] = xb + (y + thick) / -slope;
+  convexPoly(kxs, kys, 4, c, a);
+}
+static void retroStripes(int p) {
+  // big faint diagonal sweep, low on the right
+  const float SL = -0.42f;
+  float y = (p == 0) ? 300 : 290;
+  slantBand(230, y, 490, 16, SL, C_S_RED, STRIPE_ALPHA);
+  slantBand(230, y + 21, 490, 6, SL, C_S_WHT, STRIPE_ALPHA);
+  slantBand(230, y + 32, 490, 16, SL, C_S_BLU, STRIPE_ALPHA);
+  // solid tricolour rule under the top bar, kicking up between BRAKE and the right arrow
+  kinkedBand(40, 3, 398, -2.6f, C_S_RED, 255);
+  kinkedBand(44.5f, 1.5f, 398, -2.6f, C_S_WHT, 255);
+  kinkedBand(47.5f, 3, 398, -2.6f, C_S_BLU, 255);
+  // thin tricolour above the bottom bar
+  slantBand(-2, 287, 482, 1.5f, 0, C_S_RED, 200);
+  slantBand(-2, 289.5f, 482, 1, 0, C_S_WHT, 160);
+  slantBand(-2, 291.5f, 482, 1.5f, 0, C_S_BLU, 200);
+}
+
 static void renderBg(int p) {
   T = bg[p]; clipAll();
   fillRect(0, 0, W, H, C_BG);
+#if RETRO_STRIPES
+  retroStripes(p);
+#else
   hline(0, 42, W, C_OFF);
   hline(0, 288, W, C_OFF);
+#endif
   text(F_SMALL, 12, 309, "DEMO", C_AMB);
   text(F_SMALL, 60, 309, "swipe for pages", C_DIM);
   if (p == 0) {
