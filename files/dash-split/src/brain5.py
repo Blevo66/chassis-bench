@@ -14,7 +14,7 @@ def box(x0,x1,y0,y1,z0,z1): return cq.Workplane("XY").box(x1-x0,y1-y0,z1-z0).tra
 def rr(w,h,r): return cq.Sketch().rect(w,h).vertices().fillet(r)
 def slab(cx,cy,w,h,r,z0,z1): return cq.Workplane("XY").workplane(offset=z0).center(cx,cy).placeSketch(rr(w,h,r)).extrude(z1-z0)
 W=2.5; LID=2.5; R=4.0
-L,WD,H=152.0,70.0,38.0                    # 152 long x 82 wide x 38 tall (v5b: +15 for the end-wall M12)
+L,WD,H=137.0,70.0,38.0                    # 152 long x 82 wide x 38 tall (v5b: +15 for the end-wall M12)
 CX=L/2
 outer=slab(CX,0,L,WD,R,0,H)
 try: outer=outer.faces("<Z").edges().fillet(2.0)
@@ -58,17 +58,27 @@ for sx in (-1,1):
         base=base.cut(cq.Workplane("XY").workplane(offset=W-0.5).center(x,y).circle(1.4).extrude(3))
 pca=box(BXC-31.25,BXC+31.25,-12.7,12.7,W+0.8,W+4.4)        # ~62.5 x 25.4, no header pins, wires soldered
 buck=box(BXC-24,BXC-4,14,30,W+0.5,W+5.5)                    # 12->5 V buck ~20 x 16 (guess)
-# ---- Hamadap M12 12-pin socket in the FAR END wall (x=L), opposite the AMPSEAL (Joel v5b: 'screen plug out the other wall,
-# in the space next to the 12 V in'). Centred across the box for now; slide MY once the board's VIN terminal side is confirmed.
-MY,MZ=-14.0,ZC                            # v5d: shifted to the -y side, the same side as the board's 12 V (VIN) terminal (Joel)
-def seg(u0,Lh,r): return cq.Workplane("YZ").workplane(offset=L-u0-Lh).center(MY,MZ).circle(r).extrude(Lh)   # u = depth in from the outer face
-def hseg(u0,Lh,af): return cq.Workplane("YZ").workplane(offset=L-u0-Lh).center(MY,MZ).polygon(6,af/math.cos(math.pi/6)).extrude(Lh).rotate((0,MY,MZ),(1,MY,MZ),30)   # flats facing +-y
+# ---- v5e (Joel: 'try adding a lump on one side next to the AMPSEAL plug'): Hamadap M12 in the SAME END as the AMPSEAL,
+# in a hollow lump on the -y side. Lump is part of the base with its own roof under the lid line, open into the main cavity.
+MY,MZ=-45.0,ZC
+LX,LY0=27.0,-WD/2+1.0                      # lump length along the box, inner edge overlaps the side wall
+LY1=MY-11.0-1.0-W                          # outer face of the lump (hex corner 11 + 1 mm + wall)
+LT=H-LID                                   # lump roof flush with the base rim height
+lump=slab(LX/2,(LY0+LY1)/2,LX,LY0-LY1,3.0,0,LT)
+try: lump=lump.faces("<Z").edges().fillet(2.0)
+except Exception as e: print('lump fillet skip',e)
+try: lump=lump.faces(">Z").edges().fillet(1.5)
+except Exception as e: print('lump top fillet skip',e)
+base=base.union(lump)
+base=base.cut(slab(LX/2,(LY0+LY1)/2+1.5,LX-2*W,LY0-LY1+3.0-2*W,1.5,W,LT-W))       # hollow, open into the main cavity
+def seg(u0,Lh,r): return cq.Workplane("YZ").workplane(offset=u0).center(MY,MZ).circle(r).extrude(Lh)     # u = depth in from the x=0 outer face
+def hseg(u0,Lh,af): return cq.Workplane("YZ").workplane(offset=u0).center(MY,MZ).polygon(6,af/math.cos(math.pi/6)).extrude(Lh).rotate((0,MY,MZ),(1,MY,MZ),30)
 base=base.cut(seg(-1,W+2,8.1))
 m12=(hseg(W,3.0,19.0).union(seg(W+3.0,6.0,5.0)).union(seg(0,W,7.9))
      .union(hseg(-3.0,3.0,19.0)).union(seg(-4.5,1.5,7.9)).union(seg(-10.5,6.0,5.9)))
 m12p=seg(-4.7-14,14,10.0).union(seg(-4.7-45,31,7.5)).union(seg(-4.7-75,30,3.5))
 # ---- lid screws: 4 bosses in the corners (clear of the AMPSEAL tails and retainer bosses) ----
-LS=[(29.0,-27.5),(29.0,27.5),(L-6.0,-27.5),(L-6.0,27.5)]
+LS=[(29.0,-27.5),(29.0,27.5),(L-6.0,-31.0),(L-6.0,31.0)]
 for x,y in LS:
     base=base.union(cq.Workplane("XY").workplane(offset=W-0.01).center(x,y).circle(3.4).extrude(H-LID-W+0.01))
     base=base.cut(cq.Workplane("XY").workplane(offset=H-LID-6.0).center(x,y).circle(2.0).extrude(6.1))

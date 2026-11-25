@@ -48,6 +48,9 @@ Joel: v3t (all in one, 142 x 66 x 46) looked bulky -> light screen pod on the to
   floor bosses (short M3 heat-sets), so nothing sits outside the 60.8 flange. Lid screws moved to x 29 / L-6, y +-27.5. ~114 g.
 - v5d: M12 slid 14 mm to the -y side (Joel: the 12 V in is the big terminal on the side opposite the row of output terminals),
   hex turned so its flats face the side walls.
+- v5e (Joel: 'no, try adding a lump on one side next to the AMPSEAL plug'): M12 now in the SAME end as the AMPSEAL, in a hollow
+  27 x 24.5 mm lump on the -y side (roof at rim height, open into the main cavity). Box back to 137 long; 94.5 wide over the lump,
+  70 elsewhere. M12 plug 3 mm from the (guessed) AMPSEAL plug envelope. Far lid screws moved to y +-31 to clear the board.
 
 ## Brain box v4 (superseded, flange outside): AMPSEAL in the END, free-standing (brain-box-v4-end-plug/, src/brain4.py)
 - Joel 2026-11-25: 'make the ampseal plug go in the end of the unit' + 'ignore living in the triangle' (no frame fit any more).
