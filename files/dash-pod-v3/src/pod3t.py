@@ -14,7 +14,7 @@ WALL=2.5
 OW,OH=105.2,GH+2*CLR+2*WALL              # wider for the 99 mm Fowecry MOSFET board
 OR=GR+CLR+WALL
 ZS=-15.0                                 # front/back split
-ZB=-37.8                                 # v3t: back face 4.3 deeper for the REAL MOSFET board (terminals 14.1 above PCB)
+ZB=-39.3                                 # v3t: back face 4.3 deeper for the REAL MOSFET board (terminals 14.1 above PCB)
 PF=-19.0                                 # MOSFET PCB front face (toward the screen)
 PB=PF-1.5                                # MOSFET PCB component face (Joel's model: 1.5 thick)
 EXT=36.5                                 # v3t: pod widened on the RIGHT for a side bulkhead plug; screen stays at X=0
@@ -104,14 +104,16 @@ for x in (-30,30):
 GK=1.0
 AXC=67.2                                   # header centre X (flange X 51.15..83.25, clear of MOSFET PCB and closure tubes)
 ZT=ZB                                      # socket tip flush with the back face
-amp=cq.importers.importStep(SCR+'cad3/parts/ampseal23.stp')
-amp=amp.intersect(cq.Workplane("XY").box(80,40,30.0,centered=(True,True,False)).translate((0,0,-30.0)))   # pin tails trimmed at header z -30
-amp=amp.rotate((0,0,0),(0,0,1),90).rotate((0,0,0),(1,0,0),180).translate((AXC,0,ZT))
+# v3t: RIGHT-ANGLE header TE 1-776087-1 (Joel's STEP). Its PCB tails exit sideways (header -Y), turned to point -X
+# toward the MOSFET board. Board-lock pegs (header z below -36.6) snipped off: there is no PCB.
+amp=cq.importers.importStep(SCR+'cad3/parts/ampseal23-ra-776087-1.stp')
+amp=amp.intersect(cq.Workplane("XY").box(80,40,36.6,centered=(True,True,False)).translate((0,0,-36.6)))
+amp=amp.rotate((0,0,0),(0,0,1),-90).rotate((0,0,0),(1,0,0),180).translate((AXC,0,ZT))
 FZ0=ZT+18.5; FZ1=ZT+22.0                   # flange front (sealing) face and rear face, pod z
 hole=box(AXC-12.0,AXC+12.0,-21.9,21.9,ZB-1,FZ0-GK)        # socket + 0.2 all round, through wall and collar
 collar=box(AXC-14.0,AXC+14.0,-23.9,23.9,ZB+1.0,FZ0-GK)
 # slot for the plug's latch arm over the header's latch ramp (ramp sits ~1-5 mm inside the back face on the -X side)
-hole=hole.union(box(AXC-16.3,AXC-11.5,-5.5,5.5,ZB-1,ZB+7.5))
+hole=hole.union(box(AXC+11.5,AXC+16.3,-5.5,5.5,ZB-1,ZB+7.5))
 back=back.union(collar).cut(hole)
 gasket=box(AXC-16.05,AXC+16.05,-30.4,30.4,FZ0-GK,FZ0).cut(box(AXC-11.8,AXC+11.8,-21.7,21.7,FZ0-GK-1,FZ0+1))
 pocket=box(AXC-16.4,AXC+16.4,-30.8,30.8,FZ0-GK-0.2,ZS+0.2)
@@ -119,7 +121,9 @@ back=back.cut(pocket)
 RW=3.0
 # ribs from the front ring onto the flange, 0.3 mm squeeze: +X long edge, plus pads on both short ends
 # (the -X long edge has the header's rear body right behind it, so no rib there)
-front=front.union(box(AXC+16.05-RW,AXC+16.05,-27,27,FZ1-0.3,-3.15))
+front=front.union(box(AXC+14.0,AXC+16.05,-27,27,FZ1-0.3,-3.15))   # only free strip on the flange (header body fills the rest)
+# header's rear body reaches 0.6 mm past the front ring's inner floor: local pocket, front skin stays ~2.3 mm
+front=front.cut(box(AXC-16.0,AXC+14.5,-24.0,24.0,-3.5,ZT+36.6+0.4))
 # (end pads removed: the straight header's rear body fills the flange's short ends too. Clamping to be
 #  finalised with the RIGHT-ANGLE header 1-776087-1 once Joel sends its STEP.)
 # socket opening: 0.8 mm chamfer on the outside edge
@@ -151,7 +155,7 @@ parts={
  'gps_ceramic_antenna_est': box(52,70,OH/2-WALL-5.0+0.9,OH/2-1.6,-28.5,-22.5),
  'mosfet_fowecry_99x52':mos,
  'board_screws_m3x6':  cq.Workplane().add([cq.Workplane('XY').workplane(offset=PF).center(x,y).circle(2.75).extrude(2.0).val() for x,y in CB]),
- 'ampseal23_776228_1': amp,
+ 'ampseal23_ra_776087_1': amp,
  'ampseal_gasket_tpu': gasket,
  'board_plug':          box(-20.6,20.6,-26.3,-19.7,-15.5,-12.95).union(box(-20.6,20.6,-19.7,-12.3,-18.2,-13.0)),   # v3t: 2x16 RIGHT-ANGLE male header on J8, tails + soldered wires pointing UP the pod (size typical, guessed)
 }
@@ -176,7 +180,7 @@ asm.add(rot(front),name="front_ring",color=cq.Color(0.13,0.15,0.17))
 asm.add(rot(back),name="back_cover",color=cq.Color(0.13,0.15,0.17))
 asm.add(rot(seal),name="tpu_seal",color=cq.Color(0.88,0.38,0.11))
 asm.add(rot(board),name="waveshare_s3_lcd35",color=cq.Color(0.1,0.35,0.2))
-cols={'gps_receiver_atgm336h':(0.2,0.45,0.25),'gps_ceramic_antenna_est':(0.75,0.55,0.4),'gps_bn220':(0.2,0.2,0.22),'lipo_500_30x36x5':(0.75,0.75,0.8),'mcp23017_guess':(0.1,0.3,0.7),'gps_bn220':(0.2,0.2,0.22),'buck_pololu':(0.1,0.5,0.2),'mosfet_fowecry_99x52':(0.15,0.25,0.6),'board_plug':(0.05,0.05,0.05),'board_screws_m3x6':(0.7,0.7,0.7),'ampseal23_776228_1':(0.12,0.12,0.12),'ampseal_gasket_tpu':(0.88,0.38,0.11),}
+cols={'gps_receiver_atgm336h':(0.2,0.45,0.25),'gps_ceramic_antenna_est':(0.75,0.55,0.4),'gps_bn220':(0.2,0.2,0.22),'lipo_500_30x36x5':(0.75,0.75,0.8),'mcp23017_guess':(0.1,0.3,0.7),'gps_bn220':(0.2,0.2,0.22),'buck_pololu':(0.1,0.5,0.2),'mosfet_fowecry_99x52':(0.15,0.25,0.6),'board_plug':(0.05,0.05,0.05),'board_screws_m3x6':(0.7,0.7,0.7),'ampseal23_ra_776087_1':(0.12,0.12,0.12),'ampseal_gasket_tpu':(0.88,0.38,0.11),}
 for n,p in parts.items(): asm.add(rot(p),name=n,color=cq.Color(*cols[n]))
 OUT=SCR+'cad3/out20/'
 import os; os.makedirs(OUT,exist_ok=True)
