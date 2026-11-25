@@ -34,7 +34,7 @@
 // 80s-style tricolour stripes in the background. 0 = plain background.
 // STRIPE_ALPHA = how strong the big diagonal stripes are (0-255, ~40 = subtle).
 #define RETRO_STRIPES 1
-#define STRIPE_ALPHA 46
+#define STRIPE_ALPHA 150
 
 // GPS (optional). TX wire from the GPS goes to GPS_RX_PIN. -1 = no GPS.
 #define GPS_RX_PIN 17
@@ -67,11 +67,11 @@ static Arduino_GFX *lcd = new Arduino_ST7796(bus, -1 /*RST*/, SCREEN_ROTATION, t
 static constexpr uint16_t RGB(uint8_t r, uint8_t g, uint8_t b) {
   return (uint16_t)(((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3));
 }
-static const uint16_t C_BG = RGB(6, 7, 10);
-static const uint16_t C_OFF = RGB(30, 33, 40);    // unlit icons / segments
-static const uint16_t C_RING = RGB(34, 37, 46);   // unlit dial band
-static const uint16_t C_REDZ = RGB(70, 14, 12);   // unlit red zone
-static const uint16_t C_DIM = RGB(70, 75, 88);
+static const uint16_t C_BG = RGB(34, 38, 48);  
+static const uint16_t C_OFF = RGB(62, 67, 80);    // unlit icons / segments
+static const uint16_t C_RING = RGB(58, 63, 76);   // unlit dial band
+static const uint16_t C_REDZ = RGB(96, 28, 30);   // unlit red zone
+static const uint16_t C_DIM = RGB(105, 110, 124);
 static const uint16_t C_GREY = RGB(140, 146, 158);
 static const uint16_t C_TXT = RGB(238, 240, 245);
 static const uint16_t C_COOL = RGB(200, 225, 255);
@@ -262,6 +262,14 @@ static void text(const AAFont &f, int x, int y, const char *s, uint16_t c, int a
     }
     x += g.adv;
   }
+}
+
+// Text with a dark outline so it stays readable over the stripes
+static void textOutlined(const AAFont &f, int x, int y, const char *s, uint16_t c, int align = LEFT) {
+  for (int dy = -2; dy <= 2; dy++)
+    for (int dx = -2; dx <= 2; dx++)
+      if (dx || dy) text(f, x + dx, y + dy, s, C_BG, align);
+  text(f, x, y, s, c, align);
 }
 
 // ------------------------------------------------------------------ dirty list + flush
@@ -455,7 +463,7 @@ static const Rect R_TRIP = {340, 186, 136, 28}, R_ODO = {340, 218, 136, 28}, R_B
 
 // ------------------------------------------------------------------ static backgrounds
 // Retro tricolour (red / white / blue) stripes, 80s dirt-bike tank style.
-static const uint16_t C_S_RED = RGB(230, 20, 30), C_S_WHT = RGB(235, 235, 240), C_S_BLU = RGB(20, 60, 200);
+static const uint16_t C_S_RED = RGB(255, 20, 30), C_S_WHT = RGB(255, 255, 255), C_S_BLU = RGB(25, 80, 255);
 static void slantBand(float x0, float y0, float x1, float thick, float slope, uint16_t c, uint8_t a) {
   // parallelogram from x0 to x1, top edge y = y0 + slope*(x - x0), 'thick' px tall
   float xs[4] = {x0, x1, x1, x0};
@@ -485,9 +493,9 @@ static void retroStripes(int p) {
   kinkedBand(44.5f, 1.5f, 398, -2.6f, C_S_WHT, 255);
   kinkedBand(47.5f, 3, 398, -2.6f, C_S_BLU, 255);
   // thin tricolour above the bottom bar
-  slantBand(-2, 287, 482, 1.5f, 0, C_S_RED, 200);
-  slantBand(-2, 289.5f, 482, 1, 0, C_S_WHT, 160);
-  slantBand(-2, 291.5f, 482, 1.5f, 0, C_S_BLU, 200);
+  slantBand(-2, 287, 482, 1.5f, 0, C_S_RED, 255);
+  slantBand(-2, 289.5f, 482, 1, 0, C_S_WHT, 255);
+  slantBand(-2, 291.5f, 482, 1.5f, 0, C_S_BLU, 255);
 }
 
 static void renderBg(int p) {
@@ -520,9 +528,9 @@ static void renderBg(int p) {
     text(F_SMALL, (int)CX, (int)CY + 118, "r/min", C_DIM, CENTRE);
     text(F_SMALL, 470, 172, "MPH", C_GREY, RIGHT);
     hline(296, 180, 176, C_OFF);
-    text(F_SMALL, 300, 206, "TRIP", C_GREY);
-    text(F_SMALL, 300, 238, "ODO", C_GREY);
-    text(F_SMALL, 300, 270, "BATT", C_GREY);
+    textOutlined(F_SMALL, 300, 206, "TRIP", C_GREY);
+    textOutlined(F_SMALL, 300, 238, "ODO", C_GREY);
+    textOutlined(F_SMALL, 300, 270, "BATT", C_GREY);
   } else if (p == 1) {
     text(F_SMALL, 20, 66, "TRIP", C_AMB);
     const char *lab[6] = {"ODOMETER  mi", "TRIP A  mi", "TRIP B  mi", "AVERAGE  mph", "TOP SPEED  mph", "RIDING TIME"};
@@ -654,16 +662,16 @@ static void drawWidget(int id) {
     case W_DOTS:
       for (int i = 0; i < 3; i++) disc(r.x + 24 + i * 16, r.y + 10, i == page ? 4.5f : 3.0f, i == page ? C_TXT : C_DIM);
       break;
-    case W_FPS: snprintf(b, sizeof b, "%d fps", fps); text(F_SMALL, r.x + r.w - 6, r.y + 17, b, C_DIM, RIGHT); break;
+    case W_FPS: snprintf(b, sizeof b, "%d fps", fps); textOutlined(F_SMALL, r.x + r.w - 6, r.y + 17, b, C_DIM, RIGHT); break;
     case W_SPEED: {
       snprintf(b, sizeof b, "%d", shownMph());
       text(F_SPEED, 470, 140, b, C_TXT, RIGHT);
       if (gpsLive()) text(F_SMALL, 300, 172, "GPS", C_GRN);
       break;
     }
-    case W_TRIP: snprintf(b, sizeof b, "%.1f", S.tripA); text(F_MED, 470, r.y + 21, b, C_TXT, RIGHT); break;
-    case W_ODO: snprintf(b, sizeof b, "%.1f", S.odo); text(F_MED, 470, r.y + 21, b, C_TXT, RIGHT); break;
-    case W_BATT: snprintf(b, sizeof b, "%.1f V", S.battV); text(F_MED, 470, r.y + 21, b, S.battV > 13 ? C_GRN : C_AMB, RIGHT); break;
+    case W_TRIP: snprintf(b, sizeof b, "%.1f", S.tripA); textOutlined(F_MED, 470, r.y + 21, b, C_TXT, RIGHT); break;
+    case W_ODO: snprintf(b, sizeof b, "%.1f", S.odo); textOutlined(F_MED, 470, r.y + 21, b, C_TXT, RIGHT); break;
+    case W_BATT: snprintf(b, sizeof b, "%.1f V", S.battV); textOutlined(F_MED, 470, r.y + 21, b, S.battV > 13 ? C_GRN : C_AMB, RIGHT); break;
     case W_SYS: { char l[8][32]; sysLines(l); for (int i = 0; i < 8; i++) text(F_MED, 470, 98 + i * 25, l[i], C_TXT, RIGHT); break; }
     default: {
       int i = id - W_T0;
