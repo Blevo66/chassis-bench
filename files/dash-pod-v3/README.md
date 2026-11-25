@@ -157,3 +157,15 @@ Built from Joel's own STEP of the Fowecry 8-ch board (`parts/fowecry-mosfet-boar
 **Guesses / unconfirmed:** which terminal strip is at the top (I put the 14 mm strip at the top), LiPo size, GPS sizes (arrives 25 Nov).
 
 Renders: `renders/v3q-*.png`. Old v3p files in `v3p-guessed-mosfet/`.
+
+## v3r: two M12 round plugs (2026-11-25, current)
+
+Joel: the WS28 "looks ridiculous" -> picked two small M12 plugs. Script `src/pod3r.py`. Pod **132.2 x 66.4 x 37.8 mm** (v3q 143.2). Same real MOSFET board, LiPo, GPS as v3q; antenna pocket shifted to X 51-71.
+
+Two front-mount M12 panel sockets stacked on the back at the right end (X 61, Y +/-13.5), 16.2 mm panel holes. **Socket and plug sizes are TYPICAL M12 values, not a chosen part** (M16x1.5 panel thread, ~20 mm hex, ~13 mm body + solder cups inside). Plugs drawn as straight moulded cordsets; right-angle ones would stick out ~30 mm less.
+
+Pin split (ratings are typical M12 A-coded catalogue values, check the part you buy):
+- Top, 8-pin (~2 A/pin): OUT1-8.
+- Bottom, 12-pin (~1.5 A/pin): 12 V x2, power earth x4 (lamp current returns through the board), signal earth (controller + RPM screen), brake, RPM, controller 3V3, SDA, SCL.
+
+Old WS28 version in `v3q-ws28/`.
