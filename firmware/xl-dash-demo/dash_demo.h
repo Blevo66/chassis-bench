@@ -432,9 +432,9 @@ static void pollGps() {}
 // ------------------------------------------------------------------ layout
 // Rev dial (left)
 static const float CX = 150, CY = 172, R1 = 124, R0 = 108;
-static const float A0 = 135, A1 = 405;            // 270 degree sweep, gap at the bottom
+static const float ANG0 = 135, ANG1 = 405;            // 270 degree sweep, gap at the bottom
 static const float N_IN = 54, N_OUT = 127;        // needle inner/outer radius
-static float rpmToAng(float rpm) { return A0 + (A1 - A0) * constrain(rpm, 0.0f, RPM_MAX) / RPM_MAX; }
+static float rpmToAng(float rpm) { return ANG0 + (ANG1 - ANG0) * constrain(rpm, 0.0f, RPM_MAX) / RPM_MAX; }
 
 static const Rect R_GEAR = {(int16_t)(CX - 44), (int16_t)(CY - 46), 88, 92};
 static const Rect R_RPM = {(int16_t)(CX - 56), (int16_t)(CY + 72), 112, 30};
@@ -457,8 +457,8 @@ static void renderBg(int p) {
   text(F_SMALL, 12, 309, "DEMO", C_AMB);
   text(F_SMALL, 60, 309, "swipe for pages", C_DIM);
   if (p == 0) {
-    ringSeg(CX, CY, R0, R1, A0, rpmToAng(RPM_SHIFT) - 0.6f, C_RING);
-    ringSeg(CX, CY, R0, R1, rpmToAng(RPM_SHIFT) + 0.6f, A1, C_REDZ);
+    ringSeg(CX, CY, R0, R1, ANG0, rpmToAng(RPM_SHIFT) - 0.6f, C_RING);
+    ringSeg(CX, CY, R0, R1, rpmToAng(RPM_SHIFT) + 0.6f, ANG1, C_REDZ);
     for (int k = 0; k <= (int)(RPM_MAX / 500); k++) {
       float a = rpmToAng(k * 500) * DEG_TO_RAD, c = cosf(a), s = sinf(a);
       bool major = (k % 2) == 0;
@@ -649,9 +649,9 @@ static void updateWidgets(bool force) {
 }
 
 // ------------------------------------------------------------------ the rev dial
-static float ghost[3] = {A0, A0, A0};
+static float ghost[3] = {ANG0, ANG0, ANG0};
 static Rect prevNeedleBox = {0, 0, 0, 0};
-static float prevLit = A0;
+static float prevLit = ANG0;
 static int prevArcCol = -1;
 static uint32_t prevGearKey = 0, prevRpmKey = 0;
 
@@ -678,7 +678,7 @@ static const uint16_t ARC_COL[4] = {C_COOL, C_AMB, C_RED, C_TXT};
 static const uint8_t GHOST_A[3] = {110, 60, 28};
 
 static void drawDialContents(float needleAng, int arcCol) {
-  if (needleAng > A0 + 0.2f) ringSeg(CX, CY, R0, R1, A0, needleAng, ARC_COL[arcCol]);
+  if (needleAng > ANG0 + 0.2f) ringSeg(CX, CY, R0, R1, ANG0, needleAng, ARC_COL[arcCol]);
 #if GHOST_TRAIL
   for (int i = 2; i >= 0; i--) {
     if (fabsf(ghost[i] - needleAng) < 0.6f) continue;
@@ -707,7 +707,7 @@ static void updateDial(bool force) {
   bool moved = fabsf(ang - prevLit) > 0.03f;
   Rect rs[3]; int n = 0;
   if (force) {
-    rs[n++] = rUnion(arcBox(CX, CY, R0, R1, A0, A1), rUnion(R_GEAR, R_RPM));
+    rs[n++] = rUnion(arcBox(CX, CY, R0, R1, ANG0, ANG1), rUnion(R_GEAR, R_RPM));
   } else {
     if (moved || ghostsVisible || col != prevArcCol) {
       Rect box = needleBox(ang);
@@ -715,7 +715,7 @@ static void updateDial(bool force) {
       for (int i = 0; i < 3; i++) box = rUnion(box, needleBox(ghost[i]));
 #endif
       Rect r = rUnion(box, prevNeedleBox);
-      if (col != prevArcCol) r = rUnion(r, arcBox(CX, CY, R0, R1, A0, max(ang, prevLit)));
+      if (col != prevArcCol) r = rUnion(r, arcBox(CX, CY, R0, R1, ANG0, max(ang, prevLit)));
       else r = rUnion(r, arcBox(CX, CY, R0, R1, min(ang, prevLit), max(ang, prevLit)));
       rs[n++] = r;
     }
