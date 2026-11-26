@@ -279,8 +279,8 @@ struct Ride {
   int gear = 0;
   bool indL = false, indR = false, beam = false, brake = false;
   bool hazard = false, high = false, flash = false, horn = false;
-  bool lightsOn = true;           // headlight on at power-up
-  bool drl = true;                // DRL / sidelight on OUT7 (AUX), on at power-up
+  bool lightsOn = false;          // headlight OFF at power-up (hold LIGHTS to turn on)
+  bool drl = true;                // DRL / sidelight on OUT7, always on with the ignition
   bool out[8] = {};               // what each MOSFET output is doing right now
   uint8_t btn = 0;                // bit n = MCP pin n pressed (raw, live)
   int mcpAddr = -1;               // where the button chip was found, -1 = not found
@@ -499,25 +499,17 @@ static void handleButtons() {
   S.horn = S.btn & (1 << BTN_HORN);                       // straight from the switch, no delay
   uint32_t now = millis();
 
-  // LIGHTS: tap = high / low (or back on, if off), double tap = DRL on / off,
-  // hold LIGHTS_OFF_MS = headlight on / off. A single tap waits DOUBLE_TAP_MS to be sure it isn't a double.
-  static bool lightsDone = false, tapPending = false;
-  static uint32_t firstTapMs = 0;
+  // LIGHTS: hold LIGHTS_OFF_MS = headlight on (low beam) / off. Tap = high / low, only while it's on.
+  // The DRL is always on; writeOutputs() dims it when the headlight is on.
+  static bool lightsDone = false;
   if (pollButton(bLights) == 1) {
-    if (tapPending && now - firstTapMs < DOUBLE_TAP_MS) {
-      tapPending = false; S.drl = !S.drl;
-      logEvent(S.drl ? "LIGHTS double tap = DRL ON" : "LIGHTS double tap = DRL off");
-    } else { tapPending = true; firstTapMs = now; }
-  }
-  if (tapPending && now - firstTapMs >= DOUBLE_TAP_MS) {
-    tapPending = false;
-    if (!S.lightsOn) { S.lightsOn = true; logEvent("LIGHTS tap = headlight back ON"); }
+    if (!S.lightsOn) logEvent("LIGHTS tap: headlight off, hold 3 s");
     else { S.high = !S.high; logEvent(S.high ? "LIGHTS tap = HIGH beam" : "LIGHTS tap = low beam"); }
   }
   if (!bLights.down) lightsDone = false;
   else if (!lightsDone && now - bLights.downMs >= LIGHTS_OFF_MS) {
     S.lightsOn = !S.lightsOn; S.high = false; lightsDone = true;
-    logEvent(S.lightsOn ? "LIGHTS hold 3 s = headlight ON" : "LIGHTS hold 3 s = headlight OFF");
+    logEvent(S.lightsOn ? "LIGHTS hold 3 s = headlight ON (low)" : "LIGHTS hold 3 s = headlight OFF");
   }
 
   // MODE: tap = flash the high beam for PASS_FLASH_MS, hold = next page.

@@ -12,7 +12,8 @@
 //  Buttons (left controller):
 //    IND L / IND R  tap = on / cancel     hold = hazards on / off
 //    HORN           sounds while pressed
-//    LIGHTS         tap = high / low      double tap = DRL on / off    hold 3 s = headlight on / off
+//    LIGHTS         hold 3 s = headlight on (low) / off    tap = high / low (when on)
+//                   DRL (OUT7) always on: full with headlight off, dimmed with it on
 //    MODE           tap = flash high beam  hold = next page  (TRIP page: hold 3 s = reset trip A)
 //  Swipe the screen (or tap) to change page too. Pages: RIDE, TRIP, SYSTEM, TEST.
 // =====================================================================
