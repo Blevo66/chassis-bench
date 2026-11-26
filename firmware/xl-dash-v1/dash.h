@@ -279,6 +279,7 @@ struct Ride {
   int gear = 0;
   bool indL = false, indR = false, beam = false, brake = false;
   bool hazard = false, high = false, flash = false, horn = false;
+  bool lightsOn = true;           // headlight on at power-up
   bool out[8] = {};               // what each MOSFET output is doing right now
   uint8_t btn = 0;                // bit n = MCP pin n pressed (raw, live)
   int mcpAddr = -1;               // where the button chip was found, -1 = not found
@@ -476,27 +477,57 @@ static void saveTrips() {
 }
 
 static int pendingPage = 0;      // set by the MODE button, acted on in the loop
+static char lastEvent[48] = "press a button";   // shown on the TEST page and printed to Serial
+static uint32_t eventCount = 0;
+static void logEvent(const char *s) {
+  snprintf(lastEvent, sizeof lastEvent, "%s", s); eventCount++;
+  Serial.printf("[button] %s\n", s);
+}
 static void handleButtons() {
   mcpRead();
   int e;
   if ((e = pollButton(bL))) {
-    if (e == 1) { S.hazard = false; S.indR = false; S.indL = !S.indL; }
-    else        { S.hazard = !S.hazard; S.indL = S.indR = false; }
+    if (e == 1) { S.hazard = false; S.indR = false; S.indL = !S.indL; logEvent(S.indL ? "IND L tap = left ON" : "IND L tap = left off"); }
+    else        { S.hazard = !S.hazard; S.indL = S.indR = false; logEvent(S.hazard ? "IND L hold = hazards ON" : "IND L hold = hazards off"); }
   }
   if ((e = pollButton(bR))) {
-    if (e == 1) { S.hazard = false; S.indL = false; S.indR = !S.indR; }
-    else        { S.hazard = !S.hazard; S.indL = S.indR = false; }
+    if (e == 1) { S.hazard = false; S.indL = false; S.indR = !S.indR; logEvent(S.indR ? "IND R tap = right ON" : "IND R tap = right off"); }
+    else        { S.hazard = !S.hazard; S.indL = S.indR = false; logEvent(S.hazard ? "IND R hold = hazards ON" : "IND R hold = hazards off"); }
   }
-  pollButton(bHorn);
+  if (pollButton(bHorn) == 1) logEvent("HORN pressed");
   S.horn = S.btn & (1 << BTN_HORN);                       // straight from the switch, no delay
-  if (pollButton(bLights) == 1) S.high = !S.high;
-  // MODE: tap = flash the high beam for PASS_FLASH_MS, hold = next page
-  static uint32_t passUntil = 0;
-  if ((e = pollButton(bMode))) {
-    if (e == 1) passUntil = millis() + PASS_FLASH_MS;
-    else pendingPage = +1;
+  uint32_t now = millis();
+
+  // LIGHTS: tap = high / low (or back on, if off), hold LIGHTS_OFF_MS = headlight on / off
+  static bool lightsDone = false;
+  if (pollButton(bLights) == 1) {
+    if (!S.lightsOn) { S.lightsOn = true; logEvent("LIGHTS tap = headlight back ON"); }
+    else { S.high = !S.high; logEvent(S.high ? "LIGHTS tap = HIGH beam" : "LIGHTS tap = low beam"); }
   }
-  S.flash = (bLights.down && bLights.held) || (int32_t)(passUntil - millis()) > 0;
+  if (!bLights.down) lightsDone = false;
+  else if (!lightsDone && now - bLights.downMs >= LIGHTS_OFF_MS) {
+    S.lightsOn = !S.lightsOn; S.high = false; lightsDone = true;
+    logEvent(S.lightsOn ? "LIGHTS hold 3 s = headlight ON" : "LIGHTS hold 3 s = headlight OFF");
+  }
+
+  // MODE: tap = flash the high beam for PASS_FLASH_MS, hold = next page.
+  // On the TRIP page: hold and let go = next page, keep holding TRIP_RESET_MS = reset trip A.
+  static uint32_t passUntil = 0;
+  static bool modeWaiting = false;
+  if ((e = pollButton(bMode))) {
+    if (e == 1) { passUntil = now + PASS_FLASH_MS; logEvent("MODE tap = flash high beam"); }
+    else if (page == 1) modeWaiting = true;
+    else { pendingPage = +1; logEvent("MODE hold = next page"); }
+  }
+  if (modeWaiting) {
+    if (!bMode.down) { modeWaiting = false; pendingPage = +1; logEvent("MODE hold = next page"); }
+    else if (now - bMode.downMs >= TRIP_RESET_MS) {
+      modeWaiting = false;
+      S.tripA = 0; S.maxMph = 0; S.rideS = 0; S.movingS = 0; saveTrips();
+      logEvent("MODE hold 3 s = trip A RESET");
+    }
+  }
+  S.flash = (int32_t)(passUntil - now) > 0;
 }
 
 static bool flashPhase() { return (millis() % FLASH_PERIOD_MS) < FLASH_PERIOD_MS / 2; }
@@ -504,9 +535,9 @@ static void writeOutputs() {
   bool f = flashPhase(), w[8];
   w[O_IND_L] = (S.indL || S.hazard) && f;
   w[O_IND_R] = (S.indR || S.hazard) && f;
-  bool highOn = S.high || S.flash;
+  bool highOn = (S.lightsOn && S.high) || S.flash;   // flash works even with the lights off
   w[O_HIGH] = highOn;
-  w[O_LOW] = !highOn || LOW_WITH_HIGH;
+  w[O_LOW] = S.lightsOn && (!highOn || LOW_WITH_HIGH);
   w[O_HORN] = S.horn;
   w[O_USB] = true;
   w[O_AUX] = false;
@@ -756,7 +787,7 @@ static Rect widgetRect(int id) {
     case W_SYS: return Rect{180, 76, 296, 206};
     case W_BTNS: return Rect{14, 74, 452, 96};
     case W_OUTS: return Rect{14, 196, 452, 56};
-    case W_TINFO: return Rect{14, 254, 452, 30};
+    case W_TINFO: return Rect{14, 254, 452, 40};
     default: return tripRect(id - W_T0);
   }
 }
@@ -789,7 +820,7 @@ static uint32_t widgetKey(int id) {
   switch (id) {
     case W_INDL: return indLit(true) ? 1 : 2;
     case W_INDR: return indLit(false) ? 1 : 2;
-    case W_BEAM: return S.beam ? 1 : 2;
+    case W_BEAM: return S.beam ? 1 : (S.lightsOn ? 2 : 3);
     case W_NEUT: return S.horn ? 1 : 2;
     case W_BRAKE: return S.brake ? 1 : 2;
     case W_CLOCK: { int hh, mm; return ukClock(hh, mm) ? (uint32_t)(hh * 60 + mm + 10) : 1; }
@@ -799,9 +830,15 @@ static uint32_t widgetKey(int id) {
     case W_TRIP: snprintf(b, sizeof b, "%.1f", S.tripA); return fnv(b);
     case W_ODO: snprintf(b, sizeof b, "%.1f", S.odo); return fnv(b);
     case W_BATT: snprintf(b, sizeof b, "%.1f %d %d", S.battV, S.lipoPct, S.charging); return fnv(b);
-    case W_BTNS: return (uint32_t)S.btn * 4 + (S.mcpAddr < 0 ? 0 : S.mcpAddr) * 1024 + 1;
+    case W_BTNS: {
+      uint32_t k = (uint32_t)S.btn * 4 + (S.mcpAddr < 0 ? 0 : S.mcpAddr) * 1024 + eventCount * 262144u + 1;
+      const Button *bs[5] = {&bL, &bR, &bHorn, &bLights, &bMode};
+      for (int i = 0; i < 5; i++) if (bs[i]->down) k = k * 31 + (millis() - bs[i]->downMs) / 100;   // held time, 0.1 s steps
+      return k;
+    }
     case W_OUTS: { uint32_t k = 1; for (int i = 0; i < 8; i++) k = k * 2 + (S.out[i] ? 1 : 0); return k; }
-    case W_TINFO: snprintf(b, sizeof b, "%d%d%d%d", S.brake, (int)S.rpm / 10, (int)(S.mph * 10), G.sats); return fnv(b);
+    case W_TINFO: snprintf(b, sizeof b, "%d%d%d%d%d%d%d%d%d", S.brake, (int)S.rpm / 10, (int)(S.mph * 10), G.sats,
+                           S.lightsOn, S.high, S.flash, S.hazard, S.horn); return fnv(b);
     case W_SYS: { if (millis() % 500 > 40) return lastKey[W_SYS]; char l[8][32]; sysLines(l); uint32_t h = 2166136261u; for (int i = 0; i < 8; i++) h = fnv(l[i], h); return h; }
     default: {
       int i = id - W_T0;
@@ -822,7 +859,7 @@ static void drawWidget(int id) {
   switch (id) {
     case W_INDL: arrowIcon(r, true, indLit(true) ? C_GRN : C_OFF); break;
     case W_INDR: arrowIcon(r, false, indLit(false) ? C_GRN : C_OFF); break;
-    case W_BEAM: beamIcon(r, S.beam ? C_BLU : C_OFF); break;
+    case W_BEAM: beamIcon(r, S.beam ? C_BLU : (S.lightsOn ? C_GRN : C_OFF)); break;   // blue high, green low, grey off
     case W_NEUT:   // HORN light
       if (S.horn) { capsule(r.x + 15, r.y + 15, r.x + r.w - 15, r.y + 15, 14, C_AMB); text(F_SMALL, r.x + r.w / 2, r.y + 20, "HORN", C_BG, CENTRE); }
       else text(F_SMALL, r.x + r.w / 2, r.y + 20, "HORN", C_OFF, CENTRE);
@@ -860,17 +897,26 @@ static void drawWidget(int id) {
     case W_BTNS: {
       static const char *nm[5] = {"IND L", "IND R", "HORN", "LIGHTS", "MODE"};
       static const int pins[5] = {BTN_IND_L, BTN_IND_R, BTN_HORN, BTN_LIGHTS, BTN_MODE};
+      const Button *bs[5] = {&bL, &bR, &bHorn, &bLights, &bMode};
       for (int i = 0; i < 5; i++) {
         bool on = S.btn & (1 << pins[i]);
         int x = r.x + 6 + i * 89;
         capsule(x + 14, r.y + 26, x + 66, r.y + 26, 18, on ? C_GRN : C_OFF);
         text(F_SMALL, x + 40, r.y + 31, nm[i], on ? C_BG : C_GREY, CENTRE);
-        snprintf(b, sizeof b, "PA%d", pins[i]);
-        text(F_SMALL, x + 40, r.y + 60, b, C_DIM, CENTRE);
+        if (bs[i]->down) {             // how long it's been held: amber once it counts as a hold
+          uint32_t ms = millis() - bs[i]->downMs;
+          snprintf(b, sizeof b, "%.1f s", ms / 1000.0f);
+          text(F_SMALL, x + 40, r.y + 60, b, ms >= 3000 ? C_RED : ms >= HOLD_MS ? C_AMB : C_TXT, CENTRE);
+        } else {
+          snprintf(b, sizeof b, "PA%d", pins[i]);
+          text(F_SMALL, x + 40, r.y + 60, b, C_DIM, CENTRE);
+        }
       }
-      if (S.mcpAddr >= 0) snprintf(b, sizeof b, "Button chip found at 0x%02X", S.mcpAddr);
-      else snprintf(b, sizeof b, "Button chip NOT FOUND (check 4 wires / address)");
+      if (S.mcpAddr >= 0) snprintf(b, sizeof b, "Chip 0x%02X", S.mcpAddr);
+      else snprintf(b, sizeof b, "Chip NOT FOUND");
       textOutlined(F_SMALL, r.x + 6, r.y + 84, b, S.mcpAddr >= 0 ? C_GRN : C_RED);
+      textOutlined(F_SMALL, r.x + 112, r.y + 84, "Last:", C_GREY);
+      textOutlined(F_SMALL, r.x + 156, r.y + 84, lastEvent, C_AMB);
       break;
     }
     case W_OUTS:
@@ -883,8 +929,11 @@ static void drawWidget(int id) {
       }
       break;
     case W_TINFO:
+      snprintf(b, sizeof b, "Head: %s   Beam: %s%s   Hazards: %s   Horn: %s", S.lightsOn ? "ON" : "OFF",
+               S.high && S.lightsOn ? "HIGH" : S.lightsOn ? "low" : "-", S.flash ? " +FLASH" : "", S.hazard ? "ON" : "off", S.horn ? "ON" : "off");
+      textOutlined(F_SMALL, r.x + 6, r.y + 16, b, C_TXT);
       snprintf(b, sizeof b, "Brake: %s    RPM in: %d    GPS: %.1f mph, %d sats", S.brake ? "ON" : "off", (int)S.rpm, S.mph, G.sats);
-      textOutlined(F_SMALL, r.x + 6, r.y + 20, b, C_TXT);
+      textOutlined(F_SMALL, r.x + 6, r.y + 35, b, C_TXT);
       break;
     case W_SYS: { char l[8][32]; sysLines(l); for (int i = 0; i < 8; i++) text(F_MED, 470, 98 + i * 25, l[i], C_TXT, RIGHT); break; }
     default: {
