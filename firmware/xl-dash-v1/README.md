@@ -16,7 +16,7 @@ Arduino IDE: ESP32S3 Dev Module, esp32 core **3.2.0**, USB CDC On Boot Enabled, 
 | IND L / IND R (PA0 / PA1) | tap on/cancel, hold 0.7 s hazards; arrows flash in sync with OUT1/OUT2 |
 | HORN (PA2) | OUT5 + HORN light while pressed |
 | LIGHTS (PA3) | tap high/low (OUT4 / OUT3), hold = flash high |
-| MODE (PA4) | tap next page, hold reset trip A |
+| MODE (PA4) | tap = flash high beam (0.4 s, `PASS_FLASH_MS`), hold = next page |
 | GPS (IO17/18, 9600) | speed (0 below 1.5 mph), odometer + trips saved to flash every 0.1 mi, UK clock (BST auto) |
 | RPM (IO21) | needle, once the pickup is fitted (`SPARKS_PER_REV` is a guess) |
 | Brake (IO48) | BRAKE light |

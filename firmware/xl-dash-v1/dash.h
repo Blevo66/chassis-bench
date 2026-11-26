@@ -490,11 +490,13 @@ static void handleButtons() {
   pollButton(bHorn);
   S.horn = S.btn & (1 << BTN_HORN);                       // straight from the switch, no delay
   if (pollButton(bLights) == 1) S.high = !S.high;
-  S.flash = bLights.down && bLights.held;
+  // MODE: tap = flash the high beam for PASS_FLASH_MS, hold = next page
+  static uint32_t passUntil = 0;
   if ((e = pollButton(bMode))) {
-    if (e == 1) pendingPage = +1;
-    else { S.tripA = 0; S.maxMph = 0; S.rideS = 0; S.movingS = 0; saveTrips(); }
+    if (e == 1) passUntil = millis() + PASS_FLASH_MS;
+    else pendingPage = +1;
   }
+  S.flash = (bLights.down && bLights.held) || (int32_t)(passUntil - millis()) > 0;
 }
 
 static bool flashPhase() { return (millis() % FLASH_PERIOD_MS) < FLASH_PERIOD_MS / 2; }

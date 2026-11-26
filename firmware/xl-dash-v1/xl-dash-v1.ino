@@ -13,7 +13,7 @@
 //    IND L / IND R  tap = on / cancel     hold = hazards on / off
 //    HORN           sounds while pressed
 //    LIGHTS         tap = high / low      hold = flash high beam while held
-//    MODE           tap = next page       hold = reset trip A
+//    MODE           tap = flash high beam  hold = next page
 //  Swipe the screen (or tap) to change page too. Pages: RIDE, TRIP, SYSTEM, TEST.
 // =====================================================================
 #include <Arduino_GFX_Library.h>

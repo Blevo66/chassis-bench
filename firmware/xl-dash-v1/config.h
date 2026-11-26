@@ -35,6 +35,7 @@
 #define BTN_MODE   4   // PA4
 static const uint32_t HOLD_MS     = 700;   // long press
 static const uint32_t DEBOUNCE_MS = 25;
+static const uint32_t PASS_FLASH_MS = 400;  // MODE tap: how long the high beam flashes
 
 // ---- Outputs: GPIO -> MOSFET board IN1..IN8 (jumpers on H: HIGH = on) ----
 //                               OUT1 OUT2 OUT3 OUT4 OUT5 OUT6 OUT7 OUT8
