@@ -280,6 +280,7 @@ struct Ride {
   bool indL = false, indR = false, beam = false, brake = false;
   bool hazard = false, high = false, flash = false, horn = false;
   bool lightsOn = true;           // headlight on at power-up
+  bool drl = true;                // DRL / sidelight on OUT7 (AUX), on at power-up
   bool out[8] = {};               // what each MOSFET output is doing right now
   uint8_t btn = 0;                // bit n = MCP pin n pressed (raw, live)
   int mcpAddr = -1;               // where the button chip was found, -1 = not found
@@ -498,9 +499,18 @@ static void handleButtons() {
   S.horn = S.btn & (1 << BTN_HORN);                       // straight from the switch, no delay
   uint32_t now = millis();
 
-  // LIGHTS: tap = high / low (or back on, if off), hold LIGHTS_OFF_MS = headlight on / off
-  static bool lightsDone = false;
+  // LIGHTS: tap = high / low (or back on, if off), double tap = DRL on / off,
+  // hold LIGHTS_OFF_MS = headlight on / off. A single tap waits DOUBLE_TAP_MS to be sure it isn't a double.
+  static bool lightsDone = false, tapPending = false;
+  static uint32_t firstTapMs = 0;
   if (pollButton(bLights) == 1) {
+    if (tapPending && now - firstTapMs < DOUBLE_TAP_MS) {
+      tapPending = false; S.drl = !S.drl;
+      logEvent(S.drl ? "LIGHTS double tap = DRL ON" : "LIGHTS double tap = DRL off");
+    } else { tapPending = true; firstTapMs = now; }
+  }
+  if (tapPending && now - firstTapMs >= DOUBLE_TAP_MS) {
+    tapPending = false;
     if (!S.lightsOn) { S.lightsOn = true; logEvent("LIGHTS tap = headlight back ON"); }
     else { S.high = !S.high; logEvent(S.high ? "LIGHTS tap = HIGH beam" : "LIGHTS tap = low beam"); }
   }
@@ -540,13 +550,13 @@ static void writeOutputs() {
   w[O_LOW] = S.lightsOn && (!highOn || LOW_WITH_HIGH);
   w[O_HORN] = S.horn;
   w[O_USB] = true;
-  w[O_AUX] = false;
+  w[O_AUX] = S.drl;                                    // DRL: full by day, dimmed with the headlight
   w[O_TAIL] = true;
   for (int i = 0; i < 8; i++) {
     S.out[i] = w[i];
     if (PIN_OUT[i] < 0) continue;
-    if (i == O_TAIL) {
-      float d = w[i] ? TAIL_DUTY : 0.0f;
+    if (i == O_TAIL || i == O_AUX) {
+      float d = !w[i] ? 0.0f : (i == O_TAIL) ? TAIL_DUTY : (S.lightsOn ? DRL_DIM_DUTY : 1.0f);
       if (!OUT_ACTIVE_HIGH) d = 1.0f - d;
       ledcWrite(PIN_OUT[i], (uint32_t)(d * 255.0f + 0.5f));
     } else digitalWrite(PIN_OUT[i], w[i] == OUT_ACTIVE_HIGH ? HIGH : LOW);
@@ -838,7 +848,7 @@ static uint32_t widgetKey(int id) {
     }
     case W_OUTS: { uint32_t k = 1; for (int i = 0; i < 8; i++) k = k * 2 + (S.out[i] ? 1 : 0); return k; }
     case W_TINFO: snprintf(b, sizeof b, "%d%d%d%d%d%d%d%d%d", S.brake, (int)S.rpm / 10, (int)(S.mph * 10), G.sats,
-                           S.lightsOn, S.high, S.flash, S.hazard, S.horn); return fnv(b);
+                           S.lightsOn, S.high, S.flash, S.hazard, S.horn * 2 + S.drl); return fnv(b);
     case W_SYS: { if (millis() % 500 > 40) return lastKey[W_SYS]; char l[8][32]; sysLines(l); uint32_t h = 2166136261u; for (int i = 0; i < 8; i++) h = fnv(l[i], h); return h; }
     default: {
       int i = id - W_T0;
@@ -929,8 +939,9 @@ static void drawWidget(int id) {
       }
       break;
     case W_TINFO:
-      snprintf(b, sizeof b, "Head: %s   Beam: %s%s   Hazards: %s   Horn: %s", S.lightsOn ? "ON" : "OFF",
-               S.high && S.lightsOn ? "HIGH" : S.lightsOn ? "low" : "-", S.flash ? " +FLASH" : "", S.hazard ? "ON" : "off", S.horn ? "ON" : "off");
+      snprintf(b, sizeof b, "Head: %s  Beam: %s%s  DRL: %s  Haz: %s  Horn: %s", S.lightsOn ? "ON" : "OFF",
+               S.high && S.lightsOn ? "HIGH" : S.lightsOn ? "low" : "-", S.flash ? "+FLASH" : "",
+               !S.drl ? "off" : S.lightsOn ? "dim" : "FULL", S.hazard ? "ON" : "off", S.horn ? "ON" : "off");
       textOutlined(F_SMALL, r.x + 6, r.y + 16, b, C_TXT);
       snprintf(b, sizeof b, "Brake: %s    RPM in: %d    GPS: %.1f mph, %d sats", S.brake ? "ON" : "off", (int)S.rpm, S.mph, G.sats);
       textOutlined(F_SMALL, r.x + 6, r.y + 35, b, C_TXT);
@@ -1157,6 +1168,7 @@ void dashSetup() {
   // outputs first, all off, so nothing twitches while the screen starts
   for (int i = 0; i < 8; i++) if (PIN_OUT[i] >= 0) { pinMode(PIN_OUT[i], OUTPUT); digitalWrite(PIN_OUT[i], OUT_ACTIVE_HIGH ? LOW : HIGH); }
   if (PIN_OUT[O_TAIL] >= 0) ledcAttach(PIN_OUT[O_TAIL], TAIL_PWM_HZ, 8);   // esp32 core 3.x API
+  if (PIN_OUT[O_AUX] >= 0) ledcAttach(PIN_OUT[O_AUX], TAIL_PWM_HZ, 8);     // DRL dimming
   pinMode(PIN_BRAKE, INPUT_PULLUP);
   pinMode(PIN_RPM, INPUT_PULLDOWN);              // stays quiet with nothing plugged in
   attachInterrupt(digitalPinToInterrupt(PIN_RPM), rpmISR, RISING);

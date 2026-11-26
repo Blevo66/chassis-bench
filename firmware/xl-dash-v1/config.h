@@ -38,16 +38,18 @@ static const uint32_t DEBOUNCE_MS = 25;
 static const uint32_t PASS_FLASH_MS = 400;  // MODE tap: how long the high beam flashes
 static const uint32_t LIGHTS_OFF_MS = 3000; // LIGHTS hold this long: headlight on / off
 static const uint32_t TRIP_RESET_MS = 3000; // MODE hold this long on the TRIP page: reset trip A
+static const uint32_t DOUBLE_TAP_MS = 350;  // LIGHTS double tap window (single tap waits this long)
 
 // ---- Outputs: GPIO -> MOSFET board IN1..IN8 (jumpers on H: HIGH = on) ----
 //                               OUT1 OUT2 OUT3 OUT4 OUT5 OUT6 OUT7 OUT8
 static const int PIN_OUT[8]  = {  38,  39,  40,  41,  42,  45,  46,  47 };
 static const bool OUT_ACTIVE_HIGH = true;
 enum OutIdx { O_IND_L = 0, O_IND_R, O_LOW, O_HIGH, O_HORN, O_USB, O_AUX, O_TAIL };
-static const char *OUT_NAME[8] = {"IND L", "IND R", "LOW", "HIGH", "HORN", "USB", "AUX", "TAIL"};
+static const char *OUT_NAME[8] = {"IND L", "IND R", "LOW", "HIGH", "HORN", "USB", "DRL", "TAIL"};
 static const bool LOW_WITH_HIGH   = true;    // keep low beam on with high (twin lamps)
 static const uint32_t FLASH_PERIOD_MS = 667; // ~1.5 Hz indicators
 static const int   TAIL_PWM_HZ = 1000;       // guess; slow MOSFET boards may want 200-500
+static const float DRL_DIM_DUTY = 0.20f;     // DRL brightness while the headlight is on (sidelight). Full when it's off
 static const float TAIL_DUTY   = 0.20f;      // tail brightness 0..1 (guess). Keep < 0.6 for brake sensing
 
 // ---- Inputs ---------------------------------------------------------------
