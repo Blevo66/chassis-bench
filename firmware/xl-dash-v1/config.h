@@ -19,7 +19,7 @@
 #define NEEDLE_EASE_S 0.10f      // needle catch-up time, seconds
 #define SPEED_EASE_S 0.18f
 #define GHOST_TRAIL 1            // faded needles behind the real one
-#define RETRO_STRIPES 1          // tricolour stripes in the background
+#define RETRO_STRIPES 0          // tricolour stripes in the background
 #define STRIPE_ALPHA 150         // 0-255, strength of the big diagonal stripes
 
 // ---- I2C bus (Waveshare fixed: SDA 8, SCL 7). The left controller hangs off it too.
