@@ -38,7 +38,7 @@ td.dest.g-no{color:var(--no)}td.dest:not(.g-no){color:var(--fg)}
 <p class="mut">Waveshare ESP32-S3-Touch-LCD-3.5 header J8 to the Fowecry 8-ch MOSFET board, GPS and MCP23017. Matches firmware v0.2 (<code>config.h</code>), with the AMPSEAL 23 bulkhead plug and the button chip in the left controller.</p>
 </header>
 
-<div class="warn"><b>Find pin 1 on the real board first.</b> The pin names come from Waveshare's schematic, but I can't see which end of the header pin 1 is. Look for a square pad, a "1" or a triangle next to the header. <span class="tag">check</span></div>
+<div class="warn"><b>Corrected 27 Nov 2026</b> to match Waveshare's official pinout diagram. The first version had odd and even pins swapped: it put SCL/SDA on 25/27, but they are really on 26/28.</div>
 
 <section class="panel">
 <h2>Waveshare header J8 (2 × 16, 2.54 mm, female)</h2>
@@ -47,22 +47,22 @@ td.dest.g-no{color:var(--no)}td.dest:not(.g-no){color:var(--fg)}
 </div>
 <div class="scroll"><table>
 <tr><th style="text-align:right">Goes to</th><th>Odd pins</th><th style="text-align:right">Even pins</th><th>Goes to</th></tr>
-<tr><td class="dest l g-pwr">5 V in from the buck</td><td class="pin g-pwr"><b>1</b> VBUS</td><td class="pin g-no">VBAT <b>2</b></td><td class="dest g-no">Leave free (LiPo +)</td></tr>
-<tr><td class="dest l g-gnd">Buck GND</td><td class="pin g-gnd"><b>3</b> GND</td><td class="pin g-gnd">GND <b>4</b></td><td class="dest g-gnd">—</td></tr>
-<tr><td class="dest l g-no">Leave free (USB)</td><td class="pin g-no"><b>5</b> U_N</td><td class="pin g-in">IO21 <b>6</b></td><td class="dest g-in">RPM filter (plug 12)</td></tr>
-<tr><td class="dest l g-no">Leave free (USB)</td><td class="pin g-no"><b>7</b> U_P</td><td class="pin g-out">IO38 <b>8</b></td><td class="dest g-out">MOSFET IN1 · Indicator L</td></tr>
-<tr><td class="dest l g-no">Leave free (screen)</td><td class="pin g-no"><b>9</b> SCLK</td><td class="pin g-out">IO39 <b>10</b></td><td class="dest g-out">MOSFET IN2 · Indicator R</td></tr>
-<tr><td class="dest l g-no">Leave free (screen)</td><td class="pin g-no"><b>11</b> MOSI</td><td class="pin g-out">IO40 <b>12</b></td><td class="dest g-out">MOSFET IN3 · Low beam</td></tr>
-<tr><td class="dest l g-no">Leave free (screen)</td><td class="pin g-no"><b>13</b> MISO</td><td class="pin g-out">IO41 <b>14</b></td><td class="dest g-out">MOSFET IN4 · High beam</td></tr>
-<tr><td class="dest l g-gps">GPS TX</td><td class="pin g-gps"><b>15</b> IO17</td><td class="pin g-out">IO42 <b>16</b></td><td class="dest g-out">MOSFET IN5 · Horn</td></tr>
-<tr><td class="dest l g-gps">GPS RX</td><td class="pin g-gps"><b>17</b> IO18</td><td class="pin g-out">IO45 <b>18</b></td><td class="dest g-out">MOSFET IN6 · USB</td></tr>
-<tr><td class="dest l g-no">Leave free (BOOT)</td><td class="pin g-no"><b>19</b> IO0</td><td class="pin g-out">IO46 <b>20</b></td><td class="dest g-out">MOSFET IN7 · Aux</td></tr>
-<tr><td class="dest l g-no">Leave free (reset)</td><td class="pin g-no"><b>21</b> EN</td><td class="pin g-out">IO47 <b>22</b></td><td class="dest g-out">MOSFET IN8 · Tail/brake</td></tr>
-<tr><td class="dest l g-no">Leave free</td><td class="pin g-no"><b>23</b> PWRON</td><td class="pin g-in">IO48 <b>24</b></td><td class="dest g-in">Brake opto (plug 11)</td></tr>
-<tr><td class="dest l g-i2c">Plug 19 · controller SCL</td><td class="pin g-i2c"><b>25</b> SCL</td><td class="pin g-no">TXD <b>26</b></td><td class="dest g-no">Leave free (serial log)</td></tr>
-<tr><td class="dest l g-i2c">Plug 18 · controller SDA</td><td class="pin g-i2c"><b>27</b> SDA</td><td class="pin g-no">RXD <b>28</b></td><td class="dest g-no">Leave free</td></tr>
-<tr><td class="dest l g-gnd">MOSFET GND (10-way)</td><td class="pin g-gnd"><b>29</b> GND</td><td class="pin g-gnd">GND <b>30</b></td><td class="dest g-gnd">GPS GND + plug 17</td></tr>
-<tr><td class="dest l g-pwr">MOSFET VCC (10-way)</td><td class="pin g-pwr"><b>31</b> 3V3</td><td class="pin g-pwr">3V3 <b>32</b></td><td class="dest g-pwr">GPS VCC + plug 16</td></tr>
+<tr><td class="dest l g-no">Leave free (LiPo +)</td><td class="pin g-no"><b>1</b> BAT</td><td class="pin g-pwr">5V <b>2</b></td><td class="dest g-pwr">5 V in from the buck</td></tr>
+<tr><td class="dest l g-gnd">—</td><td class="pin g-gnd"><b>3</b> GND</td><td class="pin g-gnd">GND <b>4</b></td><td class="dest g-gnd">Buck GND</td></tr>
+<tr><td class="dest l g-in">RPM filter (plug 12)</td><td class="pin g-in"><b>5</b> IO21</td><td class="pin g-no">DN (IO19) <b>6</b></td><td class="dest g-no">Leave free (USB)</td></tr>
+<tr><td class="dest l g-out">MOSFET IN1 · Indicator L</td><td class="pin g-out"><b>7</b> IO38</td><td class="pin g-no">DP (IO20) <b>8</b></td><td class="dest g-no">Leave free (USB)</td></tr>
+<tr><td class="dest l g-out">MOSFET IN2 · Indicator R</td><td class="pin g-out"><b>9</b> IO39</td><td class="pin g-no">SCLK <b>10</b></td><td class="dest g-no">Leave free (screen)</td></tr>
+<tr><td class="dest l g-out">MOSFET IN3 · Low beam</td><td class="pin g-out"><b>11</b> IO40</td><td class="pin g-no">MOSI <b>12</b></td><td class="dest g-no">Leave free (screen)</td></tr>
+<tr><td class="dest l g-out">MOSFET IN4 · High beam</td><td class="pin g-out"><b>13</b> IO41</td><td class="pin g-no">MISO <b>14</b></td><td class="dest g-no">Leave free (screen)</td></tr>
+<tr><td class="dest l g-out">MOSFET IN5 · Horn</td><td class="pin g-out"><b>15</b> IO42</td><td class="pin g-gps">IO17 <b>16</b></td><td class="dest g-gps">GPS TX</td></tr>
+<tr><td class="dest l g-out">MOSFET IN6 · USB</td><td class="pin g-out"><b>17</b> IO45</td><td class="pin g-gps">IO18 <b>18</b></td><td class="dest g-gps">GPS RX</td></tr>
+<tr><td class="dest l g-out">MOSFET IN7 · Aux</td><td class="pin g-out"><b>19</b> IO46</td><td class="pin g-no">BOOT (IO0) <b>20</b></td><td class="dest g-no">Leave free (BOOT)</td></tr>
+<tr><td class="dest l g-out">MOSFET IN8 · Tail/brake</td><td class="pin g-out"><b>21</b> IO47</td><td class="pin g-no">RST <b>22</b></td><td class="dest g-no">Leave free (reset)</td></tr>
+<tr><td class="dest l g-in">Brake opto (plug 11)</td><td class="pin g-in"><b>23</b> IO48</td><td class="pin g-no">PWR <b>24</b></td><td class="dest g-no">Leave free</td></tr>
+<tr><td class="dest l g-no">Leave free (serial log)</td><td class="pin g-no"><b>25</b> TXD</td><td class="pin g-i2c">SCL (IO7) <b>26</b></td><td class="dest g-i2c">Plug 19 · controller SCL</td></tr>
+<tr><td class="dest l g-no">Leave free</td><td class="pin g-no"><b>27</b> RXD</td><td class="pin g-i2c">SDA (IO8) <b>28</b></td><td class="dest g-i2c">Plug 18 · controller SDA</td></tr>
+<tr><td class="dest l g-gnd">GPS GND + plug 17</td><td class="pin g-gnd"><b>29</b> GND</td><td class="pin g-gnd">GND <b>30</b></td><td class="dest g-gnd">MOSFET GND (10-way)</td></tr>
+<tr><td class="dest l g-pwr">GPS VCC + plug 16</td><td class="pin g-pwr"><b>31</b> 3V3</td><td class="pin g-pwr">3V3 <b>32</b></td><td class="dest g-pwr">MOSFET VCC (10-way)</td></tr>
 
 </table></div>
 </section>
@@ -72,9 +72,9 @@ td.dest.g-no{color:var(--no)}td.dest:not(.g-no){color:var(--fg)}
 <h2>MOSFET board (Fowecry, 3.3 V)</h2>
 <div class="scroll"><table>
 <tr><th>Terminal</th><th>Wire to</th></tr>
-<tr><td>VCC (10-way)</td><td>J8 pin 31 · 3V3</td></tr>
-<tr><td>GND (10-way)</td><td>J8 pin 29 · GND</td></tr>
-<tr><td>IN1 … IN8</td><td>J8 pins 8 … 22 (even)</td></tr>
+<tr><td>VCC (10-way)</td><td>J8 pin 32 · 3V3</td></tr>
+<tr><td>GND (10-way)</td><td>J8 pin 30 · GND</td></tr>
+<tr><td>IN1 … IN8</td><td>J8 pins 7 … 21 (odd)</td></tr>
 <tr><td>VIN +</td><td>Bike 12 V, fused</td></tr>
 <tr><td>VIN −</td><td>Bike earth</td></tr>
 <tr><td>OUT1–8 + / −</td><td>Load across + and −</td></tr>
@@ -86,10 +86,10 @@ td.dest.g-no{color:var(--no)}td.dest:not(.g-no){color:var(--fg)}
 <h2>GPS module</h2>
 <div class="scroll"><table>
 <tr><th>GPS pin</th><th>Wire to</th></tr>
-<tr><td>VCC</td><td>J8 pin 32 · 3V3</td></tr>
-<tr><td>GND</td><td>J8 pin 30 · GND</td></tr>
-<tr><td>TX</td><td>J8 pin 15 · IO17</td></tr>
-<tr><td>RX</td><td>J8 pin 17 · IO18</td></tr>
+<tr><td>VCC</td><td>J8 pin 31 · 3V3</td></tr>
+<tr><td>GND</td><td>J8 pin 29 · GND</td></tr>
+<tr><td>TX</td><td>J8 pin 16 · IO17</td></tr>
+<tr><td>RX</td><td>J8 pin 18 · IO18</td></tr>
 </table></div>
 <p class="mut" style="margin-top:10px">TX crosses to the ESP's receive pin. RX is optional (only needed to change the GPS settings).</p>
 </section>
@@ -98,10 +98,10 @@ td.dest.g-no{color:var(--no)}td.dest:not(.g-no){color:var(--fg)}
 <h2>MCP23017 (inside the left controller)</h2>
 <div class="scroll"><table>
 <tr><th>MCP pin (DIP)</th><th>Wire to</th></tr>
-<tr><td>9 VDD</td><td>Plug pin 16 → J8 pin 32 · 3V3</td></tr>
-<tr><td>10 VSS</td><td>Plug pin 17 → J8 pin 30 · GND</td></tr>
-<tr><td>13 SDA</td><td>Plug pin 18 → J8 pin 27 · SDA</td></tr>
-<tr><td>12 SCL</td><td>Plug pin 19 → J8 pin 25 · SCL</td></tr>
+<tr><td>9 VDD</td><td>Plug pin 16 → J8 pin 31 · 3V3</td></tr>
+<tr><td>10 VSS</td><td>Plug pin 17 → J8 pin 29 · GND</td></tr>
+<tr><td>13 SDA</td><td>Plug pin 18 → J8 pin 28 · SDA</td></tr>
+<tr><td>12 SCL</td><td>Plug pin 19 → J8 pin 26 · SCL</td></tr>
 <tr><td>15, 16, 17 A0–A2</td><td>3V3 (address 0x27)</td></tr>
 <tr><td>18 RESET</td><td>3V3</td></tr>
 <tr><td>21 GPA0</td><td>Indicator L button</td></tr>
@@ -127,15 +127,15 @@ td.dest.g-no{color:var(--no)}td.dest:not(.g-no){color:var(--fg)}
 <tr><td class="pin g-out"><b>8</b></td><td>OUT8 · Tail/brake lamp −</td><td>MOSFET OUT8 −</td><td>0.5 mm²</td></tr>
 <tr><td class="pin g-pwr"><b>9</b></td><td>Bike 12 V in (fused)</td><td>Buck in + and MOSFET VIN +</td><td>0.75–1 mm²</td></tr>
 <tr><td class="pin g-gnd"><b>10</b></td><td>Earth</td><td>Buck in − and MOSFET VIN −</td><td>0.75–1 mm²</td></tr>
-<tr><td class="pin g-in"><b>11</b></td><td>Brake sense</td><td>Brake opto → J8 pin 24 · IO48</td><td>0.25 mm²</td></tr>
-<tr><td class="pin g-in"><b>12</b></td><td>RPM pickup signal</td><td>RPM filter → J8 pin 6 · IO21</td><td>0.25 mm² screened</td></tr>
+<tr><td class="pin g-in"><b>11</b></td><td>Brake sense</td><td>Brake opto → J8 pin 23 · IO48</td><td>0.25 mm²</td></tr>
+<tr><td class="pin g-in"><b>12</b></td><td>RPM pickup signal</td><td>RPM filter → J8 pin 5 · IO21</td><td>0.25 mm² screened</td></tr>
 <tr><td class="pin g-gnd"><b>13</b></td><td>RPM cable screen</td><td>Pod GND (this end only)</td><td>drain</td></tr>
 <tr><td class="pin g-no"><b>14</b></td><td>spare</td><td>blanking plug</td><td></td></tr>
 <tr><td class="pin g-no"><b>15</b></td><td>spare</td><td>blanking plug</td><td></td></tr>
-<tr><td class="pin g-i2c"><b>16</b></td><td>Controller 3V3</td><td>J8 pin 32 · 3V3</td><td>0.25 mm²</td></tr>
-<tr><td class="pin g-i2c"><b>17</b></td><td>Controller GND</td><td>J8 pin 30 · GND</td><td>0.25 mm²</td></tr>
-<tr><td class="pin g-i2c"><b>18</b></td><td>Controller SDA</td><td>J8 pin 27 · SDA</td><td>0.25 mm² twisted</td></tr>
-<tr><td class="pin g-i2c"><b>19</b></td><td>Controller SCL</td><td>J8 pin 25 · SCL</td><td>0.25 mm² twisted</td></tr>
+<tr><td class="pin g-i2c"><b>16</b></td><td>Controller 3V3</td><td>J8 pin 31 · 3V3</td><td>0.25 mm²</td></tr>
+<tr><td class="pin g-i2c"><b>17</b></td><td>Controller GND</td><td>J8 pin 29 · GND</td><td>0.25 mm²</td></tr>
+<tr><td class="pin g-i2c"><b>18</b></td><td>Controller SDA</td><td>J8 pin 28 · SDA</td><td>0.25 mm² twisted</td></tr>
+<tr><td class="pin g-i2c"><b>19</b></td><td>Controller SCL</td><td>J8 pin 26 · SCL</td><td>0.25 mm² twisted</td></tr>
 <tr><td class="pin g-no"><b>20</b></td><td>spare</td><td>blanking plug</td><td></td></tr>
 <tr><td class="pin g-no"><b>21</b></td><td>spare</td><td>blanking plug</td><td></td></tr>
 <tr><td class="pin g-no"><b>22</b></td><td>spare</td><td>blanking plug</td><td></td></tr>
@@ -150,11 +150,11 @@ td.dest.g-no{color:var(--no)}td.dest:not(.g-no){color:var(--fg)}
 <tr><th>From</th><th>To</th></tr>
 <tr><td>Plug pin 9 · bike 12 V (fused)</td><td>5 V buck in, MOSFET VIN +</td></tr>
 <tr><td>Plug pin 10 · earth</td><td>Buck in −, MOSFET VIN −</td></tr>
-<tr><td>Buck 5 V out</td><td>J8 pin 1 · VBUS</td></tr>
-<tr><td>Buck GND</td><td>J8 pin 3 · GND</td></tr>
+<tr><td>Buck 5 V out</td><td>J8 pin 2 · 5V</td></tr>
+<tr><td>Buck GND</td><td>J8 pin 4 · GND</td></tr>
 <tr><td>PKCell LiPo</td><td>Waveshare battery socket</td></tr>
 </table></div>
-<p class="mut" style="margin-top:10px">All grounds are common. Don't feed 5 V into VBUS while a laptop is on the USB-C. Never connect anything to pin 2 (VBAT).</p>
+<p class="mut" style="margin-top:10px">All grounds are common. Don't feed 5 V into the 5V pin while a laptop is on the USB-C. Never connect anything to pin 1 (BAT).</p>
 </section>
 </div>
 </div>
