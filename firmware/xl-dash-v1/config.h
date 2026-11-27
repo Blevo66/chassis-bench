@@ -35,7 +35,7 @@
 #define BTN_MODE   4   // PA4
 static const uint32_t HOLD_MS     = 700;   // long press
 static const uint32_t DEBOUNCE_MS = 25;
-static const uint32_t PASS_FLASH_MS = 400;  // MODE tap: how long the high beam flashes
+static const uint32_t PASS_FLASH_MS = 400;  // LIGHTS tap: how long the high beam flashes
 static const uint32_t LIGHTS_OFF_MS = 3000; // LIGHTS hold this long: headlight on (low) / off
 static const uint32_t TRIP_RESET_MS = 3000; // MODE hold this long on the TRIP page: reset trip A
 

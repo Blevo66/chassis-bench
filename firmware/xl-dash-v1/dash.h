@@ -499,25 +499,26 @@ static void handleButtons() {
   S.horn = S.btn & (1 << BTN_HORN);                       // straight from the switch, no delay
   uint32_t now = millis();
 
-  // LIGHTS: hold LIGHTS_OFF_MS = headlight on (low beam) / off. Tap = high / low, only while it's on.
+  // LIGHTS: tap = flash the high beam for PASS_FLASH_MS (works with the headlight off too).
+  // Hold LIGHTS_OFF_MS = headlight on (low beam) / off.
   // The DRL is always on; writeOutputs() dims it when the headlight is on.
+  static uint32_t passUntil = 0;
   static bool lightsDone = false;
-  if (pollButton(bLights) == 1) {
-    if (!S.lightsOn) logEvent("LIGHTS tap: headlight off, hold 3 s");
-    else { S.high = !S.high; logEvent(S.high ? "LIGHTS tap = HIGH beam" : "LIGHTS tap = low beam"); }
-  }
+  if (pollButton(bLights) == 1) { passUntil = now + PASS_FLASH_MS; logEvent("LIGHTS tap = flash high beam"); }
   if (!bLights.down) lightsDone = false;
   else if (!lightsDone && now - bLights.downMs >= LIGHTS_OFF_MS) {
     S.lightsOn = !S.lightsOn; S.high = false; lightsDone = true;
     logEvent(S.lightsOn ? "LIGHTS hold 3 s = headlight ON (low)" : "LIGHTS hold 3 s = headlight OFF");
   }
 
-  // MODE: tap = flash the high beam for PASS_FLASH_MS, hold = next page.
+  // MODE: tap = high / low beam (only while the headlight is on), hold = next page.
   // On the TRIP page: hold and let go = next page, keep holding TRIP_RESET_MS = reset trip A.
-  static uint32_t passUntil = 0;
   static bool modeWaiting = false;
   if ((e = pollButton(bMode))) {
-    if (e == 1) { passUntil = now + PASS_FLASH_MS; logEvent("MODE tap = flash high beam"); }
+    if (e == 1) {
+      if (!S.lightsOn) logEvent("MODE tap: headlight off, hold LIGHTS 3 s");
+      else { S.high = !S.high; logEvent(S.high ? "MODE tap = HIGH beam" : "MODE tap = low beam"); }
+    }
     else if (page == 1) modeWaiting = true;
     else { pendingPage = +1; logEvent("MODE hold = next page"); }
   }
