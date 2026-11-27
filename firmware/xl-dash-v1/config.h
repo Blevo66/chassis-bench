@@ -39,7 +39,13 @@ static const uint32_t PASS_FLASH_MS = 400;  // MODE tap: how long the high beam 
 static const uint32_t LIGHTS_OFF_MS = 3000; // LIGHTS hold this long: headlight on (low) / off
 static const uint32_t TRIP_RESET_MS = 3000; // MODE hold this long on the TRIP page: reset trip A
 
-// ---- Outputs: GPIO -> MOSFET board IN1..IN8 (jumpers on H: HIGH = on) ----
+// ---- Outputs ------------------------------------------------------------------
+// 1 = through a PCA9685 output chip in the dumb box (8-pin link: 5V, GND, SDA, SCL, RPM, brake).
+//     PCA channel 0..7 -> MOSFET board IN1..IN8. Address 0x40 (all A0-A5 pads open).
+// 0 = straight from the screen's GPIO pins in PIN_OUT below (needs 8 spare pins + 8 more wires).
+#define OUTPUTS_VIA_PCA9685 1
+#define PCA9685_ADDR 0x40
+// GPIO -> MOSFET board IN1..IN8 (only used when OUTPUTS_VIA_PCA9685 is 0; jumpers on H: HIGH = on)
 //                               OUT1 OUT2 OUT3 OUT4 OUT5 OUT6 OUT7 OUT8
 static const int PIN_OUT[8]  = {  38,  39,  40,  41,  42,  45,  46,  47 };
 static const bool OUT_ACTIVE_HIGH = true;

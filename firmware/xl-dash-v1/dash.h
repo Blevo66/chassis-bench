@@ -532,6 +532,37 @@ static void handleButtons() {
   S.flash = (int32_t)(passUntil - now) > 0;
 }
 
+// PCA9685 output chip in the dumb box. Each channel gets a duty 0..1; full on / full off use the
+// chip's special bits so there's no flicker. Only channels that changed are rewritten.
+static int pcaAddr = -1;
+static int pcaLast[8];
+static void pcaFind() {
+  pcaAddr = -1;
+  int a = PCA9685_ADDR;
+  if (!i2cWrite(a, 0x00, 0x10)) { Serial.println("Output chip (PCA9685) not found at 0x40"); return; }  // MODE1: sleep
+  uint8_t pre = (uint8_t)(25000000.0f / (4096.0f * TAIL_PWM_HZ) + 0.5f) - 1;
+  i2cWrite(a, 0xFE, pre);                 // PWM frequency
+  i2cWrite(a, 0x01, 0x04);                // MODE2: totem-pole outputs
+  i2cWrite(a, 0x00, 0x20);                // MODE1: wake, register auto-increment
+  delayMicroseconds(600);
+  pcaAddr = a;
+  for (int i = 0; i < 8; i++) pcaLast[i] = -1;
+  Serial.printf("Output chip (PCA9685) found at 0x%02X\n", a);
+}
+static void pcaSet(int ch, float duty) {
+  if (pcaAddr < 0) return;
+  int v = (int)(duty * 4095.0f + 0.5f);
+  if (v == pcaLast[ch]) return;
+  uint16_t on = 0, off = (uint16_t)v;
+  if (v >= 4095) { on = 0x1000; off = 0; }           // full on
+  else if (v <= 0) { on = 0; off = 0x1000; }         // full off
+  Wire.beginTransmission(pcaAddr);
+  Wire.write(0x06 + 4 * ch);
+  Wire.write(on & 0xFF); Wire.write(on >> 8); Wire.write(off & 0xFF); Wire.write(off >> 8);
+  if (Wire.endTransmission() != 0) { pcaAddr = -1; return; }   // box unplugged? look again later
+  pcaLast[ch] = v;
+}
+
 static bool flashPhase() { return (millis() % FLASH_PERIOD_MS) < FLASH_PERIOD_MS / 2; }
 static void writeOutputs() {
   bool f = flashPhase(), w[8];
@@ -544,14 +575,21 @@ static void writeOutputs() {
   w[O_USB] = true;
   w[O_AUX] = S.drl;                                    // DRL: full by day, dimmed with the headlight
   w[O_TAIL] = true;
+#if OUTPUTS_VIA_PCA9685
+  static uint32_t lastTry = 0;
+  if (pcaAddr < 0 && millis() - lastTry > 2000) { lastTry = millis(); pcaFind(); }
+#endif
   for (int i = 0; i < 8; i++) {
     S.out[i] = w[i];
+    float d = !w[i] ? 0.0f : (i == O_TAIL) ? TAIL_DUTY : (i == O_AUX) ? (S.lightsOn ? DRL_DIM_DUTY : 1.0f) : 1.0f;
+    if (!OUT_ACTIVE_HIGH) d = 1.0f - d;
+#if OUTPUTS_VIA_PCA9685
+    pcaSet(i, d);
+#else
     if (PIN_OUT[i] < 0) continue;
-    if (i == O_TAIL || i == O_AUX) {
-      float d = !w[i] ? 0.0f : (i == O_TAIL) ? TAIL_DUTY : (S.lightsOn ? DRL_DIM_DUTY : 1.0f);
-      if (!OUT_ACTIVE_HIGH) d = 1.0f - d;
-      ledcWrite(PIN_OUT[i], (uint32_t)(d * 255.0f + 0.5f));
-    } else digitalWrite(PIN_OUT[i], w[i] == OUT_ACTIVE_HIGH ? HIGH : LOW);
+    if (i == O_TAIL || i == O_AUX) ledcWrite(PIN_OUT[i], (uint32_t)(d * 255.0f + 0.5f));
+    else digitalWrite(PIN_OUT[i], d > 0.5f ? HIGH : LOW);
+#endif
   }
   S.beam = highOn;
 }
@@ -833,7 +871,7 @@ static uint32_t widgetKey(int id) {
     case W_ODO: snprintf(b, sizeof b, "%.1f", S.odo); return fnv(b);
     case W_BATT: snprintf(b, sizeof b, "%.1f %d %d", S.battV, S.lipoPct, S.charging); return fnv(b);
     case W_BTNS: {
-      uint32_t k = (uint32_t)S.btn * 4 + (S.mcpAddr < 0 ? 0 : S.mcpAddr) * 1024 + eventCount * 262144u + 1;
+      uint32_t k = (uint32_t)S.btn * 4 + (S.mcpAddr < 0 ? 0 : S.mcpAddr) * 1024 + eventCount * 262144u + (pcaAddr >= 0 ? 2 : 1);
       const Button *bs[5] = {&bL, &bR, &bHorn, &bLights, &bMode};
       for (int i = 0; i < 5; i++) if (bs[i]->down) k = k * 31 + (millis() - bs[i]->downMs) / 100;   // held time, 0.1 s steps
       return k;
@@ -914,9 +952,11 @@ static void drawWidget(int id) {
           text(F_SMALL, x + 40, r.y + 60, b, C_DIM, CENTRE);
         }
       }
-      if (S.mcpAddr >= 0) snprintf(b, sizeof b, "Chip 0x%02X", S.mcpAddr);
-      else snprintf(b, sizeof b, "Chip NOT FOUND");
-      textOutlined(F_SMALL, r.x + 6, r.y + 84, b, S.mcpAddr >= 0 ? C_GRN : C_RED);
+      // chip status: BTN = button chip in the left controller, OUT = output chip in the box
+      textOutlined(F_SMALL, r.x + 6, r.y + 84, "BTN", S.mcpAddr >= 0 ? C_GRN : C_RED);
+#if OUTPUTS_VIA_PCA9685
+      textOutlined(F_SMALL, r.x + 50, r.y + 84, "OUT", pcaAddr >= 0 ? C_GRN : C_RED);
+#endif
       textOutlined(F_SMALL, r.x + 112, r.y + 84, "Last:", C_GREY);
       textOutlined(F_SMALL, r.x + 156, r.y + 84, lastEvent, C_AMB);
       break;
@@ -1158,9 +1198,11 @@ static uint32_t lastMs = 0, fpsT0 = 0, framesSent = 0, drawUs = 0, sendUs = 0;
 void dashSetup() {
   Serial.begin(115200);
   // outputs first, all off, so nothing twitches while the screen starts
+#if !OUTPUTS_VIA_PCA9685
   for (int i = 0; i < 8; i++) if (PIN_OUT[i] >= 0) { pinMode(PIN_OUT[i], OUTPUT); digitalWrite(PIN_OUT[i], OUT_ACTIVE_HIGH ? LOW : HIGH); }
   if (PIN_OUT[O_TAIL] >= 0) ledcAttach(PIN_OUT[O_TAIL], TAIL_PWM_HZ, 8);   // esp32 core 3.x API
   if (PIN_OUT[O_AUX] >= 0) ledcAttach(PIN_OUT[O_AUX], TAIL_PWM_HZ, 8);     // DRL dimming
+#endif
   pinMode(PIN_BRAKE, INPUT_PULLUP);
   pinMode(PIN_RPM, INPUT_PULLDOWN);              // stays quiet with nothing plugged in
   attachInterrupt(digitalPinToInterrupt(PIN_RPM), rpmISR, RISING);
@@ -1192,6 +1234,9 @@ void dashSetup() {
   touchOk = Wire.endTransmission() == 0;
   Serial.printf("Touch %s\n", touchOk ? "found" : "NOT found: pages change by themselves every 10 s");
   mcpFind();
+#if OUTPUTS_VIA_PCA9685
+  pcaFind();
+#endif
 #if DEMO_MODE
   phase = BOOT_SWEEP;
 #else

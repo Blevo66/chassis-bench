@@ -27,3 +27,14 @@ The button chip is searched for at 0x21-0x27 (0x20 is the screen board's own chi
 
 ## Status
 Compiles and runs on a PC with stand-in headers (`tools/host-preview`, pictures in `previews/`). The ESP32 build is untested; the demo built from the same engine has run on the real board.
+
+## Outputs: dumb box with a PCA9685 (default)
+`OUTPUTS_VIA_PCA9685 1` in `config.h`: the 8 outputs go through a PCA9685 "16-channel PWM
+servo driver" breakout in the dumb box (address 0x40, pads untouched), on the same I2C wires as
+the left controller. Channels 0..7 -> MOSFET board IN1..IN8 (OUT1 IND L, 2 IND R, 3 LOW,
+4 HIGH, 5 HORN, 6 USB, 7 DRL, 8 TAIL), its GND to GND, its VCC to 5V. Leave the servo V+ empty.
+
+8-pin link screen <-> box: 1+8 5V, 2+7 GND, 3 SDA (IO8), 4 SCL (IO7), 5 RPM (IO21), 6 brake (IO48).
+
+Test page: **BTN** (button chip) and **OUT** (output chip) go green when found, red when not.
+Set `OUTPUTS_VIA_PCA9685 0` to drive the MOSFET board from GPIO `PIN_OUT` instead (unchecked pins).

@@ -5,7 +5,7 @@ uint64_t g_us = 0; double g_spi_hz = 40e6; uint16_t g_screen[480 * 320];
 FakeSerial Serial, Serial1; 
 #include "fake/Wire.h"
 FakeWire Wire;
-uint8_t g_fake_btns = 0;
+uint8_t g_fake_btns = 0; int g_pca[8];
 #include "../../config.h"
 #include "../../dash.h"
 static void save(const char *dir, const char *name) {

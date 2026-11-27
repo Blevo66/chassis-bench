@@ -16,6 +16,7 @@
 //                   DRL (OUT7) always on: full with headlight off, dimmed with it on
 //    MODE           tap = flash high beam  hold = next page  (TRIP page: hold 3 s = reset trip A)
 //  Swipe the screen (or tap) to change page too. Pages: RIDE, TRIP, SYSTEM, TEST.
+//  Outputs: PCA9685 board in the dumb box (I2C 0x40), see config.h OUTPUTS_VIA_PCA9685.
 // =====================================================================
 #include <Arduino_GFX_Library.h>
 #include <Wire.h>
